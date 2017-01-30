@@ -1,0 +1,17 @@
+BOARD SETUP
+ w h w h w w
+w w t t t h w
+ h t t t t w
+w t t t t t h
+ h t t t t w
+w w t t t h w
+ w h w h w w
+RESOURCES
+1 desert
+3 ore
+3 brick
+4 wool
+4 grain
+4 lumber
+DICE ROLLS
+5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11
