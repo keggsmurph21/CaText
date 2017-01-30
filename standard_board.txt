@@ -1,11 +1,41 @@
 BOARD SETUP
- w h w h w w
-w w t t t h w
- h t t t t w
-w t t t t t h
- h t t t t w
-w w t t t h w
- w h w h w w
+0 x x x 1 5 4 -1.5 -3.0 harbor 5 mystery
+1 0 x x 2 6 5 -0.5 -3.0 water
+2 1 x x 3 7 6 0.5 -3.0 harbor 6 wool
+3 2 x x x 8 7 1.5 -3.0 water
+4 x x 0 5 10 9 -2.0 -2.0 water
+5 4 0 1 6 11 10 -1.0 -2.0 resource
+6 5 1 2 7 12 11 0.0 -2.0 resource
+7 6 2 3 8 13 12 1.0 -2.0 resource
+8 7 3 x x 14 13 2.0 -2.0 harbor 13 mystery
+9 x x 4 10 16 15 -2.5 -1.0 harbor 10 ore
+10 9 4 5 11 17 16 -1.5 -1.0 resource
+11 10 5 6 12 18 17 -0.5 -1.0 resource
+12 11 6 7 13 19 18 0.5 -1.0 resource
+13 12 7 8 14 20 19 1.5 -1.0 resource
+14 13 8 x x 21 20 2.5 -1.0 water
+15 x x 9 16 22 x -3.0 0.0 water
+16 15 9 10 17 23 22 -2.0 0.0 resource
+17 16 10 11 18 24 23 -1.0 0.0 resource
+18 17 11 12 19 25 24 0.0 0.0 resource
+19 18 12 13 20 26 25 1.0 0.0 resource
+20 19 13 14 21 27 26 2.0 0.0 resource
+21 20 14 x x x 27 3.0 0.0 harbor 20 mystery
+22 x 15 16 23 28 x -2.5 1.0 harbor 23 grain
+23 22 16 17 24 29 28 -1.5 1.0 resource
+24 23 17 18 25 30 29 -0.5 1.0 resource
+25 24 18 19 26 31 30 0.5 1.0 resource
+26 25 19 20 27 32 31 1.5 1.0 resource
+27 26 20 21 x x 32 2.5 1.0 water
+28 x 22 23 29 33 x -2.0 2.0 water
+29 28 23 24 30 34 33 -1.0 2.0 resource
+30 29 24 25 31 35 34 0.0 2.0 resource
+31 30 25 26 32 36 35 1.0 2.0 resource
+32 31 26 27 x x 36 2.0 2.0 harbor 26 brick
+33 x 28 29 34 x x -1.5 3.0 harbor 29 mystery
+34 33 29 30 35 x x -0.5 3.0 water
+35 34 30 31 36 x x 0.5 3.0 harbor 30 lumber
+36 35 31 32 x x x 1.5 3.0 water
 RESOURCES
 1 desert
 3 ore
@@ -15,3 +45,4 @@ RESOURCES
 4 lumber
 DICE ROLLS
 5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11
+29,30,31,26,20,13,7,6,5,10,16,23,24,25,19,12,11,17,18
