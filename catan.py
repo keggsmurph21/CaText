@@ -33,27 +33,27 @@ ADJACENT_NODES = [
 PLAYER_COLORS_LOOKUP = {
     0 : color_rgb(255,20,0),
     1 : color_rgb(0,10,255),
-    2 : color_rgb(255,70,0),
-    3 : color_rgb(140,70,20)
+    2 : color_rgb(220,70,70),
+    3 : color_rgb(170,100,40)
 }
 
 class Catan(object):
     def __init__(self, filename, humanplayers, cpuplayers):
         self.window = GraphWin("Catan", 640, 480)
         self.window.setBackground(BACKGROUND_COLOR)
-        self.board = []
-        self.filename = filename
-        self.resources = []
         self.center = Point(320,240)
 
-        self.players = [Player(i, False) for i in range(humanplayers)]
-        for i in range(cpuplayers):
-            self.players.append(Player(humanplayers+i, True))
+        self.board = None
+        self.filename = filename
+
+        self.players = Players(self.window, humanplayers, cpuplayers)
 
         self.buildBoard() # eventually add error handling here
 
     def play(self):
-        self.window.getMouse()
+        while 1:
+            click = self.window.getMouse()
+            print click.getX(), click.getY()
         self.window.close()
 
     def getDesert(self):
@@ -67,6 +67,10 @@ class Catan(object):
 
     def getRobber(self):
         return self.board.robber.id
+
+    def collectResource(self, id):
+        if self.getRobber != id:
+            pass
 
     def getTile(self, id):
         for tile in self.board.tiles:
@@ -195,6 +199,14 @@ class Catan(object):
         desert = self.getDesert()
         self.moveRobber(desert)
 
+        player_rolls = []
+
+        for p in self.players.players:
+            roll = self.board.dice.roll()
+            player_rolls.append(roll)
+            print "Player " + str(p.id+1) + " rolled a " + str(roll)
+            self.window.getMouse()
+
 class Robber(object):
     def __init__(self, window, x, y):
         self.window = window
@@ -239,6 +251,7 @@ class Dice(object):
     def roll(self):
         self.one.roll()
         self.two.roll()
+        return self.one.value + self.two.value
 
 class Die(object):
     def __init__(self, window, x1, y1, x2, y2):
@@ -369,16 +382,46 @@ class Resource(Tile):
 
         self.text = None # also a Graphics object, holds the dice roll
 
-class Player(object):
-    def __init__(self, id, isCPU):
-        self.id = id
-        self.isCPU = isCPU
-        self.color = PLAYER_COLORS_LOOKUP[id]
+class Players(object):
+    def __init__(self, window, humans, cpus):
+        self.window = window
+        self.players = set()
+        for i in range(humans):
+            self.players.add(HumanPlayer(len(self.players)))
+        for i in range(cpus):
+            self.players.add(CPUPlayer(len(self.players)))
+        for p in self.players:
+            p.display_name(window)
 
-        self.resources = []
-        self.devcards = []
-        self.settlements = []
-        self.roads = []
+    def adjustOrder(self,a,b,c,d):
+        temp = [self.players[a], self.players[b], self.players[c], self.players[d]]
+        self.players = temp
+        for p in self.players:
+            p.textbox.undraw()
+            p.textbox.draw(self.window)
+
+class Player(object):
+    def super_init(self, id):
+        self.id = id
+        self.color = PLAYER_COLORS_LOOKUP[id]
+        self.name = ""
+
+        self.resources = set()
+        self.devcards = set()
+        self.settlements = set()
+        self.roads = set()
+
+        self.next = None
+
+class HumanPlayer(Player):
+    def __init__(self, id):
+        self.super_init(id)
+        self.name = "Player " + str(id+1)
+
+class CPUPlayer(Player):
+    def __init__(self, id):
+        self.super_init(id)
+        self.name = "Player " + str(id+1) + " (CPU)"
 
 class Board(object):
     def __init__(self, window):
