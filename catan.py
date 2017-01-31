@@ -14,8 +14,7 @@ RESOURCE_COLOR_LOOKUP = {
     "wool"   : color_rgb(140,210,40),
     "grain"  : color_rgb(255,210,0),
     "lumber" : color_rgb(40,120,30),
-    "mystery": color_rgb(255,255,255)
-}
+    "mystery": color_rgb(255,255,255) }
 ADJACENT_NODES = [
     ("E","SE"),
     ("SE","E"),
@@ -28,14 +27,12 @@ ADJACENT_NODES = [
     ("NW","NE"),
     ("NE","NW"),
     ("NE","E"),
-    ("E","NE")
-]
+    ("E","NE") ]
 PLAYER_COLORS_LOOKUP = {
     0 : color_rgb(255,20,0),
     1 : color_rgb(0,10,255),
     2 : color_rgb(220,70,70),
-    3 : color_rgb(170,100,40)
-}
+    3 : color_rgb(170,100,40) }
 
 class Catan(object):
     def __init__(self, filename, humanplayers, cpuplayers):
@@ -49,6 +46,54 @@ class Catan(object):
         self.players = Players(self.window, humanplayers, cpuplayers)
 
         self.buildBoard() # eventually add error handling here
+
+    def getNearby(self, click):
+        tileDistances = []
+
+        for t in self.board.tiles:
+            tileDistances.append(distance(click, t.getCenter()))
+        tileID = tileDistances.index(min(tileDistances))
+        tile = self.getTile(tileID)
+
+        dist = 640
+
+        for n in self.board.nodes:
+            if distance(click, n.getCenter()) < dist:
+                node = n
+                dist = distance(click, n.getCenter())
+
+        dist = 640
+
+        for e in self.board.edges:
+            if distance(click, e.getCenter()) < dist:
+                edge = e
+                dist = distance(click, e.getCenter())
+
+        return (tile, node, edge)
+
+    def getAdjNodesFromTile(self, tile):
+        nodes = set()
+        for node in self.board.nodes:
+            if distance(node.getCenter(), tile.getCenter()) < EDGE_SIZE * 1.1:
+                nodes.add(node)
+
+        return nodes
+
+    def getAdjEdgesFromTile(self, tile):
+        edges = set()
+        for edge in self.board.edges:
+            if distance(edge.getCenter(), tile.getCenter()) < EDGE_SIZE:
+                edges.add(edge)
+
+        return edges
+
+    def getAdjEdgesFromNode(self, node):
+        edges = set()
+        for edge in self.board.edges:
+            if distance(edge.getCenter(), node.getCenter()) < EDGE_SIZE * 0.9:
+                edges.add(edge)
+
+        return edges
 
     def play(self):
         while 1:
@@ -199,14 +244,16 @@ class Catan(object):
         desert = self.getDesert()
         self.moveRobber(desert)
 
-        player_rolls = []
-
-        for p in self.players.players:
-            roll = self.board.dice.roll()
-            player_rolls.append(roll)
-            print "Player " + str(p.id+1) + " rolled a " + str(roll)
-            self.window.getMouse()
-
+        while 1:
+            click = self.window.getMouse()
+            tile = self.getNearby(click)[0]
+            nodes = self.getAdjNodesFromTile(tile)
+            for n in nodes:
+                n.node.draw(self.window)
+                edges = self.getAdjEdgesFromNode(n)
+                for e in edges:
+                    print len(edges), "edge"
+                    e.line.setFill(randomColor())
 class Robber(object):
     def __init__(self, window, x, y):
         self.window = window
@@ -287,6 +334,18 @@ class Tile(object):
         self.SW = None
 
         self.hex = None
+
+    def getCenter(self):
+        xTotal = 0.0
+        yTotal = 0.0
+        numPoints = 0
+
+        for point in self.hex.getPoints():
+            xTotal += point.getX()
+            yTotal += point.getY()
+            numPoints += 1
+
+        return Point(xTotal/numPoints, yTotal/numPoints)
 
     def getNeighbors(self):
         neighbors = {}
@@ -390,8 +449,6 @@ class Players(object):
             self.players.add(HumanPlayer(len(self.players)))
         for i in range(cpus):
             self.players.add(CPUPlayer(len(self.players)))
-        for p in self.players:
-            p.display_name(window)
 
     def adjustOrder(self,a,b,c,d):
         temp = [self.players[a], self.players[b], self.players[c], self.players[d]]
@@ -440,6 +497,7 @@ class Node(object):
         self.isCity = False
         self.color = None
         self.north = north
+        self.settlable = True
 
         if north:
             self.N  = a
@@ -461,6 +519,9 @@ class Node(object):
         self.y = (aCenter.getY() + bCenter.getY() + cCenter.getY())/3.0
         self.node = Circle(Point(self.x, self.y), EDGE_SIZE * 1.0/4)
         self.node.setFill("white")
+
+    def getCenter(self):
+        return self.node.getCenter()
 
     def getNeighbors(self):
         neighbors = {}
@@ -518,11 +579,25 @@ class Edge(object):
         self.line.setFill("white")
         self.line.draw(self.window)
 
+    def getCenter(self):
+        xTotal = self.line.getP1().getX() + self.line.getP2().getX()
+        yTotal = self.line.getP1().getY() + self.line.getP2().getY()
+
+        return Point(xTotal/2.0, yTotal/2.0)
+
+def distance(p1, p2):
+    return math.sqrt((p1.getX() - p2.getX())**2 + (p1.getY() - p2.getY())**2)
+
+def randomColor():
+    return color_rgb(random.randint(0,255),random.randint(0,255),random.randint(0,255))
+
 def main():
     if (sys.argv != None):
         filename = sys.argv[1]
         humanplayers = int(sys.argv[2])
         cpuplayers = int(sys.argv[3])
+    else:
+        print "Please provide a map and the number of humans/CPUs."
 
     catan = Catan(filename, humanplayers, cpuplayers)
     catan.play()
