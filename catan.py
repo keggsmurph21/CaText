@@ -148,7 +148,7 @@ class Catan(object):
             minDist = min(distances)
         b = distances.index(minDist)
         return self.buttons[b].text
-    def roll(self):
+    def roll(self, roller):
         roll = self.board.dice.roll()
         if roll == 7:
             for player in self.players.players:
@@ -156,6 +156,7 @@ class Catan(object):
                     discard = len(player.resources)/2
                     print "%s had %d cards and needs to discard %d of them." % (player.name, len(player.resources), discard)
                     self.chooseCardsToDiscard(player, discard)
+            self.playerMoveRobber(roller)
         else:
             tiles = set()
             nodes = []
@@ -169,7 +170,7 @@ class Catan(object):
         while 1:
             self.turnNumber += 1
             for i in range(self.players.numPlayers):
-                self.roll()
+                self.roll(self.getPlayer(i))
 
                 if self.getPlayer(i).style == "human":
                     action = None
@@ -202,30 +203,61 @@ class Catan(object):
                     return t
     def chooseCardsToDiscard(self, player, n):
         if player.style == "human":
-            pass
+            for i in range(n):
+                total = len(player.resources)
+                choice = 0
+                while choice < 1 or choice > total:
+                    print "You need to discard %d more cards." % (n-i)
+                    print "Please enter a number between 1 and %d." % total
+                    for r in range(len(player.resources)):
+                        print "%d: %s" % (r+1, player.resources[r])
+                    rawChoice = raw_input(">> Type in the card number to discard it: ")
+                    try:
+                        choice = int(rawChoice)
+                    except:
+                        print "Error reading choice."
+                player.resources.pop(choice-1)
         elif player.style == "random":
-            print player.resources
             for i in range(n):
                 total = len(player.resources)
                 player.resources.pop(random.randint(0,total-1))
-            print player.resources
+            print "\%\%\%\%\%! random discard"
+        elif player.style == "maximize":
+            print player.optimize(player.resources)
+            for i in range(n):
+                total = len(player.resources)
+                choice = random.randint(1, total) # default to choosing randomly
+                for resource in player.resources: # unless there are lots of a particular type
+                    if player.resources.count(resource) > 4:
+                        choice = player.resources.index(resource)
+                player.resources.pop(choice-1)
+            print player.optimize(player.resources)
+    def playerMoveRobber(self, player):
+        if player.style == "human":
+            success = False
+            while not(success):
+                print "Click on a tile to move the Robber."
+                click = self.window.getMouse()
+                for node in self.board.nodes:
+                    dist = distance(node.getCenter(), click)
+                    if dist < EDGE_SIZE * math.sqrt(3) / 2.0:
+                        tile = self.getNearby(click)[0]
+                        success = self.board.robber.move(self.window, tile)
+                        if success:
+                            print "need to steal"
+                            return
+        elif player.style == "random":
+            success = False
+            while not(success):
+                tile = list(self.board.tiles)[0]
+                success = self.board.robber.move(self.window, tile)
+            print "need to steal"
         elif player.style == "maximize":
             pass
-    def playerMoveRobber(self, i):
-        if self.getPlayer(i).style == "human":
-            pass
-        elif self.getPlayer(i).style == "random":
-            pass
-        elif self.getPlayer(i).style == "maximize":
-            pass
-    def moveRobber(self, tile):
-        self.board.robber.move(tile)
-    def getRobber(self):
-        return self.board.robber.id
     def collectResource(self, tile, i, isCity):
         if type(tile) == Resource:
             resource = tile.label
-            if tile.id != self.getRobber():
+            if tile != self.board.robber.tile:
                 self.getPlayer(i).resources.append(resource)
                 number = 1
                 if isCity:
@@ -317,7 +349,10 @@ class Catan(object):
                 self.board.tiles[d].diceroll = dicerolls.pop(0)
 
         for t in self.board.tiles:
-            t.placeOnBoard()
+            t.placeOnBoard()            # Place the tiles onto the board
+            if type(t) == Resource:     # and the robber in the desert
+                if t.label == "desert":
+                    self.board.robber = Robber(self.window, t)
 
         # Build edges
         centers = set()
@@ -400,9 +435,6 @@ class Catan(object):
                         source.neighbors.add(target)
 
         # Put robber onto desert to start game
-        desert = self.getDesert()
-        self.moveRobber(desert)
-
         # Build buttons
         trade = Button(self.window, "trade", 70, randomColor())
         dev = Button(self.window, "dev card", 120, randomColor())
@@ -621,22 +653,25 @@ class Button(object):
                            + (click.getY() - self.object.getP1().getY() - 20)**2)
         return distance
 class Robber(object):
-    def __init__(self, window, x, y):
-        self.window = window
-        self.robber = Circle(Point(x,y), 12)
+    def __init__(self, window, tile):
+        self.tile = tile
+        self.robber = Circle(self.tile.getCenter(), 12)
         self.robber.setOutline(color_rgb(0,0,0))
         self.robber.setWidth(5)
-        self.id = 0
+        self.robber.draw(window)
 
-    def move(self, tile):
-        if type(tile) == Resource:
+    def move(self, window, tile):
+        if type(tile) == Resource and self.tile != tile:
+            self.tile = tile
             self.robber.undraw()
-            self.robber = Circle(Point(tile.x, tile.y), 12)
+            self.robber = Circle(self.tile.getCenter(), 12)
             self.robber.setWidth(5)
-            self.robber.draw(self.window)
-            self.id = tile.id
+            self.robber.draw(window)
+
+            return True
         else:
             print "Unable to move Robber here."
+            return False
 class DevCards(object):
     def __init__(self):
         self.deck = []
@@ -895,7 +930,7 @@ class Board(object):
         self.edges = set()
         self.dice = Dice(window)
         self.devcards = DevCards()
-        self.robber = Robber(window, 0, 0)
+        self.robber = None
 class Node(object):
     def __init__(self, window, north, a, b, c):
         self.window = window
