@@ -29,10 +29,10 @@ ADJACENT_NODES = [
     ("NE","E"),
     ("E","NE") ]
 PLAYER_COLORS_LOOKUP = {
-    0 : color_rgb(255,20,0),
-    1 : color_rgb(0,10,255),
-    2 : color_rgb(220,70,70),
-    3 : color_rgb(170,100,40) }
+    0 : color_rgb(255,20,0),    # Red
+    1 : color_rgb(0,10,255),    # Blue
+    2 : color_rgb(35,140,35),   # Green
+    3 : color_rgb(170,100,40) } # Brown
 AI_TYPES = ["random","maximize"]
 DICE_ROLL_FREQUENCIES = {
     '0' : 0,
@@ -151,7 +151,11 @@ class Catan(object):
     def roll(self):
         roll = self.board.dice.roll()
         if roll == 7:
-            pass
+            for player in self.players.players:
+                if len(player.resources) > 7:
+                    discard = len(player.resources)/2
+                    print "%s had %d cards and needs to discard %d of them." % (player.name, len(player.resources), discard)
+                    self.chooseCardsToDiscard(player, discard)
         else:
             tiles = set()
             nodes = []
@@ -188,12 +192,32 @@ class Catan(object):
                     self.window.close()
                     quit()
     def getPlayer(self, id):
-        return self.players.players[id]
+        for player in self.players.players:
+            if player.id == id:
+                return player
     def getDesert(self):
         for t in self.board.tiles:
             if type(t) == Resource:
                 if t.label == "desert":
                     return t
+    def chooseCardsToDiscard(self, player, n):
+        if player.style == "human":
+            pass
+        elif player.style == "random":
+            print player.resources
+            for i in range(n):
+                total = len(player.resources)
+                player.resources.pop(random.randint(0,total-1))
+            print player.resources
+        elif player.style == "maximize":
+            pass
+    def playerMoveRobber(self, i):
+        if self.getPlayer(i).style == "human":
+            pass
+        elif self.getPlayer(i).style == "random":
+            pass
+        elif self.getPlayer(i).style == "maximize":
+            pass
     def moveRobber(self, tile):
         self.board.robber.move(tile)
     def getRobber(self):
@@ -201,14 +225,15 @@ class Catan(object):
     def collectResource(self, tile, i, isCity):
         if type(tile) == Resource:
             resource = tile.label
-            if tile.id != self.getRobber:
+            if tile.id != self.getRobber():
                 self.getPlayer(i).resources.append(resource)
                 number = 1
                 if isCity:
                     self.getPlayer(i).resources.append(resource)
                     number = 2
                     print "You collect one extra from your city."
-                print "%s collected %d %s." % (self.getPlayer(i).name, number, resource)
+                if self.getPlayer(i).style == "human":
+                    print "%s collected %d %s." % (self.getPlayer(i).name, number, resource)
                 return resource
 
         return None
