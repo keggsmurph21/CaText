@@ -158,6 +158,19 @@ def standard(keyword):
     rolls = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
     harbors = ["mystery","mystery","mystery","mystery",
         "ore","brick","wool","grain","lumber"]
+    dicefreq = {
+        '0' : 0,
+        '2' : 1,
+        '3' : 2,
+        '4' : 3,
+        '5' : 4,
+        '6' : 5,
+        '8' : 5,
+        '9' : 4,
+        '10': 3,
+        '11': 2,
+        '12': 1 }
+
 
     if keyword == "tiles":
         return g_dict
@@ -169,3 +182,5 @@ def standard(keyword):
         return rolls
     elif keyword == "harbors":
         return harbors
+    elif keyword == "dicefreq":
+        return dicefreq

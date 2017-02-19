@@ -1,14 +1,14 @@
 from random import shuffle
 
 class Graph(object):
-    def __init__(self, g_dict=None):
+    def __init__(self, g_dict, data, cards, rolls):
         if g_dict == None:
             g_dict = {}
         self.g_dict = g_dict
+
         self.generate_nodes()
         self.generate_edges()
 
-    def optimize(self,data,cards,rolls):
         self.verts = []
         self.tiles = []
         self.adjs = []
@@ -53,7 +53,85 @@ class Graph(object):
 
         self.edges = edges
 
-    def vertGetNeighbors(self, vert):
+    def buildSettlement(self,vert,player):
+        player.settlements.append(vert)
+        player.vpts += 1
+        vert.owner = player
+        vert.isSettlable = False
+        for neighbor in self.vertGetVerts(vert):
+            neighbor.isSettlable = False
+
+    def buildRoad(self,edge,player):
+        player.roads.append(edge)
+        edge.owner = player
+
+    def shortestPath(self,v1,v2,player):
+        available = {player,None}
+
+        if v1 == v2:
+            return []
+
+        path = []
+        visited = [v1]
+        queue = [v1]
+        previous = [None]
+
+        while len(queue) > 0:
+            current = queue.pop(0)
+
+            for neighbor in self.vertGetVerts(current):
+                if neighbor.owner in available and neighbor not in visited:
+                    edge = self.vvGetEdge(current,neighbor)
+                    if edge.owner in available:
+                        visited.append(neighbor)
+                        queue.append(neighbor)
+                        previous.append(current)
+            if current == v2:
+                break
+
+        prev = v2
+        v = visited.pop()
+        p = previous.pop()
+
+        while p != None:
+            if v == prev:
+                prev = p
+                path.append(self.vvGetEdge(v,p))
+            v = visited.pop()
+            p = previous.pop()
+
+        path.reverse()
+
+        return path
+
+    def vertGetAdjs(self,vert):
+        this = []
+
+        for adj in self.adjs:
+            if adj.vert == vert:
+                this.append(adj)
+
+        return this
+
+    def vvGetEdge(self, v1, v2):
+        this = None
+
+        for edge in self.edges:
+            if {v1,v2} == edge.verts():
+                this = edge
+
+        return this
+
+    def vertGetEdges(self, vert):
+        neighbors = []
+
+        for edge in self.edges:
+            if vert in edge.verts():
+                neighbors.append(edge)
+
+        return neighbors
+
+    def vertGetVerts(self, vert):
         neighbors = []
 
         for edge in self.edges:

@@ -58,6 +58,32 @@ class GUI(object):
             edge.obj.draw(self.win)
 
         self.robber = Robber()
+        self.moveRobber(graph.getDesert())
+
+        self.dice = Dice(self.win)
+
+    def updateDice(self, roll):
+        self.dice.update(roll[0],roll[1])
+
+    def clearDice(self):
+        self.dice.clear()
+
+    def buildSettlement(self, vert, player):
+        vert.obj.undraw()
+        vert.obj.object.setFill(player.color)
+        vert.obj.draw(self.win)
+
+    def buildRoad(self, edge, player):
+        edge.obj.undraw()
+        edge.obj.object.setFill(player.color)
+        edge.obj.draw(self.win)
+
+    def makeCity(self, vert):
+        vert.obj.undraw()
+        vert.obj.object = Circle(vert.obj.point,self.edge_size/3)
+        vert.obj.object.setFill(vert.obj.color)
+        vert.obj.object.setWidth(0)
+        vert.obj.draw(self.win)
 
     def moveRobber(self,tile):
         x = tile.obj.x
@@ -65,7 +91,12 @@ class GUI(object):
         self.robber.move(x,y,self.edge_size,self.win)
 
     def changecolor(self,thing):  ### TEMP FXN to test robustness
-        thing.obj.object.setFill(randomColor())
+        try:
+            thing.obj.undraw()
+            thing.obj.object.setFill(randomColor())
+            thing.obj.draw(self.win)
+        except AttributeError:
+            print "attribute error:",thing
 
     def clickObj(self,click,graph,ret):
         this = None
@@ -107,7 +138,7 @@ class Robber(object):
 
     def move(self,x,y,len,win):
         self.undraw()
-        self.object = Circle(Point(x,y),12)
+        self.object = Circle(Point(x,y),len/3)
 
         self.object.setOutline(color_rgb(0,0,0))
         self.object.setWidth(5)
@@ -118,7 +149,6 @@ class Robber(object):
 
     def undraw(self):
         self.object.undraw()
-
 
 class Hexagon(object):
     def __init__(self, x, y, len, color, diceroll):
@@ -184,9 +214,10 @@ class Pt(object):
     def __init__(self,x,y,color):
         self.x = x
         self.y = y
+        self.color = color
 
         self.point = Point(x,y)
-        self.object = Circle(self.point,6)
+        self.object = Circle(self.point,8)
         self.object.setFill(color)
         self.object.setWidth(0)
 
@@ -195,7 +226,6 @@ class Pt(object):
 
     def undraw(self):
         self.object.undraw()
-
 
 class Road(object):
     def __init__(self,p1,p2,color):
@@ -212,13 +242,44 @@ class Road(object):
     def undraw(self):
         self.object.undraw()
 
-class Settlement(object):
-    def __init__(self):
-        pass
+class Dice(object):
+    def __init__(self, win):
+        self.x = 585
+        self.y = 40
 
-class City(object):
-    def __init__(self):
-        pass
+        self.one = Die(630,20,590,60)
+        self.two = Die(580,20,540,60)
+
+        self.one.obj.draw(win)
+        self.two.obj.draw(win)
+        self.one.textobj.draw(win)
+        self.two.textobj.draw(win)
+
+    def update(self, r1, r2):
+        self.one.update(r1)
+        self.two.update(r2)
+
+    def clear(self):
+        self.one.clear()
+        self.two.clear()
+
+class Die(object):
+    def __init__(self, x1, y1, x2, y2):
+        self.value = 0
+        self.obj = Rectangle(Point(x1,y1), Point(x2,y2))
+        self.obj.setFill(color_rgb(200,69,69))
+        self.obj.setOutline(color_rgb(0,0,0))
+        self.obj.setWidth(3)
+
+        self.textobj = Text(self.obj.getCenter(), "")
+        self.textobj.setSize(20)
+
+    def update(self, roll):
+        self.textobj.setText(str(roll))
+
+    def clear(self):
+        self.textobj.setText("")
+
 
 def randomColor():
     return color_rgb(randint(0,255),randint(0,255),randint(0,255))
