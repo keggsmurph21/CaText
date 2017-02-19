@@ -25,20 +25,11 @@ class Catan(object):
         self.players.reverse()
 
         for p in firstTurnOrder:
-            if type(p) == player.HumanPlayer:
-                vert = p.chooseSettleSpot(self.graph, self.gui)
-            else:
-                vert = p.findBestSpot(self.graph, self.dicefreq, 0)
-
+            vert = p.settle(self.graph, self.gui, self.dicefreq, 0)
             self.graph.buildSettlement(vert, p)
             self.gui.buildSettlement(vert, p)
 
-            if type(p) == player.HumanPlayer:
-                road = p.chooseRoadSpot(self.graph, self.gui, vert)
-            else:
-                v2 = p.findBestSpot(self.graph,self.dicefreq, 3)
-                road = p.findBestRoad(self.graph, v2, vert)
-
+            road = p.findRoad(self.graph, self.gui, self.dicefreq, vert)
             self.graph.buildRoad(road, p)
             self.gui.buildRoad(road, p)
 
@@ -51,15 +42,18 @@ class Catan(object):
                 roll = p.rollDice()
                 self.gui.updateDice(roll)
 
+                for q in self.players:
+                    q.collectResources(self.graph,sum(roll))
+                    print q.id, q.resources
+
                 victor = self.checkVictory()
                 if victor != None:
                     return
 
-        self.gui.pause()
+                self.gui.win.getMouse()
 
     def checkVictory(self):
         for p in self.players:
-            print p.vpts
             if p.vpts >= 10:
                 return p
 

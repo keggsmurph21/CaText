@@ -9,22 +9,51 @@ class Player(object):
         self.resources = []
         self.color = PLAYER_COLORS_LOOKUP[id]
         self.vpts = 0
+        self.type = ""
 
     def rollDice(self):
         return randint(1,6), randint(1,6)
 
+    def collectResources(self, graph, num):
+        for tile in graph.tiles:
+            if tile.diceroll == num:
+                for vert in tile.verts:
+                    if vert.owner == self and tile.resource != "desert":
+                        self.resources.append(tile.resource)
+                        if vert.isCity:
+                            self.resources.append(tile.resource)
+
+    def settle(self, graph, gui, df, dist=0):
+        if self.type == "cpu":
+            vert = self.findBestSpot(graph, df, dist)
+        else:
+            vert = self.chooseSettleSpot(graph, gui)
+
+        return vert
+
+    def findRoad(self, graph, gui, df, settlement=None):
+        if self.type == "cpu":
+            goal = self.findBestSpot(graph, df, 3)
+            road = self.findBestRoad(graph, goal, settlement)
+        else:
+            road = self.chooseRoadSpot(graph, gui, settlement)
+
+        return road
+
 class CPUPlayer(Player):
     def __init__(self, id):
         super(CPUPlayer, self).__init__(id)
+        self.type = "cpu"
 
     def findBestSpot(self, graph, df, dist=0):
-        this = None # the spot to be settled
+        this = None
         max = 0
         d = 0
 
         for v in graph.verts:
-            for s in self.settlements:
-                d = len(graph.shortestPath(v,s,self))
+            if dist:
+                d = min([len(graph.shortestPath(v,s,self)) for s in self.settlements])
+
             if (dist == 0 or d <= dist) and v.isSettlable:
                 m = 0
                 for a in graph.vertGetAdjs(v):
@@ -55,6 +84,7 @@ class CPUPlayer(Player):
 class HumanPlayer(Player):
     def __init__(self, id):
         super(HumanPlayer, self).__init__(id)
+        self.type = "human"
 
     def chooseSettleSpot(self, graph, gui):
         click = gui.win.getMouse()

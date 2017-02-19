@@ -53,6 +53,9 @@ class Graph(object):
 
         self.edges = edges
 
+        for adj in self.adjs:
+            adj.tile.verts.append(adj.vert)
+            
     def buildSettlement(self,vert,player):
         player.settlements.append(vert)
         player.vpts += 1
@@ -193,6 +196,7 @@ class Tile(object):
         self.y = data[2]
         self.diceroll = 0
         self.resource = resource
+        self.verts = []
 
         self.obj = None
 

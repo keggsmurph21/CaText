@@ -102,9 +102,6 @@ class GUI(object):
         this = None
         dist = self.edge_size
 
-        x = click.getX()
-        y = click.getY()
-
         if ret == "r" or ret == "e":
             it = graph.edges
         elif ret == "t" or ret == "h":
@@ -112,11 +109,17 @@ class GUI(object):
         elif ret == "v" or ret == "n":
             it = graph.verts
 
-        for i in it:
-            d = sqrt((i.obj.x-x)**2 + (i.obj.y-y)**2)
-            if d < dist:
-                this = i
-                dist = d
+        while this == None:
+            x = click.getX()
+            y = click.getY()
+
+            for i in it:
+                d = sqrt((i.obj.x-x)**2 + (i.obj.y-y)**2)
+                if d < dist:
+                    this = i
+                    dist = d
+
+            click = self.win.getMouse()
 
         return this
 
