@@ -12,8 +12,11 @@ class Catan(object):
         self.graph = graph.Graph(g_dict,data,cards,rolls)
         self.gui = gui.GUI(self.graph, harbors)
 
-        self.players = [player.HumanPlayer(0), player.CPUPlayer(1),
-            player.CPUPlayer(2), player.CPUPlayer(3)]
+        self.players = [
+            player.HumanPlayer(0),
+            player.CPUPlayer(1),
+            player.CPUPlayer(2),
+            player.CPUPlayer(3) ]
 
             ### Temp for implementing longest road counter
         p = self.players[0]
