@@ -1,5 +1,5 @@
 from graphics import color_rgb
-from random import randint
+from random import choice, randint
 
 class Player(object):
     def __init__(self, id):
@@ -10,6 +10,70 @@ class Player(object):
         self.color = PLAYER_COLORS_LOOKUP[id]
         self.vpts = 0
         self.type = ""
+
+    def countLongestRoad(self, graph):
+        longest = 0
+
+        roads = list(self.roads)
+        roadsets = []
+        mark = set()
+        counted = set()
+
+        while len(roads): # Separate roads into connected groups
+            roadset = set()
+            road = roads.pop()
+            for r in roads:
+                if graph.checkConnected(road,r) and r not in mark:
+                        roadset.add(r)
+                        mark.add(r)
+
+            if len(roadset) or road not in counted:
+                roadset.add(road)
+                for r in roadset:
+                    counted.add(r)
+                roadsets.append(roadset)
+
+        for rs in roadsets: # For each group, calculate Longest Road
+            localmax = 0    #  = LR for this subgroup
+
+            mark = set()
+            rand = choice(list(rs)) # Choose a random starting road
+                                    # and make sure it's at the end of a segment
+            while len(graph.edgeGetEdges(rand,self)) > 1:
+                mark.add(rand)
+                if mark == rs: # Avoid infinite loops
+                    break
+                rand = choice(list(rs))
+
+            queue = []   # Then DFS to find farthest
+            mark = set()
+            dist = {}
+
+            queue.append(rand)
+            mark.add(rand)
+            dist[rand] = 0
+
+            while len(queue):
+                c = queue.pop(0)
+                d = dist[c]
+
+                for e in graph.edgeGetEdges(c,self):
+                    vertOwner = c.verts().intersection(e.verts()).pop().owner
+                    if vertOwner == self or vertOwner == None:
+                        if e not in mark:
+                            queue.append(e)
+                            mark.add(e)
+                            dist[e] = d+1
+                        else:
+                            if dist[e] < d+1:
+                                dist[e] = d+1
+
+            localmax = max(dist.values())
+
+            if longest < localmax:
+                longest = localmax
+
+        return longest
 
     def rollDice(self):
         return randint(1,6), randint(1,6)
@@ -79,7 +143,10 @@ class CPUPlayer(Player):
 
         path = graph.shortestPath(this,goal,self)
 
-        return path[0]
+        if len(path):
+            return path[0]
+        else:
+            return choice(graph.vertGetEdges(this))
 
 class HumanPlayer(Player):
     def __init__(self, id):
@@ -121,7 +188,7 @@ def validateRoadPlacement(road,player,graph,settlement):
             if r.v2.owner == None or r.v2.owner == player:
                 nearby.add(r.v2)
 
-    if nearby.intersection({road.v1,road.v2}) == set([]):
+    if nearby.intersection(road.verts()) == set([]):
         return False
 
     return True

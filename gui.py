@@ -119,7 +119,8 @@ class GUI(object):
                     this = i
                     dist = d
 
-            click = self.win.getMouse()
+            if this == None:
+                click = self.win.getMouse()
 
         return this
 

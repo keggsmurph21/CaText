@@ -55,7 +55,7 @@ class Graph(object):
 
         for adj in self.adjs:
             adj.tile.verts.append(adj.vert)
-            
+
     def buildSettlement(self,vert,player):
         player.settlements.append(vert)
         player.vpts += 1
@@ -143,6 +143,43 @@ class Graph(object):
                     neighbors.append(edge.v2)
                 else:
                     neighbors.append(edge.v1)
+
+        return neighbors
+
+    def checkConnected(self,e1,e2):
+        if e1.owner != e2.owner:
+            return False
+
+        mark = set()
+        totry = set()
+
+        mark.add(e1)
+        totry.add(e1)
+
+        while len(totry):
+            tt = totry.pop()
+            for e in self.edgeGetEdges(tt,e1.owner):
+                if e not in mark:
+                    mark.add(e)
+                    totry.add(e)
+
+                if e2 in mark:
+                    return True
+
+        return False
+
+    def edgeGetEdges(self, edge, player=None):
+        neighbors = []
+
+        for vert in edge.verts():
+            edges = self.vertGetEdges(vert)
+            for e in edges:
+                if edge != e:
+                    if player:
+                        if player==e.owner:
+                            neighbors.append(e)
+                    else:
+                        neighbors.append(e)
 
         return neighbors
 

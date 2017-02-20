@@ -14,6 +14,23 @@ class Catan(object):
 
         self.players = [player.HumanPlayer(0), player.CPUPlayer(1),
             player.CPUPlayer(2), player.CPUPlayer(3)]
+
+            ### Temp for implementing longest road counter
+        p = self.players[0]
+        vert = p.settle(self.graph, self.gui, self.dicefreq, 0)
+        self.graph.buildSettlement(vert,p)
+        self.gui.buildSettlement(vert,p)
+        vert = p.settle(self.graph, self.gui, self.dicefreq, 0)
+        self.graph.buildSettlement(vert,p)
+        self.gui.buildSettlement(vert,p)
+        for f in range(6):
+            road = p.findRoad(self.graph, self.gui, self.dicefreq, None)
+            self.graph.buildRoad(road,p)
+            self.gui.buildRoad(road,p)
+
+        print p.countLongestRoad(self.graph)
+            ### End temp
+
         random.shuffle(self.players)
 
         firstTurnOrder = [] # eventually should roll to see who goes first
@@ -45,6 +62,8 @@ class Catan(object):
                 for q in self.players:
                     q.collectResources(self.graph,sum(roll))
                     print q.id, q.resources
+
+                print p.countLongestRoad(self.graph)
 
                 victor = self.checkVictory()
                 if victor != None:
