@@ -1,3 +1,4 @@
+from collections import deque
 from graphics import color_rgb
 from random import choice, randint
 
@@ -9,7 +10,12 @@ class Player(object):
         self.resources = []
         self.color = PLAYER_COLORS_LOOKUP[id]
         self.vpts = 0
+        self.hasLongestRoad = False
+        self.hasLargestArmy = False
         self.type = ""
+
+    def countLargestArmy(self):
+        return 0
 
     def countLongestRoad(self, graph):
         longest = 0
@@ -36,39 +42,33 @@ class Player(object):
         for rs in roadsets: # For each group, calculate Longest Road
             localmax = 0    #  = LR for this subgroup
 
-            mark = set()
-            rand = choice(list(rs)) # Choose a random starting road
-                                    # and make sure it's at the end of a segment
-            while len(graph.edgeGetEdges(rand,self)) > 1:
-                mark.add(rand)
-                if mark == rs: # Avoid infinite loops
-                    break
-                rand = choice(list(rs))
+            for road in rs:
+                queue = deque()   # Then DFS to find farthest
+                mark = set()
+                dist = {}
 
-            queue = []   # Then DFS to find farthest
-            mark = set()
-            dist = {}
+                queue.append(road)
+                mark.add(road)
+                dist[road] = 1
 
-            queue.append(rand)
-            mark.add(rand)
-            dist[rand] = 0
+                while len(queue):
+                    c = queue.popleft()
+                    d = dist[c]
 
-            while len(queue):
-                c = queue.pop(0)
-                d = dist[c]
+                    for e in graph.edgeGetEdges(c,self):
+                        vertOwner = c.verts().intersection(e.verts()).pop().owner
+                        if vertOwner == self or vertOwner == None:
+                            if e not in mark:
+                                queue.append(e)
+                                mark.add(e)
+                                if e in dist:
+                                    if dist[e] < d+1:
+                                        dist[e] = d+1
+                                else:
+                                    dist[e] = d+1
 
-                for e in graph.edgeGetEdges(c,self):
-                    vertOwner = c.verts().intersection(e.verts()).pop().owner
-                    if vertOwner == self or vertOwner == None:
-                        if e not in mark:
-                            queue.append(e)
-                            mark.add(e)
-                            dist[e] = d+1
-                        else:
-                            if dist[e] < d+1:
-                                dist[e] = d+1
-
-            localmax = max(dist.values())
+                if localmax < max(dist.values()):
+                    localmax = max(dist.values())
 
             if longest < localmax:
                 longest = localmax
@@ -144,9 +144,21 @@ class CPUPlayer(Player):
         path = graph.shortestPath(this,goal,self)
 
         if len(path):
-            return path[0]
+            for road in path:
+                if road.owner == None:
+                    return road
+
+        options = []
+
+        for e in graph.vertGetEdges(this):
+            if e.owner == None:
+                options.append(e)
+
+        if len(options):
+            return choice(options)
         else:
-            return choice(graph.vertGetEdges(this))
+            print "Cannot find a road!!\n"
+            return None
 
 class HumanPlayer(Player):
     def __init__(self, id):

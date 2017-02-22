@@ -12,27 +12,14 @@ class Catan(object):
         self.graph = graph.Graph(g_dict,data,cards,rolls)
         self.gui = gui.GUI(self.graph, harbors)
 
+        self.longestRoad = 4
+        self.largestArmy = 2
+
         self.players = [
             player.HumanPlayer(0),
-            player.CPUPlayer(1),
+            player.HumanPlayer(1),
             player.CPUPlayer(2),
             player.CPUPlayer(3) ]
-
-            ### Temp for implementing longest road counter
-        p = self.players[0]
-        vert = p.settle(self.graph, self.gui, self.dicefreq, 0)
-        self.graph.buildSettlement(vert,p)
-        self.gui.buildSettlement(vert,p)
-        vert = p.settle(self.graph, self.gui, self.dicefreq, 0)
-        self.graph.buildSettlement(vert,p)
-        self.gui.buildSettlement(vert,p)
-        for f in range(6):
-            road = p.findRoad(self.graph, self.gui, self.dicefreq, None)
-            self.graph.buildRoad(road,p)
-            self.gui.buildRoad(road,p)
-
-        print p.countLongestRoad(self.graph)
-            ### End temp
 
         random.shuffle(self.players)
 
@@ -45,13 +32,8 @@ class Catan(object):
         self.players.reverse()
 
         for p in firstTurnOrder:
-            vert = p.settle(self.graph, self.gui, self.dicefreq, 0)
-            self.graph.buildSettlement(vert, p)
-            self.gui.buildSettlement(vert, p)
-
-            road = p.findRoad(self.graph, self.gui, self.dicefreq, vert)
-            self.graph.buildRoad(road, p)
-            self.gui.buildRoad(road, p)
+            vert = self.buildSettlement(p,0)
+            self.buildRoad(p,vert)
 
             if len(p.settlements) == 2:
                 for adj in self.graph.vertGetAdjs(vert):
@@ -64,18 +46,74 @@ class Catan(object):
 
                 for q in self.players:
                     q.collectResources(self.graph,sum(roll))
-                    print q.id, q.resources
+                    #print q.id, q.resources
 
-                print p.countLongestRoad(self.graph)
+                # Keep adding roads every turn
+                road = p.findRoad(self.graph, self.gui, self.dicefreq)
+                self.graph.buildRoad(road,p)
+                self.gui.buildRoad(road,p)
+                print p.id, p.countLongestRoad(self.graph)
 
                 victor = self.checkVictory()
                 if victor != None:
                     return
 
-                self.gui.win.getMouse()
+                #self.gui.win.getMouse()
+
+    def buildRoad(self, player, settlement=None):
+        road = player.findRoad(self.graph, self.gui, self.dicefreq, settlement)
+        self.graph.buildRoad(road, player)
+        self.gui.buildRoad(road, player)
+
+        return road
+
+    def buildSettlement(self, player, dist):
+        vert = player.settle(self.graph, self.gui, self.dicefreq, dist)
+        self.graph.buildSettlement(vert, player)
+        self.gui.buildSettlement(vert, player)
+
+        return vert
+
+    def checkLongestRoad(self, player):
+        roads = player.countLongestRoad(self.graph)
+        if roads > self.longestRoad:
+            for p in self.players:
+                if p.hasLongestRoad:
+                    p.hasLongestRoad = False
+                    p.vpts -= 2
+            player.hasLongestRoad = True
+            player.vpts += 2
+            self.longestRoad = roads
+
+            return player
+
+        return None
+
+    def checkLargestArmy(self, player):
+        army = player.countLargestArmy()
+        if army > self.largestArmy:
+            for p in self.players:
+                if p.hasLargestArmy:
+                    p.hasLargestArmy = False
+                    p.vpts -= 2
+            player.hasLargestArmy = True
+            player.vpts += 2
+            self.largestArmy = army
+
+            return player
+
+        return None
 
     def checkVictory(self):
         for p in self.players:
+            plr = self.checkLongestRoad(p)
+            pla = self.checkLargestArmy(p)
+
+            if plr != None:
+                print "Longest road:", plr.id
+            if pla != None:
+                print "Largest army:", pla.id
+
             if p.vpts >= 10:
                 return p
 
