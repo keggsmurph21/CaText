@@ -58,7 +58,7 @@ class Catan(object):
                     vert = self.buildSettlement(p, 0, vert)
 
                 print p.id, ":", p.vpts
-                
+
                 victor = self.checkVictory()
                 if victor != None:
                     return
@@ -68,16 +68,23 @@ class Catan(object):
 
     def buildRoad(self, player, settlement=None):
         road = player.findRoad(self.graph, self.gui, self.dicefreq, settlement)
-        self.graph.buildRoad(road, player)
-        self.gui.buildRoad(road, player)
+        if road == None:
+            print "main.py :: Error finding road for player",player.id
+        else:
+            self.graph.buildRoad(road, player)
+            self.gui.buildRoad(road, player)
 
         return road
 
     def buildSettlement(self, player, dist, vert=None):
         if vert == None:
             vert = player.settle(self.graph, self.gui, self.dicefreq, dist)
-        self.graph.buildSettlement(vert, player)
-        self.gui.buildSettlement(vert, player)
+
+        if vert == None:
+            print "main.py :: Error building settlement for player",player.id
+        else:
+            self.graph.buildSettlement(vert, player)
+            self.gui.buildSettlement(vert, player)
 
         return vert
 

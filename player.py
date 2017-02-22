@@ -181,7 +181,7 @@ class CPUPlayer(Player):
         if len(options):
             return choice(options)
         else:
-            print "Cannot find a road!!\n"
+            print "player.py :: Cannot find a road!!"
             return None
 
 class HumanPlayer(Player):
