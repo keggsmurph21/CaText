@@ -104,10 +104,34 @@ class Player(object):
 
         return road
 
+    def checkSettle(self, graph, df):
+        return None
+
 class CPUPlayer(Player):
     def __init__(self, id):
         super(CPUPlayer, self).__init__(id)
         self.type = "cpu"
+
+    def checkSettle(self, graph, df):
+        ## Need to consider prospective spots that aren't settled
+        this = None
+        verts = set()
+        max = 0
+        m = 0
+
+        for road in self.roads:
+            for v in road.verts():
+                if v.isSettlable:
+                    verts.add(v)
+
+        for v in verts:
+            for a in graph.vertGetAdjs(v):
+                m += df[str(a.tile.diceroll)]
+            if m > max:
+                this = v
+                max = m
+
+        return this
 
     def findBestSpot(self, graph, df, dist=0):
         this = None

@@ -14,6 +14,7 @@ class Catan(object):
 
         self.longestRoad = 4
         self.largestArmy = 2
+        self.turnNumber = 1
 
         self.players = [
             player.HumanPlayer(0),
@@ -40,6 +41,8 @@ class Catan(object):
                     p.resources.append(adj.tile.resource)
 
         while 1:
+            print ">>> Turn", self.turnNumber, "<<<"
+
             for p in self.players:
                 roll = p.rollDice()
                 self.gui.updateDice(roll)
@@ -50,13 +53,17 @@ class Catan(object):
 
                 # Keep adding roads every turn
                 self.buildRoad(p)
+                vert = p.checkSettle(self.graph, self.dicefreq)
+                if vert != None:
+                    vert = self.buildSettlement(p, 0, vert)
 
-                #print p.id, p.countLongestRoad(self.graph)
-
+                print p.id, ":", p.vpts
+                
                 victor = self.checkVictory()
                 if victor != None:
                     return
 
+            self.turnNumber += 1
                 #self.gui.win.getMouse()
 
     def buildRoad(self, player, settlement=None):
@@ -66,8 +73,9 @@ class Catan(object):
 
         return road
 
-    def buildSettlement(self, player, dist):
-        vert = player.settle(self.graph, self.gui, self.dicefreq, dist)
+    def buildSettlement(self, player, dist, vert=None):
+        if vert == None:
+            vert = player.settle(self.graph, self.gui, self.dicefreq, dist)
         self.graph.buildSettlement(vert, player)
         self.gui.buildSettlement(vert, player)
 

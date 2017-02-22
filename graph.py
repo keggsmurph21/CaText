@@ -65,8 +65,11 @@ class Graph(object):
             neighbor.isSettlable = False
 
     def buildRoad(self,edge,player):
-        player.roads.append(edge)
-        edge.owner = player
+        if edge == None:
+            print "NONETYPE ROAD"
+        else:
+            player.roads.append(edge)
+            edge.owner = player
 
     def shortestPath(self,v1,v2,player):
         available = {player,None}
