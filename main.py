@@ -49,10 +49,9 @@ class Catan(object):
                     #print q.id, q.resources
 
                 # Keep adding roads every turn
-                road = p.findRoad(self.graph, self.gui, self.dicefreq)
-                self.graph.buildRoad(road,p)
-                self.gui.buildRoad(road,p)
-                print p.id, p.countLongestRoad(self.graph)
+                self.buildRoad(p)
+
+                #print p.id, p.countLongestRoad(self.graph)
 
                 victor = self.checkVictory()
                 if victor != None:
