@@ -3,7 +3,6 @@
 html, .container { /* make container take up full screen */
   height: 100%;
   width: 100%;
-
 }
 
 .container {
@@ -11,4 +10,10 @@ html, .container { /* make container take up full screen */
   top: 0;
   left: 0;
   background-color: #aaa;
+}
+
+#map {
+  position: fixed;
+  top: 20px; right: 20px; bottom: 20px; left: 20px;
+  background-color: #fff;
 }

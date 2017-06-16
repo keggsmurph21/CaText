@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Catan</title>
+    <title>Settlers of Catan</title>
     <meta charset="utf-8">
     <script src="./d3.v2.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css" />
@@ -12,12 +12,11 @@
 
     <?php
     require_once('core/includes/funcs.php');
-
-    parse_ini_file('settings.ini');
+    init_settings('setup/standard/settings.ini');
     ?>
 
   	<div class="container">
-      test
+      <div id="map"> </div>
   	</div>
 
   </body>
@@ -42,7 +41,19 @@
     return true;
   }
 
+  var aspectRatio = 0.707
+    , width = parseInt(d3.select('#map').style('width'))
+    , height = width * aspectRatio
+    , nsweeps = 800
+    , anchor_array = []
+    , label_array = [];
 
+  var svg = d3.select('#map').append('svg')
+    .attr('width', width)
+    .attr('height', height)
+    .attr('xmlns', 'http://www.w3.org/2000/svg');
+
+  svg.append('path').attr('x', 300).attr('y', 400);
   /*
   var width = 1440, // height = 960,
       height = 800; //height = 500
@@ -59,63 +70,6 @@
     , anchor_array= []
     , label_array = [];
   var  links, labels;
-
-
-
-  var options = [
-    {name: "Aitoff", projection: d3.geo.aitoff().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "August", projection: d3.geo.august().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Bonne", projection: d3.geo.bonne().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Collignon", projection: d3.geo.collignon().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Eckert I", projection: d3.geo.eckert1().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Eckert II", projection: d3.geo.eckert2().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Eckert III", projection: d3.geo.eckert3().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Eckert IV", projection: d3.geo.eckert4().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Eckert V", projection: d3.geo.eckert5().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Eckert VI", projection: d3.geo.eckert6().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Eisenlohr", projection: d3.geo.eisenlohr().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Equirectangular (Plate Carrée)", projection: d3.geo.equirectangular().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Hammer", projection: d3.geo.hammer().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Goode Homolosine", projection: d3.geo.homolosine().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Kavrayskiy VII", projection: d3.geo.kavrayskiy7().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Lambert cylindrical equal-area", projection: d3.geo.cylindricalEqualArea().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Lagrange", projection: d3.geo.lagrange().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Larrivée", projection: d3.geo.larrivee().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Mercator", projection: d3.geo.mercator().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Miller", projection: d3.geo.miller().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Mollweide", projection: d3.geo.mollweide().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Nell–Hammer", projection: d3.geo.nellHammer().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Polyconic", projection: d3.geo.polyconic().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Robinson", projection: d3.geo.robinson().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Sinusoidal", projection: d3.geo.sinusoidal().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "van der Grinten", projection: d3.geo.vanDerGrinten().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Wagner VI", projection: d3.geo.wagner6().translate([width/2, height/2]).scale((width/640)*100)},
-    {name: "Winkel Tripel", projection: d3.geo.winkel3()}
-  ];
-
-  // Disable adaptive resampling to allow transitions.
-  options.forEach(function(option) {
-    option.projection.precision(0);
-  });
-
-  var interval,
-      i = 7,
-      n = options.length - 1;
-
-  var d = new Date();
-  var startdate = 2007
-  	, maxdate = d.getFullYear()
-  	, currentdate = maxdate
-  	, totalcount = 0;
-
-  var path = d3.geo.path()
-      .projection(options[i].projection);
-
-  var projection = options[i].projection;
-
-  var datelabel = d3.select("#datelabel")
-  	, totallabel = d3.select("#total");
-  var graticule = d3.geo.graticule();
 
   var svg = d3.select("#map").append("svg")
       .attr("width", width)
