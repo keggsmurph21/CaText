@@ -249,7 +249,7 @@ class Catan(object):
         elif player.style == "random":
             success = False
             while not(success):
-                tile = list(self.board.tiles)[0]
+                tile = random.choice(list(self.board.tiles))
                 success = self.board.robber.move(self.window, tile)
             print "need to steal"
         elif player.style == "maximize":
