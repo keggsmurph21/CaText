@@ -1,0 +1,14 @@
+@charset "UTF-8";
+
+html, .container { /* make container take up full screen */
+  height: 100%;
+  width: 100%;
+
+}
+
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #aaa;
+}

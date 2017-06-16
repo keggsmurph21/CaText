@@ -5,16 +5,18 @@
     <title>Catan</title>
     <meta charset="utf-8">
     <script src="./d3.v2.js"></script>
-
-    <style>
-
-    </style>
-
+    <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
 
-  	<div id="container">
+    <?php
+    require_once('core/includes/funcs.php');
+
+    parse_ini_file('settings.ini');
+    ?>
+
+  	<div class="container">
       test
   	</div>
 
@@ -22,6 +24,7 @@
 
   <script>
 
+  // define new classes & methods
   function Hexagon (x,y) {
     this.center = [x,y];
     this.points = {p1 : [0,0], p2 : [0,0], p3 : [0,0], p4 : [0,0], p5 : [0,0], p6 : [0,0] };
@@ -31,7 +34,15 @@
     return true;
   };
 
-  
+  function Player () {
+    this.points = 0
+  }
+
+  Player.prototype.init = function() {
+    return true;
+  }
+
+
   /*
   var width = 1440, // height = 960,
       height = 800; //height = 500
