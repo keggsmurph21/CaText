@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Settlers of Catan</title>
     <meta charset="utf-8">
-    <script src="./d3.v2.js"></script>
+    <script src="core/includes/d3.v2.min.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
 

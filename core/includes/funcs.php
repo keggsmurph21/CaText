@@ -13,8 +13,6 @@ function init_settings($file, $flavor='standard') {
   }
 
   $settings['flavor'] = $flavor;
-  var_dump($settings);
-  echo get_setting('flavor');
 }
 
 /**
