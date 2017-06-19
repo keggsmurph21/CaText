@@ -1,0 +1,14 @@
+{
+  "tiles" : [
+    "lumber", "lumber", "lumber", "lumber",
+    "grain", "grain", "grain", "grain",
+    "wool", "wool", "wool", "wool",
+    "brick", "brick", "brick",
+    "ore", "ore", "ore",
+    "desert"
+  ],
+  "harbors" : [
+    "mystery", "mystery", "mystery", "mystery",
+    "lumber", "grain", "wool", "brick", "ore"
+  ]
+}

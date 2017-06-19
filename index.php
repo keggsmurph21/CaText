@@ -12,16 +12,24 @@
 
     <?php
     require_once('core/includes/funcs.php');
-    init_settings('setup/standard/settings.ini');
+    init_settings('setup/standard/settings.ini'); // should eventually be able to change which style gets loaded
+
+    var_dump(get_setting('board_shape'));
+
+    $center = array( 'x'=>10, 'y'=>10 );
+    $size = 5;
+    var_dump(get_hex($center, $size));
     ?>
 
   	<div class="container">
+      <svg id="boardContainer" width=600 height=600>
+      </svg>
   	</div>
 
   </body>
 
   <script>
-
+    /*
     // define new classes & methods
     function Hexagon (x,y) {
       this.center = [x,y];
@@ -52,7 +60,7 @@
       .attr('height', height)
       .attr('xmlns', 'http://www.w3.org/2000/svg');
 
-    svg.append('path').attr('x', 300).attr('y', 400);
+    svg.append('path').attr('x', 300).attr('y', 400);*/
 
     /*
     var width = 1440, // height = 960,
