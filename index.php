@@ -12,17 +12,12 @@
 
     <?php
     require_once('core/includes/funcs.php');
-    init_settings('setup/standard/settings.ini'); // should eventually be able to change which style gets loaded
-
-    var_dump(get_setting('board_shape'));
-
-    $center = array( 'x'=>10, 'y'=>10 );
-    $size = 5;
-    var_dump(get_hex($center, $size));
+    init_settings('setup/standard/'); // should eventually be able to change which style gets loaded
     ?>
 
   	<div class="container">
-      <svg id="boardContainer" width=600 height=600>
+      <svg id="boardContainer" width=<?= get_setting('board_container_width') ?> height=<?= get_setting('board_container_height') ?>>
+        <?php setup_board(); ?>
       </svg>
   	</div>
 
