@@ -74,48 +74,10 @@ function get_hex_corner($center, $size, $i) {
 }
 
 /**
- * returns an array of the six corners surrounding the hex centerpoint
- */
-function get_hex($center, $size) {
-  $hexagon = array();
-  for ($i=0; $i<6; $i++) {
-    $hexagon[] = get_hex_corner($center, $size, $i);
-  }
-  return $hexagon;
-}
-
-/**
  * returns a Hex object
  */
 function Hex($x, $y, $z) {
   return array('x'=>$x, 'y'=>$y, 'z'=>$z);
-}
-
-/**
- * returns the sum of two Hex objects
- */
-function hex_add($a, $b) {
-  $x = x($a) + x($b);
-  $y = y($a) + y($b);
-  $z = z($a) + z($b);
-  return Hex($x, $y, $z);
-}
-
-function hex_mult($a, $k) {
-  $x = x($a) * $k;
-  $y = y($a) * $k;
-  $z = z($a) * $k;
-  return Hex($x, $y, $z);
-}
-/**
- * determines whether two Hex objects have the same coordinates
- */
-function hex_equal($a, $b, $dist=0.001) {
-  if (abs(x($a) - x($b)) < $dist) { return false; }
-  if (abs(y($a) - y($b)) < $dist) { return false; }
-  if (abs(z($a) - z($b)) < $dist) { return false; }
-
-  return true;
 }
 
 /**
@@ -201,15 +163,6 @@ function pt_to_hex($pt, $size) {
   return Hex($x,$y,$z);
 }
 
-function is_node_in_list($node, $nodes, $dist=0.0001) {
-  foreach ($nodes as $n) {
-    if (pt_dist($node, $n) < $dist) {
-      return true;
-    }
-  }
-
-  return false;
-}
 
 /**
  * given two objs, will return true if they are $dist away and false if not
@@ -222,35 +175,6 @@ function is_neighbor($a, $b, $dist, $margin=0.001) {
   return false;
 }
 
-function get_hex_id($hex, $hexes) {
-  // evaluate whether we want a solid or img background (imgs take much longer)
-  $style = get_setting('background_style');
-
-  // count number of neighbors.. anything less than 6 is an ocean spot
-  $neighbors = 0;
-
-  foreach ($hexes as $h) {
-    if (is_neighbor($hex, $h)) {
-      $neighbors++;
-    }
-  }
-
-  if ($neighbors < 6) {
-    return 'ocean-' . $style;
-  } else {
-    global $tiles;
-    return array_pop($tiles) . '-' . $style;
-  }
-}
-
-function echo_hexagon($id, $pt, $size, $points) {
-  echo '<polygon class="hex" id="' . $id . '" points="';
-  for ($i=0; $i<6; $i++) {
-    $node = get_hex_corner($pt, $size, $i);
-    echo x($node) . ' ' . y($node) . ' ';
-  }
-  echo '" />';
-}
 
 function is_edge_hex($hex, &$min_x, &$max_x, &$min_y, &$max_y, &$min_z, &$max_z) {
   $x = x($hex); $y = y($hex); $z = z($hex);
@@ -262,11 +186,12 @@ function is_edge_hex($hex, &$min_x, &$max_x, &$min_y, &$max_y, &$min_z, &$max_z)
   }
 }
 
-function place_roll_chip($hex) {
-  $x = $hex['pt']['x'];
-  $y = $hex['pt']['y'];
+function echo_roll_chip($hex) {
+  $x = x($hex['pt']);
+  $y = y($hex['pt']);
 
   if ($hex['roll'] != 0) {
+    // only place a chip if this hex yields resources
     $color = 'black';
     if ($hex['roll'] == 6 || $hex['roll'] == 8) {
       $color = 'red';
@@ -276,10 +201,17 @@ function place_roll_chip($hex) {
       echo $hex['roll'];
     echo '</text>';
   } else {
+    // otherwise place a robber on the hex
     echo '<g class="robber">';
+
+      echo '<circle class="shadow" cx="' . $x . '" cy="' . ($y-7) . '" r="8"> </circle>';
+      echo '<polygon class="shadow" points="' . $x . ' ' . ($y-8)  . ' ';
+      echo ($x-12) . ' ' . ($y+15) . ' ' . ($x+12) . ' ' . ($y+15) . '"> </polygon>';
+
       echo '<circle cx="' . $x . '" cy="' . ($y-7) . '" r="7"> </circle>';
       echo '<polygon points="' . $x . ' ' . ($y-7)  . ' ';
       echo ($x-10) . ' ' . ($y+14) . ' ' . ($x+10) . ' ' . ($y+14) . '"> </polygon>';
+
     echo '</g>';
   }
 }
@@ -292,8 +224,8 @@ function echo_objects(&$data) {
     if ($hex['type'] == 'ocean') {
       echo '<polygon class="hex" id="' . 'ocean-' . $style . '" points="';
       foreach ($hex['points'] as $p) {
-        echo $data['nodes'][$p]['pt']['x'] . ' ';
-        echo $data['nodes'][$p]['pt']['y'] . ' ';
+        echo x($data['nodes'][$p]['pt']) . ' ';
+        echo y($data['nodes'][$p]['pt']) . ' ';
       }
       echo '"> </polygon>';
     }
@@ -304,25 +236,25 @@ function echo_objects(&$data) {
     if ($hex['type'] != 'ocean') {
       echo '<polygon class="hex" id="' . $hex['type'] . '-' . $style . '" points="';
       foreach ($hex['points'] as $p) {
-        echo $data['nodes'][$p]['pt']['x'] . ' ';
-        echo $data['nodes'][$p]['pt']['y'] . ' ';
+        echo x($data['nodes'][$p]['pt']) . ' ';
+        echo y($data['nodes'][$p]['pt']) . ' ';
       }
       echo '"> </polygon>';
-      place_roll_chip($hex);
+      echo_roll_chip($hex);
     }
   }
 
   // then the edges
   foreach ($data['edges'] as $edge) {
-    echo '<line class="edge" x1="' . $edge['pts'][0]['x'] . '" y1="' . $edge['pts'][0]['y'];
-    echo '" x2="' . $edge['pts'][1]['x'] . '" y2="' . $edge['pts'][1]['y'] . '" > </line>';
+    echo '<line class="edge" x1="' . x($edge['pts'][0]) . '" y1="' . y($edge['pts'][0]);
+    echo '" x2="' . x($edge['pts'][1]) . '" y2="' . y($edge['pts'][1]) . '" > </line>';
   }
 
   // and finally the nodes (if set to display)
   if (get_setting('display_nodes')) {
     foreach ($data['nodes'] as $node) {
       if ($node['type'] != 'ocean') {
-        echo '<circle class="node" cx="' . $node['pt']['x'] . '" cy="' . $node['pt']['y'] . '" stroke="black" stroke-width="2" fill="white" r="5"> </circle>';
+        echo '<circle class="node" cx="' . x($node['pt']) . '" cy="' . y($node['pt']) . '" stroke="black" stroke-width="2" fill="white" r="5"> </circle>';
       }
     }
   }

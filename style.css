@@ -44,6 +44,10 @@ text.roll {
   fill: #555;
 }
 
+.robber .shadow {
+  fill: #000;
+}
+
 #lumber-solid { fill: #017c2e; }
 #lumber-img { fill: url(#lumber); }
 
