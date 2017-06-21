@@ -20,19 +20,6 @@ function init_settings($path, $flavor='standard') {
   }
 
   $settings['flavor'] = $flavor;
-
-  // make some more global variables
-  global $hex_dirs;
-  $hex_dirs = [];
-  $dirs = [[-1,1,0], [0,1,-1], [1,0,-1], [1,-1,0], [0,-1,1], [-1,0,1]];
-
-  foreach ($dirs as $dir) {
-    $hex_dirs[] = Hex($dir[0], $dir[1], $dir[2]);
-  }
-
-  global $tiles;
-  $tiles = get_setting('tiles');
-  shuffle($tiles);
 }
 
 /**
@@ -114,6 +101,12 @@ function hex_add($a, $b) {
   return Hex($x, $y, $z);
 }
 
+function hex_mult($a, $k) {
+  $x = x($a) * $k;
+  $y = y($a) * $k;
+  $z = z($a) * $k;
+  return Hex($x, $y, $z);
+}
 /**
  * determines whether two Hex objects have the same coordinates
  */
@@ -144,7 +137,7 @@ function pt_add($a, $b) {
 /**
  * determines whether two Pt objects have the same coordinates
  */
- function pt_equal($a, $b, $dist=0.001) {
+function pt_equal($a, $b, $dist=0.001) {
    if (pt_dist($a, $b) < $dist) {
      return true;
    }
@@ -201,6 +194,13 @@ function hex_to_pt($hex, $size) {
   return Pt($x,$y);
 }
 
+function pt_to_hex($pt, $size) {
+  $z = y($pt) / $size * -2.0 / 3.0;
+  $y = x($pt) / $size * -1.0 / sqrt(3.0) - $z / 2.0;
+  $x = - ($y + $z);
+  return Hex($x,$y,$z);
+}
+
 function is_node_in_list($node, $nodes, $dist=0.0001) {
   foreach ($nodes as $n) {
     if (pt_dist($node, $n) < $dist) {
@@ -227,6 +227,9 @@ function is_neighbor($a, $b) {
 }
 
 function get_hex_id($hex, $hexes) {
+  // evaluate whether we want a solid or img background (imgs take much longer)
+  $style = get_setting('background_style');
+
   // count number of neighbors.. anything less than 6 is an ocean spot
   $neighbors = 0;
 
@@ -237,10 +240,10 @@ function get_hex_id($hex, $hexes) {
   }
 
   if ($neighbors < 6) {
-    return 'ocean';
+    return 'ocean-' . $style;
   } else {
     global $tiles;
-    return array_pop($tiles);
+    return array_pop($tiles) . '-' . $style;
   }
 }
 
@@ -253,18 +256,155 @@ function echo_hexagon($id, $pt, $size, $points) {
   echo '" />';
 }
 
+function is_edge_hex($hex, &$min_x, &$max_x, &$min_y, &$max_y, &$min_z, &$max_z) {
+  $x = x($hex); $y = y($hex); $z = z($hex);
+
+  if ( $x == $min_x || $x == $max_x || $y == $min_y || $y == $max_y || $z == $min_z || $z == $max_z) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function echo_objects(&$data) {
+  $style = get_setting('background_style');
+
+  foreach ($data['hexes'] as $hex) {
+    echo '<polygon id="' . $hex['type'] . '-' . $style;
+    echo '" fill="orange" points="';
+    foreach ($hex['points'] as $p) {
+      echo $data['nodes'][$p]['pt']['x'] . ' ';
+      echo $data['nodes'][$p]['pt']['y'] . ' ';
+    }
+    echo '"> </polygon>';
+    echo '<circle cx="' . $hex['pt']['x'] . '" cy="' . $hex['pt']['y'] . '" r="4"> </circle>';
+  }
+
+  foreach ($data['nodes'] as $node) {
+    echo '<circle cx="' . $node['pt']['x'] . '" cy="' . $node['pt']['y'] . '" r="1"> </circle>';
+  }
+}
+
+function append_node(&$data, $node, $hex_id) {
+  $new_node = array('i'=>'', 'coords'=>pt_to_hex($node,$data['size']), 'pt'=>$node, 'hexes'=>array($hex_id));
+  $index = false;
+
+  for ($n=0; $n<$data['node_count']; $n++) {
+    if (pt_dist($node, $data['nodes'][$n]['pt']) < 0.001) {
+      $index = $n;
+    }
+  }
+
+  if ($index === false) {
+
+    $new_node['i'] = $data['node_count'];
+    array_push($data['nodes'], $new_node);
+    array_push($data['hexes'][$hex_id]['points'], $data['node_count']);
+
+    $data['node_count']++;
+
+  } else {
+
+    array_push($data['nodes'][$index]['hexes'], $hex_id);
+    array_push($data['hexes'][$hex_id]['points'], $index);
+
+  }
+}
+
 /**
  *
  */
 function setup_board() {
-  $hexes = get_setting('board_shape');
-  if (!$hexes) {
+  global $data; // to store most of the variables, pass around references to it
+  $data = array('dirs'=>array(), 'tiles'=>array(), 'hexes'=>array(),
+    'pts'=>array(), 'nodes'=>array(), 'edges'=>array(), 'hex_count'=>0,
+    'node_count'=>0, 'edge_count'=>0);
+
+  // set up the valid directions (in hex coords)
+  $dirs = [[-1,1,0], [0,1,-1], [1,0,-1], [1,-1,0], [0,-1,1], [-1,0,1]];
+  foreach ($dirs as $dir) {
+    array_push($data['dirs'], Hex($dir[0], $dir[1], $dir[2]));
+  }
+
+  // load and shuffle the resource tiles
+  $data['tiles'] = get_setting('tiles');
+  shuffle($data['tiles']);
+
+  $board_shape = get_setting('board_shape');
+  if (!$board_shape) {
     throw new Exception('Unable to load board.');
   }
 
-  $hexes = parse_hex_coordinates($hexes);
+  $hexes = parse_hex_coordinates($board_shape);
 
-  // determine how many hexes we have in each direction (ni=max in i direction)
+  // get min and max values in each coordinate direction and pixel direction
+  $min_x = 0; $max_x = 0;
+  $min_y = 0; $max_y = 0;
+  $min_z = 0; $max_z = 0;
+
+  $min_width = 0; $max_width = 0;
+  $min_height= 0; $max_height= 0;
+
+  foreach ($hexes as $hex) {
+    $data['hex_count']++; // iterate the hex counter
+
+    if (x($hex) < $min_x) { $min_x = x($hex); }
+    if (x($hex) > $max_x) { $max_x = x($hex); }
+
+    if (y($hex) < $min_y) { $min_y = y($hex); }
+    if (y($hex) > $max_y) { $max_y = y($hex); }
+
+    if (z($hex) < $min_z) { $min_z = z($hex); }
+    if (z($hex) > $max_z) { $max_z = z($hex); }
+
+    $x = x(hex_to_pt($hex,1));
+    if ($x < $min_width) { $min_width = $x; }
+    if ($x > $max_width) { $max_width = $x; }
+
+    $y = y(hex_to_pt($hex,1));
+    if ($y <$min_height) { $min_height= $y; }
+    if ($y >$max_height) { $max_height= $y; }
+  }
+
+  // calculate the size (radius) of each hexagon based on number of hexes & container size
+  $width = get_setting('board_container_width');
+  $height= get_setting('board_container_height');
+  $center = Pt($width/2.0, $height/2.0);
+
+  $data['size'] = min($width / (2 + $max_width - $min_width), $height/ (2 + $max_height-$min_height));
+
+  $count = 0; // reset a local counter
+
+  // add data to each hex object
+  foreach ($hexes as $hex) {
+
+    $h = array('i'=>$count, 'type'=>'');
+
+    if (is_edge_hex($hex, $min_x, $max_x, $min_y, $max_y, $min_z, $max_z)) {
+      $h['type'] = 'ocean';
+    } else {
+      $h['type'] = array_pop($data['tiles']);
+    }
+
+    $h['coords'] = $hex;
+    $h['pt'] = pt_add($center, hex_to_pt($hex, $data['size']));
+    $h['points'] = array();
+
+    array_push($data['hexes'], $h);
+
+    for ($i=0; $i<6; $i++) {
+      $node = get_hex_corner($h['pt'], $data['size'], $i);
+      append_node($data, $node, $count);
+    }
+
+    $count++;
+
+    //var_dump($h);
+  }
+
+  echo_objects($data);
+
+  /* // determine how many hexes we have in each direction (ni=max in i direction)
   $min_x = 0; $max_x = 0;
   $min_y = 0; $max_y = 0;
 
@@ -318,8 +458,6 @@ function setup_board() {
     echo_hexagon($id, $cntrs[$i], $size, $cntr_nodes[$i]);
   }
 
-  // create and draw the lines
-
-  echo count($nodes);
+  // create and draw the lines*/
 }
 ?>

@@ -18,31 +18,23 @@ html, .container { /* make container take up full screen */
   background-color: #fff;
 }
 
-#ocean {
-  fill: #ac0;
-}
+#lumber-solid { fill: #017c2e; }
+#lumber-img { fill: url(#lumber); }
 
-#lumber {
-  fill: #3ea;
-}
+#grain-solid { fill: #f7df2a; }
+#grain-img { fill: url(#grain); }
 
-#grain {
-  fill: #fa0;
-}
+#wool-solid { fill: #73ef73; }
+#wool-img { fill: url(#wool); }
 
-#wool {
-  fill: #555;
-}
+#brick-solid { fill: #d8991a}
+#brick-img { fill: url(#brick); }
 
-#brick {
-  fill: url(#brick);
-  min-height: 100%;
-}
+#ore-solid { fill: #464c46; }
+#ore-img { fill: url(#ore); }
 
-#ore {
-  fill: #000;
-}
+#desert-solid { fill: #c0c16c; }
+#desert-img { fill: url(#desert); }
 
-#desert {
-  fill: #b0f;
-}
+#ocean-solid { fill: #3a64b7; }
+#ocean-img { fill: url(#ocean); }
