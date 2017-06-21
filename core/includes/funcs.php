@@ -212,15 +212,11 @@ function is_node_in_list($node, $nodes, $dist=0.0001) {
 }
 
 /**
- * given two hexes, will return true if they are adjacent and false if not
+ * given two objs, will return true if they are $dist away and false if not
  */
-function is_neighbor($a, $b) {
-  global $hex_dirs;
-
-  foreach ($hex_dirs as $dir) {
-    if (pt_equal( pt_add($a, $dir), $b )) {
-      return true;
-    }
+function is_neighbor($a, $b, $dist, $margin=0.001) {
+  if (pow(pt_dist($a, $b) - $dist, 2) < $margin) {
+    return true;
   }
 
   return false;
@@ -266,27 +262,75 @@ function is_edge_hex($hex, &$min_x, &$max_x, &$min_y, &$max_y, &$min_z, &$max_z)
   }
 }
 
+function place_roll_chip($hex) {
+  $x = $hex['pt']['x'];
+  $y = $hex['pt']['y'];
+
+  if ($hex['roll'] != 0) {
+    $color = 'black';
+    if ($hex['roll'] == 6 || $hex['roll'] == 8) {
+      $color = 'red';
+    }
+    echo '<circle class="roll_chip" cx="' . $x . '" cy="' . $y . '" r="15"> </circle>';
+    echo '<text class="roll" x="' . $x . '" y="' . $y . '" fill="' . $color . '">';
+      echo $hex['roll'];
+    echo '</text>';
+  } else {
+    echo '<g class="robber">';
+      echo '<circle cx="' . $x . '" cy="' . ($y-7) . '" r="7"> </circle>';
+      echo '<polygon points="' . $x . ' ' . ($y-7)  . ' ';
+      echo ($x-10) . ' ' . ($y+14) . ' ' . ($x+10) . ' ' . ($y+14) . '"> </polygon>';
+    echo '</g>';
+  }
+}
+
 function echo_objects(&$data) {
   $style = get_setting('background_style');
 
+  // print the ocean hexes first
   foreach ($data['hexes'] as $hex) {
-    echo '<polygon id="' . $hex['type'] . '-' . $style;
-    echo '" fill="orange" points="';
-    foreach ($hex['points'] as $p) {
-      echo $data['nodes'][$p]['pt']['x'] . ' ';
-      echo $data['nodes'][$p]['pt']['y'] . ' ';
+    if ($hex['type'] == 'ocean') {
+      echo '<polygon class="hex" id="' . 'ocean-' . $style . '" points="';
+      foreach ($hex['points'] as $p) {
+        echo $data['nodes'][$p]['pt']['x'] . ' ';
+        echo $data['nodes'][$p]['pt']['y'] . ' ';
+      }
+      echo '"> </polygon>';
     }
-    echo '"> </polygon>';
-    echo '<circle cx="' . $hex['pt']['x'] . '" cy="' . $hex['pt']['y'] . '" r="4"> </circle>';
   }
 
-  foreach ($data['nodes'] as $node) {
-    echo '<circle cx="' . $node['pt']['x'] . '" cy="' . $node['pt']['y'] . '" r="1"> </circle>';
+  // then the resource hexes
+  foreach ($data['hexes'] as $hex) {
+    if ($hex['type'] != 'ocean') {
+      echo '<polygon class="hex" id="' . $hex['type'] . '-' . $style . '" points="';
+      foreach ($hex['points'] as $p) {
+        echo $data['nodes'][$p]['pt']['x'] . ' ';
+        echo $data['nodes'][$p]['pt']['y'] . ' ';
+      }
+      echo '"> </polygon>';
+      place_roll_chip($hex);
+    }
+  }
+
+  // then the edges
+  foreach ($data['edges'] as $edge) {
+    echo '<line class="edge" x1="' . $edge['pts'][0]['x'] . '" y1="' . $edge['pts'][0]['y'];
+    echo '" x2="' . $edge['pts'][1]['x'] . '" y2="' . $edge['pts'][1]['y'] . '" > </line>';
+  }
+
+  // and finally the nodes (if set to display)
+  if (get_setting('display_nodes')) {
+    foreach ($data['nodes'] as $node) {
+      if ($node['type'] != 'ocean') {
+        echo '<circle class="node" cx="' . $node['pt']['x'] . '" cy="' . $node['pt']['y'] . '" stroke="black" stroke-width="2" fill="white" r="5"> </circle>';
+      }
+    }
   }
 }
 
 function append_node(&$data, $node, $hex_id) {
-  $new_node = array('i'=>'', 'coords'=>pt_to_hex($node,$data['size']), 'pt'=>$node, 'hexes'=>array($hex_id));
+  $new_node = array('i'=>'', 'coords'=>pt_to_hex($node,$data['size']),
+    'pt'=>$node, 'hexes'=>array($hex_id), 'type'=>'ocean');
   $index = false;
 
   for ($n=0; $n<$data['node_count']; $n++) {
@@ -297,6 +341,10 @@ function append_node(&$data, $node, $hex_id) {
 
   if ($index === false) {
 
+    if ($data['hexes'][$hex_id]['type'] != 'ocean') {
+      $new_node['type'] = 'land';
+    }
+
     $new_node['i'] = $data['node_count'];
     array_push($data['nodes'], $new_node);
     array_push($data['hexes'][$hex_id]['points'], $data['node_count']);
@@ -305,9 +353,41 @@ function append_node(&$data, $node, $hex_id) {
 
   } else {
 
+    if ($data['nodes'][$index]['type'] == 'ocean') {
+      if ($data['hexes'][$hex_id]['type'] != 'ocean') {
+        $data['nodes'][$index]['type'] = 'land';
+      }
+    }
+
     array_push($data['nodes'][$index]['hexes'], $hex_id);
     array_push($data['hexes'][$hex_id]['points'], $index);
 
+  }
+}
+
+function append_edge(&$data, $a, $b) {
+  $new_edge = array('i'=>'', 'pts'=>array(), 'pt_ids'=>array());
+  $pts = array($a['pt'], $b['pt']);
+  $alt  = array($b['pt'], $a['pt']);
+
+  $match = false;
+
+  foreach ($data['edges'] as $edge) {
+    if ( pt_equal($edge['pts'][0], $pts[0]) && pt_equal($edge['pts'][1], $pts[1]) ) {
+      $match = true;
+    }
+    if ( pt_equal($edge['pts'][0], $alt[0]) && pt_equal($edge['pts'][1], $alt[1]) ) {
+      $match = true;
+    }
+  }
+
+  if (!$match) {
+    $new_edge['i'] = $data['edge_count'];
+    $new_edge['pts'] = $pts;
+    $new_edge['pt_ids'] = array($a['i'], $b['i']);
+    array_push($data['edges'], $new_edge);
+
+    $data['edge_count']++;
   }
 }
 
@@ -315,7 +395,8 @@ function append_node(&$data, $node, $hex_id) {
  *
  */
 function setup_board() {
-  global $data; // to store most of the variables, pass around references to it
+  // to store most of the variables, pass around references to it
+  global $data;
   $data = array('dirs'=>array(), 'tiles'=>array(), 'hexes'=>array(),
     'pts'=>array(), 'nodes'=>array(), 'edges'=>array(), 'hex_count'=>0,
     'node_count'=>0, 'edge_count'=>0);
@@ -330,11 +411,17 @@ function setup_board() {
   $data['tiles'] = get_setting('tiles');
   shuffle($data['tiles']);
 
+  // and do the same for the dicerolls
+  $data['dicerolls'] = get_setting('dicerolls');
+  shuffle($data['dicerolls']);
+
+  // load the board shape
   $board_shape = get_setting('board_shape');
   if (!$board_shape) {
     throw new Exception('Unable to load board.');
   }
 
+  // convert basic arrays into Hex() objects
   $hexes = parse_hex_coordinates($board_shape);
 
   // get min and max values in each coordinate direction and pixel direction
@@ -375,15 +462,18 @@ function setup_board() {
 
   $count = 0; // reset a local counter
 
-  // add data to each hex object
+  // add data to each hex object and create the nodes
   foreach ($hexes as $hex) {
 
-    $h = array('i'=>$count, 'type'=>'');
+    $h = array('i'=>$count, 'type'=>'', 'roll'=>0);
 
     if (is_edge_hex($hex, $min_x, $max_x, $min_y, $max_y, $min_z, $max_z)) {
       $h['type'] = 'ocean';
     } else {
       $h['type'] = array_pop($data['tiles']);
+      if ($h['type'] != 'desert') {
+        $h['roll'] = array_pop($data['dicerolls']);
+      }
     }
 
     $h['coords'] = $hex;
@@ -398,8 +488,19 @@ function setup_board() {
     }
 
     $count++;
+  }
 
-    //var_dump($h);
+  // create the edges
+  foreach ($data['nodes'] as $node) {
+    if ($node['type'] != 'ocean') {
+      foreach ($data['nodes'] as $candidate) {
+        if ($candidate['type'] != 'ocean') {
+          if (is_neighbor($node['pt'], $candidate['pt'], $data['size'])) {
+            append_edge($data, $node, $candidate);
+          }
+        }
+      }
+    }
   }
 
   echo_objects($data);

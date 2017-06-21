@@ -9,13 +9,39 @@ html, .container { /* make container take up full screen */
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #aaa;
+  background-color: #3a64b7;
 }
 
 #map { /* do i even use this??? */
   position: fixed;
   top: 20px; right: 20px; bottom: 20px; left: 20px;
   background-color: #fff;
+}
+
+.hex {
+  stroke: #000;
+  stroke-width: 2px;
+}
+
+.edge {
+  stroke: #fff;
+  stroke-width: 3px;
+}
+
+circle.roll_chip {
+  fill: #dbdbc9;
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+text.roll {
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.robber * {
+  fill: #555;
 }
 
 #lumber-solid { fill: #017c2e; }
@@ -36,5 +62,12 @@ html, .container { /* make container take up full screen */
 #desert-solid { fill: #c0c16c; }
 #desert-img { fill: url(#desert); }
 
-#ocean-solid { fill: #3a64b7; }
-#ocean-img { fill: url(#ocean); }
+#ocean-solid {
+  fill: #3a64b7;
+  stroke: none;
+}
+
+#ocean-img {
+  fill: url(#ocean);
+  stroke: none;
+}
