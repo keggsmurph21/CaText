@@ -1,4 +1,12 @@
 <?php
+/******************
+ *
+ * FUNCS.php >>> php functions accessible to every page on the site
+ *
+ ******************/
+
+
+
 /**
  * Open up the .ini file and read contents, save to $settings file.  Defaults
  * to initializing a standard Catan game.
@@ -23,7 +31,7 @@ function init_settings($path, $flavor='standard') {
 }
 
 /**
- *
+ * returns the value of a setting from the ini or json initialization file
  */
 function get_setting($setting, $default=FALSE) {
   global $settings;
@@ -36,7 +44,7 @@ function get_setting($setting, $default=FALSE) {
 }
 
 /**
- *
+ * returns the full path to a media file (in resources/)
  */
 function get_media_file($filename='') {
   if (!strlen($filename)){ return FALSE; }
@@ -49,7 +57,7 @@ function get_media_file($filename='') {
 }
 
 /**
- *
+ * returns the full path to a setup file (in setup/)
  */
 function get_layout_file($filename='') {
   if (!strlen($filename)){ return FALSE; }
@@ -62,7 +70,27 @@ function get_layout_file($filename='') {
 }
 
 /**
- *  i=0 is the top right corner (2:00), iterate counterclockwise
+ * returns a Hex object
+ */
+function Hex($x, $y, $z) {
+  return array('x'=>$x, 'y'=>$y, 'z'=>$z);
+}
+
+/**
+ * takes array of hex coordinates and returns an array of Hex objects
+ */
+function parse_hex_coordinates($hex_coords) {
+  $hexes = [];
+
+  foreach ($hex_coords as $hex_coord) {
+    $hexes[] = Hex( $hex_coord[0], $hex_coord[1], $hex_coord[2] );
+  }
+
+  return $hexes;
+}
+
+/**
+ *  i=0 is the bottom right corner (4:00), iterate clockwise
  */
 function get_hex_corner($center, $size, $i) {
   $deg = 60 * $i + 30; $rad = pi() / 180.0 * $deg;
@@ -71,13 +99,6 @@ function get_hex_corner($center, $size, $i) {
   $y = y($center) + $size * sin($rad);
 
   return Pt($x, $y);
-}
-
-/**
- * returns a Hex object
- */
-function Hex($x, $y, $z) {
-  return array('x'=>$x, 'y'=>$y, 'z'=>$z);
 }
 
 /**
@@ -97,7 +118,7 @@ function pt_add($a, $b) {
 }
 
 /**
- * determines whether two Pt objects have the same coordinates
+ * determines whether two Pt objects have the same coordinates (w/in $dist)
  */
 function pt_equal($a, $b, $dist=0.001) {
    if (pt_dist($a, $b) < $dist) {
@@ -105,25 +126,15 @@ function pt_equal($a, $b, $dist=0.001) {
    }
 
    return false;
- }
+}
 
+/**
+ * returns the triangular distance between two Pt objects
+ */
 function pt_dist($a, $b) {
   $dx = x($a) - x($b);
   $dy = y($a) - y($b);
   return sqrt(pow($dx,2) + pow($dy,2));
-}
-
-/**
- * takes array of hex coordinates and returns an array of Hex objects
- */
-function parse_hex_coordinates($hex_coords) {
-  $hexes = [];
-
-  foreach ($hex_coords as $hex_coord) {
-    $hexes[] = Hex( $hex_coord[0], $hex_coord[1], $hex_coord[2] );
-  }
-
-  return $hexes;
 }
 
 /**
@@ -148,7 +159,7 @@ function z($obj) {
 }
 
 /**
- *
+ * transforms a Hex object into a Pt object for rendering
  */
 function hex_to_pt($hex, $size) {
   $x = $size * (x($hex) - y($hex)) * sqrt(3)/2;
@@ -156,6 +167,9 @@ function hex_to_pt($hex, $size) {
   return Pt($x,$y);
 }
 
+/**
+ * transforms a Pt object into a Hex object for computation
+ */
 function pt_to_hex($pt, $size) {
   $z = y($pt) / $size * -2.0 / 3.0;
   $y = x($pt) / $size * -1.0 / sqrt(3.0) - $z / 2.0;
@@ -163,9 +177,8 @@ function pt_to_hex($pt, $size) {
   return Hex($x,$y,$z);
 }
 
-
 /**
- * given two objs, will return true if they are $dist away and false if not
+ * given two (Pt) objs, will return true if they are $dist away and false if not
  */
 function is_neighbor($a, $b, $dist, $margin=0.001) {
   if (pow(pt_dist($a, $b) - $dist, 2) < $margin) {
@@ -175,7 +188,10 @@ function is_neighbor($a, $b, $dist, $margin=0.001) {
   return false;
 }
 
-
+/**
+ * returns whether a given object is on the edge of the hexes
+ * ( helper function for setup_board() )
+ */
 function is_edge_hex($hex, &$min_x, &$max_x, &$min_y, &$max_y, &$min_z, &$max_z) {
   $x = x($hex); $y = y($hex); $z = z($hex);
 
@@ -186,6 +202,10 @@ function is_edge_hex($hex, &$min_x, &$max_x, &$min_y, &$max_y, &$min_z, &$max_z)
   }
 }
 
+/**
+ * outputs the HTML code for either a roll chip or a robber, depending on the
+ * value of a given object's $roll
+ */
 function echo_roll_chip($hex) {
   $x = x($hex['pt']);
   $y = y($hex['pt']);
@@ -216,6 +236,10 @@ function echo_roll_chip($hex) {
   }
 }
 
+/**
+ * outputs the HTML code for all of the objects that get rendered server-side, including
+ * hexes, edges, and nodes
+ */
 function echo_objects(&$data) {
   $style = get_setting('background_style');
 
@@ -260,6 +284,9 @@ function echo_objects(&$data) {
   }
 }
 
+/**
+ * add a node to the $data array, perform various other related operations
+ */
 function append_node(&$data, $node, $hex_id) {
   $new_node = array('i'=>'', 'coords'=>pt_to_hex($node,$data['size']),
     'pt'=>$node, 'hexes'=>array($hex_id), 'type'=>'ocean');
@@ -297,6 +324,9 @@ function append_node(&$data, $node, $hex_id) {
   }
 }
 
+/**
+ * add a node to the $data array, perform various other related operations
+ */
 function append_edge(&$data, $a, $b) {
   $new_edge = array('i'=>'', 'pts'=>array(), 'pt_ids'=>array());
   $pts = array($a['pt'], $b['pt']);
@@ -324,9 +354,10 @@ function append_edge(&$data, $a, $b) {
 }
 
 /**
- *
+ * most important function that outputs HTML code for all of the objects on the game board
  */
 function setup_board() {
+
   // to store most of the variables, pass around references to it
   global $data;
   $data = array('dirs'=>array(), 'tiles'=>array(), 'hexes'=>array(),
@@ -424,7 +455,7 @@ function setup_board() {
 
   // create the edges
   foreach ($data['nodes'] as $node) {
-    if ($node['type'] != 'ocean') {
+    if ($node['type'] != 'ocean') { // no edges should extend into the ocean
       foreach ($data['nodes'] as $candidate) {
         if ($candidate['type'] != 'ocean') {
           if (is_neighbor($node['pt'], $candidate['pt'], $data['size'])) {
@@ -437,60 +468,5 @@ function setup_board() {
 
   echo_objects($data);
 
-  /* // determine how many hexes we have in each direction (ni=max in i direction)
-  $min_x = 0; $max_x = 0;
-  $min_y = 0; $max_y = 0;
-
-  foreach ($hexes as $hex) {
-    $x = x(hex_to_pt($hex,1));
-    if ($x < $min_x) { $min_x = $x; }
-    if ($x > $max_x) { $max_x = $x; }
-
-    $y = y(hex_to_pt($hex,1));
-    if ($y < $min_y) { $min_y = $y; }
-    if ($y > $max_y) { $max_y = $y; }
-  }
-
-  $width = get_setting('board_container_width');
-  $height = get_setting('board_container_height');
-
-  $size = min($width / (2 + $max_x - $min_x), $height / (2 + $max_y - $min_y));
-
-  // update hex directions to points
-  global $hex_dirs;
-  $tmp = [];
-  foreach ($hex_dirs as $dir) {
-    $tmp[] = hex_to_pt($dir, $size);
-  }
-  $hex_dirs = $tmp;
-
-  // create and draw the hexagons
-  $ctr = Pt($width/2, $height/2);
-  $cntrs = [];
-  $cntr_nodes = [];
-  $nodes = [];
-
-  foreach ($hexes as $hex) {
-    $pt = hex_to_pt($hex, $size);
-    $pt = pt_add($pt, $ctr);
-    $cntrs[] = $pt;
-
-    for ($i=0; $i<6; $i++) {
-      $node = get_hex_corner($pt, $size, $i);
-      $tmp[] = $node;
-      if (!is_node_in_list($node, $nodes)) {
-        $nodes[] = $node;
-      }
-    }
-
-    array_push($cntr_nodes, $tmp);
-  }
-
-  for ($i=0; $i<count($cntrs); $i++) {
-    $id = get_hex_id($cntrs[$i], $cntrs);
-    echo_hexagon($id, $cntrs[$i], $size, $cntr_nodes[$i]);
-  }
-
-  // create and draw the lines*/
 }
 ?>
