@@ -354,116 +354,185 @@ function append_edge(&$data, $a, $b) {
 }
 
 /**
+ * iterates over all the hexes and returns an array of all those hexes
+ * which neighbor a given hex.. if $filter_oceans==true, return only those
+ * hexes of type!='ocean'
+ */
+function hex_get_neighbors(&$data, $hex, $filter_oceans=false) {
+  $neighbors = array();
+
+  // iterate over all the hexes and check each one
+  foreach ($data['hexes'] as $h) {
+    $dist = pt_dist($h['pt'], $hex['pt']);
+    if ($dist < 2*$data['size'] && $dist > 0) {
+      if ($filter_oceans) {
+        if ($h['type'] != 'ocean') {
+          array_push($neighbors, $h);
+        }
+      } else {
+        array_push($neighbors, $h);
+      }
+    }
+  }
+
+  return $neighbors;
+}
+
+/**
+ * iterates over the board to make sure a red hex is not adjacent to another
+ * red hex or to two 4-dot hexes
+ */
+function validate_board(&$data) {
+  foreach ($data['nodes'] as $node) {
+
+    $tension = 0;
+    foreach ($node['hexes'] as $hex_id) {
+
+      $hex = $data['hexes'][$hex_id];
+      if ($hex['roll'] == 6 || $hex['roll'] == 8) {
+        $tension += 0.5;
+      }
+      if ($hex['roll'] == 5 || $hex['roll'] == 9) {
+        $tension += 0.25;
+      }
+
+      if ($tension >= 1.0) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/**
  * most important function that outputs HTML code for all of the objects on the game board
  */
 function setup_board() {
 
-  // to store most of the variables, pass around references to it
-  global $data;
-  $data = array('dirs'=>array(), 'tiles'=>array(), 'hexes'=>array(),
-    'pts'=>array(), 'nodes'=>array(), 'edges'=>array(), 'hex_count'=>0,
-    'node_count'=>0, 'edge_count'=>0);
+  // default to not valid board arrangement
+  $valid = false;
 
-  // set up the valid directions (in hex coords)
-  $dirs = [[-1,1,0], [0,1,-1], [1,0,-1], [1,-1,0], [0,-1,1], [-1,0,1]];
-  foreach ($dirs as $dir) {
-    array_push($data['dirs'], Hex($dir[0], $dir[1], $dir[2]));
-  }
+  // continuously attempt to setup the board until we achieve a valid configuration
+  while (!$valid) {
 
-  // load and shuffle the resource tiles
-  $data['tiles'] = get_setting('tiles');
-  shuffle($data['tiles']);
+    // delete the $data from old attempts
+    unset($data);
 
-  // and do the same for the dicerolls
-  $data['dicerolls'] = get_setting('dicerolls');
-  shuffle($data['dicerolls']);
+    // to store most of the variables, pass around references to it
+    $data = array('dirs'=>array(), 'tiles'=>array(), 'hexes'=>array(),
+      'pts'=>array(), 'nodes'=>array(), 'edges'=>array(), 'hex_count'=>0,
+      'node_count'=>0, 'edge_count'=>0);
 
-  // load the board shape
-  $board_shape = get_setting('board_shape');
-  if (!$board_shape) {
-    throw new Exception('Unable to load board.');
-  }
+    // set up the valid directions (in hex coords)
+    $dirs = [[-1,1,0], [0,1,-1], [1,0,-1], [1,-1,0], [0,-1,1], [-1,0,1]];
+    foreach ($dirs as $dir) {
+      array_push($data['dirs'], Hex($dir[0], $dir[1], $dir[2]));
+    }
 
-  // convert basic arrays into Hex() objects
-  $hexes = parse_hex_coordinates($board_shape);
+    // load the board shape
+    $board_shape = get_setting('board_shape');
+    if (!$board_shape) {
+      throw new Exception('Unable to load board.');
+    }
 
-  // get min and max values in each coordinate direction and pixel direction
-  $min_x = 0; $max_x = 0;
-  $min_y = 0; $max_y = 0;
-  $min_z = 0; $max_z = 0;
+    // convert basic arrays into Hex() objects
+    $hexes = parse_hex_coordinates($board_shape);
 
-  $min_width = 0; $max_width = 0;
-  $min_height= 0; $max_height= 0;
+    // get min and max values in each coordinate direction
+    $min_x = 0; $max_x = 0;
+    $min_y = 0; $max_y = 0;
+    $min_z = 0; $max_z = 0;
 
-  foreach ($hexes as $hex) {
-    $data['hex_count']++; // iterate the hex counter
+    // and each pixel direction
+    $min_width = 0; $max_width = 0;
+    $min_height= 0; $max_height= 0;
 
-    if (x($hex) < $min_x) { $min_x = x($hex); }
-    if (x($hex) > $max_x) { $max_x = x($hex); }
+    foreach ($hexes as $hex) {
+      $data['hex_count']++; // iterate the hex counter
 
-    if (y($hex) < $min_y) { $min_y = y($hex); }
-    if (y($hex) > $max_y) { $max_y = y($hex); }
+      if (x($hex) < $min_x) { $min_x = x($hex); }
+      if (x($hex) > $max_x) { $max_x = x($hex); }
 
-    if (z($hex) < $min_z) { $min_z = z($hex); }
-    if (z($hex) > $max_z) { $max_z = z($hex); }
+      if (y($hex) < $min_y) { $min_y = y($hex); }
+      if (y($hex) > $max_y) { $max_y = y($hex); }
 
-    $x = x(hex_to_pt($hex,1));
-    if ($x < $min_width) { $min_width = $x; }
-    if ($x > $max_width) { $max_width = $x; }
+      if (z($hex) < $min_z) { $min_z = z($hex); }
+      if (z($hex) > $max_z) { $max_z = z($hex); }
 
-    $y = y(hex_to_pt($hex,1));
-    if ($y <$min_height) { $min_height= $y; }
-    if ($y >$max_height) { $max_height= $y; }
-  }
+      $x = x(hex_to_pt($hex,1));
+      if ($x < $min_width) { $min_width = $x; }
+      if ($x > $max_width) { $max_width = $x; }
 
-  // calculate the size (radius) of each hexagon based on number of hexes & container size
-  $width = get_setting('board_container_width');
-  $height= get_setting('board_container_height');
-  $center = Pt($width/2.0, $height/2.0);
+      $y = y(hex_to_pt($hex,1));
+      if ($y <$min_height) { $min_height= $y; }
+      if ($y >$max_height) { $max_height= $y; }
+    }
 
-  $data['size'] = min($width / (2 + $max_width - $min_width), $height/ (2 + $max_height-$min_height));
+    // calculate the size (radius) of each hexagon based on number of hexes & container size
+    $width = get_setting('board_container_width');
+    $height= get_setting('board_container_height');
+    $center = Pt($width/2.0, $height/2.0);
 
-  $count = 0; // reset a local counter
+    $data['size'] = min($width / (2 + $max_width - $min_width), $height/ (2 + $max_height-$min_height));
 
-  // add data to each hex object and create the nodes
-  foreach ($hexes as $hex) {
+    // load and shuffle the resource tiles
+    $data['tiles'] = get_setting('tiles');
+    shuffle($data['tiles']);
 
-    $h = array('i'=>$count, 'type'=>'', 'roll'=>0);
+    // and do the same for the dicerolls
+    $data['dicerolls'] = get_setting('dicerolls');
+    shuffle($data['dicerolls']);
 
-    if (is_edge_hex($hex, $min_x, $max_x, $min_y, $max_y, $min_z, $max_z)) {
-      $h['type'] = 'ocean';
-    } else {
-      $h['type'] = array_pop($data['tiles']);
-      if ($h['type'] != 'desert') {
-        $h['roll'] = array_pop($data['dicerolls']);
+    // and again for harbors
+    $data['harbors'] = get_setting('harbors');
+    shuffle($data['harbors']);
+
+    // reset a local counter
+    $count = 0;
+
+    // add data to each hex object and create the nodes
+    foreach ($hexes as $hex) {
+
+      $h = array('i'=>$count, 'type'=>'', 'roll'=>0);
+
+      if (is_edge_hex($hex, $min_x, $max_x, $min_y, $max_y, $min_z, $max_z)) {
+        $h['type'] = 'ocean';
+      } else {
+        $h['type'] = array_pop($data['tiles']);
+        if ($h['type'] != 'desert') {
+          $h['roll'] = array_pop($data['dicerolls']);
+        }
       }
+
+      $h['coords'] = $hex;
+      $h['pt'] = pt_add($center, hex_to_pt($hex, $data['size']));
+      $h['points'] = array();
+
+      array_push($data['hexes'], $h);
+
+      for ($i=0; $i<6; $i++) {
+        $node = get_hex_corner($h['pt'], $data['size'], $i);
+        append_node($data, $node, $count);
+      }
+
+      $count++;
     }
 
-    $h['coords'] = $hex;
-    $h['pt'] = pt_add($center, hex_to_pt($hex, $data['size']));
-    $h['points'] = array();
-
-    array_push($data['hexes'], $h);
-
-    for ($i=0; $i<6; $i++) {
-      $node = get_hex_corner($h['pt'], $data['size'], $i);
-      append_node($data, $node, $count);
-    }
-
-    $count++;
-  }
-
-  // create the edges
-  foreach ($data['nodes'] as $node) {
-    if ($node['type'] != 'ocean') { // no edges should extend into the ocean
-      foreach ($data['nodes'] as $candidate) {
-        if ($candidate['type'] != 'ocean') {
-          if (is_neighbor($node['pt'], $candidate['pt'], $data['size'])) {
-            append_edge($data, $node, $candidate);
+    // create the edges
+    foreach ($data['nodes'] as $node) {
+      if ($node['type'] != 'ocean') { // no edges should extend into the ocean
+        foreach ($data['nodes'] as $candidate) {
+          if ($candidate['type'] != 'ocean') {
+            if (is_neighbor($node['pt'], $candidate['pt'], $data['size'])) {
+              append_edge($data, $node, $candidate);
+            }
           }
         }
       }
     }
+
+    $valid = validate_board($data);
   }
 
   echo_objects($data);
