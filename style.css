@@ -17,3 +17,32 @@ html, .container { /* make container take up full screen */
   top: 20px; right: 20px; bottom: 20px; left: 20px;
   background-color: #fff;
 }
+
+#ocean {
+  fill: #ac0;
+}
+
+#lumber {
+  fill: #3ea;
+}
+
+#grain {
+  fill: #fa0;
+}
+
+#wool {
+  fill: #555;
+}
+
+#brick {
+  fill: url(#brick);
+  min-height: 100%;
+}
+
+#ore {
+  fill: #000;
+}
+
+#desert {
+  fill: #b0f;
+}

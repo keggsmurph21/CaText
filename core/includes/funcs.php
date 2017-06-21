@@ -29,6 +29,10 @@ function init_settings($path, $flavor='standard') {
   foreach ($dirs as $dir) {
     $hex_dirs[] = Hex($dir[0], $dir[1], $dir[2]);
   }
+
+  global $tiles;
+  $tiles = get_setting('tiles');
+  shuffle($tiles);
 }
 
 /**
@@ -76,8 +80,8 @@ function get_layout_file($filename='') {
 function get_hex_corner($center, $size, $i) {
   $deg = 60 * $i + 30; $rad = pi() / 180.0 * $deg;
 
-  $x = $center['x'] + $size * cos($rad);
-  $y = $center['y'] + $size * sin($rad);
+  $x = x($center) + $size * cos($rad);
+  $y = y($center) + $size * sin($rad);
 
   return Pt($x, $y);
 }
@@ -91,21 +95,6 @@ function get_hex($center, $size) {
     $hexagon[] = get_hex_corner($center, $size, $i);
   }
   return $hexagon;
-}
-
-/**
- * given two hexes, will return true if they are adjacent and false if not
- */
-function hex_hex_is_neighbor($a, $b) {
-  global $hex_directions;
-
-  foreach ($hex_dirs as $dir) {
-    if (hex_equal( hex_add($a, $dir), $b )) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 /**
@@ -128,10 +117,10 @@ function hex_add($a, $b) {
 /**
  * determines whether two Hex objects have the same coordinates
  */
-function hex_equal($a, $b) {
-  if (x($a) != x($b)) { return false; }
-  if (y($a) != y($b)) { return false; }
-  if (z($a) != z($b)) { return false; }
+function hex_equal($a, $b, $dist=0.001) {
+  if (abs(x($a) - x($b)) < $dist) { return false; }
+  if (abs(y($a) - y($b)) < $dist) { return false; }
+  if (abs(z($a) - z($b)) < $dist) { return false; }
 
   return true;
 }
@@ -155,11 +144,18 @@ function pt_add($a, $b) {
 /**
  * determines whether two Pt objects have the same coordinates
  */
-function pt_equal($a, $b) {
-  if (x($a) != x($b)) { return false; }
-  if (y($a) != y($b)) { return false; }
+ function pt_equal($a, $b, $dist=0.001) {
+   if (pt_dist($a, $b) < $dist) {
+     return true;
+   }
 
-  return true;
+   return false;
+ }
+
+function pt_dist($a, $b) {
+  $dx = x($a) - x($b);
+  $dy = y($a) - y($b);
+  return sqrt(pow($dx,2) + pow($dy,2));
 }
 
 /**
@@ -196,10 +192,65 @@ function z($obj) {
   return $obj['z'];
 }
 
+/**
+ *
+ */
 function hex_to_pt($hex, $size) {
-  $x = $size * (x($hex) - y($hex));
-  $y = $size * z($hex) * sqrt(3);
+  $x = $size * (x($hex) - y($hex)) * sqrt(3)/2;
+  $y = $size * z($hex) * -1.5;
   return Pt($x,$y);
+}
+
+function is_node_in_list($node, $nodes, $dist=0.0001) {
+  foreach ($nodes as $n) {
+    if (pt_dist($node, $n) < $dist) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * given two hexes, will return true if they are adjacent and false if not
+ */
+function is_neighbor($a, $b) {
+  global $hex_dirs;
+
+  foreach ($hex_dirs as $dir) {
+    if (pt_equal( pt_add($a, $dir), $b )) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function get_hex_id($hex, $hexes) {
+  // count number of neighbors.. anything less than 6 is an ocean spot
+  $neighbors = 0;
+
+  foreach ($hexes as $h) {
+    if (is_neighbor($hex, $h)) {
+      $neighbors++;
+    }
+  }
+
+  if ($neighbors < 6) {
+    return 'ocean';
+  } else {
+    global $tiles;
+    return array_pop($tiles);
+  }
+}
+
+function echo_hexagon($id, $pt, $size, $points) {
+  echo '<polygon class="hex" id="' . $id . '" points="';
+  for ($i=0; $i<6; $i++) {
+    $node = get_hex_corner($pt, $size, $i);
+    echo x($node) . ' ' . y($node) . ' ';
+  }
+  echo '" />';
 }
 
 /**
@@ -216,41 +267,59 @@ function setup_board() {
   // determine how many hexes we have in each direction (ni=max in i direction)
   $min_x = 0; $max_x = 0;
   $min_y = 0; $max_y = 0;
-  $min_z = 0; $max_z = 0;
 
   foreach ($hexes as $hex) {
-    $x = x($hex); $y = x($hex); $z = x($hex);
-    if ($x < $min_x) { $min_x = $x; } if ($x > $max_x) { $max_x = $x; }
-    if ($y < $min_y) { $min_y = $y; } if ($y > $max_y) { $max_y = $y; }
-    if ($z < $min_z) { $min_z = $z; } if ($z > $max_z) { $max_z = $z; }
-  }
+    $x = x(hex_to_pt($hex,1));
+    if ($x < $min_x) { $min_x = $x; }
+    if ($x > $max_x) { $max_x = $x; }
 
-  $nx = $max_x - $min_x; $ny = $max_y - $min_y; $nz = $max_z - $min_z;
+    $y = y(hex_to_pt($hex,1));
+    if ($y < $min_y) { $min_y = $y; }
+    if ($y > $max_y) { $max_y = $y; }
+  }
 
   $width = get_setting('board_container_width');
   $height = get_setting('board_container_height');
 
-  // use the hex-count to determine the max size of each hex against the container
-  $size_x = min($width / ($nx * sqrt(3) * 2), $height / (0.5 + 1.5 * $nx));
-  $size_y = min($width / ($ny * sqrt(3) * 2), $height / (0.5 + 1.5 * $ny));
-  $size_z = min($width / ($nz * sqrt(3) * 2), $height / (0.5 + 1.5 * $nz));
+  $size = min($width / (2 + $max_x - $min_x), $height / (2 + $max_y - $min_y));
 
-  $size = min($size_x, $size_y, $size_z);
-  echo $size;
+  // update hex directions to points
+  global $hex_dirs;
+  $tmp = [];
+  foreach ($hex_dirs as $dir) {
+    $tmp[] = hex_to_pt($dir, $size);
+  }
+  $hex_dirs = $tmp;
 
+  // create and draw the hexagons
   $ctr = Pt($width/2, $height/2);
-  $pts = [];
+  $cntrs = [];
+  $cntr_nodes = [];
+  $nodes = [];
 
   foreach ($hexes as $hex) {
     $pt = hex_to_pt($hex, $size);
     $pt = pt_add($pt, $ctr);
-    echo '<circle cx="' . x($pt) . '" cy="' . y($pt) . '" r="5" fill="black">';
-    echo '</circle>';
+    $cntrs[] = $pt;
+
     for ($i=0; $i<6; $i++) {
-      $v = get_hex_corner($pt, $size, $i);
-      echo '<circle cx="' . x($v) . '" cy="' . y($v) . '" r="1" fill="black">';
-      echo '</circle>';
+      $node = get_hex_corner($pt, $size, $i);
+      $tmp[] = $node;
+      if (!is_node_in_list($node, $nodes)) {
+        $nodes[] = $node;
+      }
     }
+
+    array_push($cntr_nodes, $tmp);
   }
+
+  for ($i=0; $i<count($cntrs); $i++) {
+    $id = get_hex_id($cntrs[$i], $cntrs);
+    echo_hexagon($id, $cntrs[$i], $size, $cntr_nodes[$i]);
+  }
+
+  // create and draw the lines
+
+  echo count($nodes);
 }
 ?>

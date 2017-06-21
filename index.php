@@ -17,7 +17,14 @@
 
   	<div class="container">
       <svg id="boardContainer" width=<?= get_setting('board_container_width') ?> height=<?= get_setting('board_container_height') ?>>
+        <defs>
+          <pattern id="brick" x="0" y="0" patternUnites="userSpaceOnUse" width="200" height="200">
+            <image x="-100" y="0" width="168" height="194" href="./resources/tile_bkg_brick.png"> </image>
+          </pattern>
+        </defs>
+
         <?php setup_board(); ?>
+
       </svg>
   	</div>
 
