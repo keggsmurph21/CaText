@@ -118,6 +118,18 @@ function pt_add($a, $b) {
 }
 
 /**
+ * returns a Pt object rotated by $theta degrees
+ */
+function pt_rotate($a, $theta) {
+  $rad = pi() / 180.0 * $theta;
+
+  $x = cos($rad) * x($a) - sin($rad) * y($a);
+  $y = sin($rad) * x($a) + cos($rad) * y($a);
+
+  return Pt($x, $y);
+}
+
+/**
  * determines whether two Pt objects have the same coordinates (w/in $dist)
  */
 function pt_equal($a, $b, $dist=0.001) {
@@ -252,6 +264,11 @@ function echo_objects(&$data) {
         echo y($data['nodes'][$p]['pt']) . ' ';
       }
       echo '"> </polygon>';
+      if ($hex['harbor'] != 'open') {
+        echo '<text class="roll" x="' . x($hex['pt']) . '" y="' . y($hex['pt']) . '">';
+          echo $hex['harbor'];
+        echo '</text>';
+      }
     }
   }
 
@@ -267,6 +284,21 @@ function echo_objects(&$data) {
       echo_roll_chip($hex);
     }
   }
+
+  // then the harbors
+  foreach ($data['harbors'] as $harbor) {
+
+    $pts = array(pt_add($harbor['pt'], pt_rotate(Pt($data['size']/3.0,0), $harbor['theta'])),
+                 pt_add($harbor['pt'], pt_rotate(Pt($data['size'],0), $harbor['theta']+30)),
+                 pt_add($harbor['pt'], pt_rotate(Pt($data['size'],0), $harbor['theta']-30)));
+
+    echo '<polygon id="' . $harbor['type'] . '-' . get_setting('background_style') . '" points="';
+    foreach ($pts as $pt) {
+      echo x($pt) . ' ' . y($pt) . ' ';
+    }
+    echo '"> </polygon>';
+  }
+
 
   // then the edges
   foreach ($data['edges'] as $edge) {
@@ -390,13 +422,13 @@ function validate_board(&$data) {
 
       $hex = $data['hexes'][$hex_id];
       if ($hex['roll'] == 6 || $hex['roll'] == 8) {
-        $tension += 0.5;
+        $tension += 2;
       }
       if ($hex['roll'] == 5 || $hex['roll'] == 9) {
-        $tension += 0.25;
+        $tension += 1;
       }
 
-      if ($tension >= 1.0) {
+      if ($tension > 3) {
         return false;
       }
     }
@@ -508,6 +540,7 @@ function setup_board() {
       $h['coords'] = $hex;
       $h['pt'] = pt_add($center, hex_to_pt($hex, $data['size']));
       $h['points'] = array();
+      $h['harbor'] = 'open';
 
       array_push($data['hexes'], $h);
 
@@ -532,9 +565,28 @@ function setup_board() {
       }
     }
 
+    // designate harbors (chosen randomly)
+    $harbors = array();
+    $harbor_places = get_setting('harbor_placement');
+
+    foreach ($harbor_places as $hp) {
+      $harbor = array('coords'=>array(), 'pt'=>array(), 'theta'=>0, 'type'=>'');
+
+      $harbor['coords'] = Hex($hp[0], $hp[1], $hp[2]);
+      $harbor['theta'] = $hp[3];
+      $harbor['pt'] = pt_add(hex_to_pt($harbor['coords'], $data['size']), $center);
+      $harbor['type'] = array_pop($data['harbors']);
+
+      array_push($harbors, $harbor);
+    }
+
+    // save the result into the data array
+    $data['harbors'] = $harbors;
+
     $valid = validate_board($data);
   }
 
+  // output a valid game board
   echo_objects($data);
 
 }
