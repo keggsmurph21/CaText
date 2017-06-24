@@ -102,6 +102,55 @@ function get_hex_corner($center, $size, $i) {
 }
 
 /**
+ * use the configuration of hexes and the size of the container to calculate the
+ * maximum radius of each hex
+ */
+function get_hex_radius(&$hexes, &$center, &$extrema) {
+
+  // get min and max values in each coordinate direction
+  $min_x = 0; $max_x = 0;
+  $min_y = 0; $max_y = 0;
+  $min_z = 0; $max_z = 0;
+
+  // and each pixel direction
+  $min_width = 0; $max_width = 0;
+  $min_height= 0; $max_height= 0;
+
+  foreach ($hexes as $hex) {
+
+    if (x($hex) < $min_x) { $min_x = x($hex); }
+    if (x($hex) > $max_x) { $max_x = x($hex); }
+
+    if (y($hex) < $min_y) { $min_y = y($hex); }
+    if (y($hex) > $max_y) { $max_y = y($hex); }
+
+    if (z($hex) < $min_z) { $min_z = z($hex); }
+    if (z($hex) > $max_z) { $max_z = z($hex); }
+
+    $x = x(hex_to_pt($hex,1));
+    if ($x < $min_width) { $min_width = $x; }
+    if ($x > $max_width) { $max_width = $x; }
+
+    $y = y(hex_to_pt($hex,1));
+    if ($y <$min_height) { $min_height= $y; }
+    if ($y >$max_height) { $max_height= $y; }
+  }
+
+  $extrema['min_x'] = $min_x;   $extrema['max_x'] = $max_x;
+  $extrema['min_y'] = $min_y;   $extrema['max_y'] = $max_y;
+  $extrema['min_z'] = $min_z;   $extrema['max_z'] = $max_z;
+
+  // calculate the size (radius) of each hexagon based on number of hexes & container size
+  $width = get_setting('board_container_width');
+  $height= get_setting('board_container_height');
+  $center = Pt($width/2.0, $height/2.0);
+  $size = min($width / (2 + $max_width - $min_width), $height/ (2 + $max_height-$min_height));
+
+  return $size;
+
+}
+
+/**
  * returns a Pt (Point) object
  */
 function Pt($x, $y) {
@@ -204,10 +253,11 @@ function is_neighbor($a, $b, $dist, $margin=0.001) {
  * returns whether a given object is on the edge of the hexes
  * ( helper function for setup_board() )
  */
-function is_edge_hex($hex, &$min_x, &$max_x, &$min_y, &$max_y, &$min_z, &$max_z) {
+function is_edge_hex($hex, &$extrema) {
   $x = x($hex); $y = y($hex); $z = z($hex);
 
-  if ( $x == $min_x || $x == $max_x || $y == $min_y || $y == $max_y || $z == $min_z || $z == $max_z) {
+  if ( $x == $extrema['min_x'] || $x == $extrema['max_x'] || $y == $extrema['min_y'] ||
+       $y == $extrema['max_y'] || $z == $extrema['min_z'] || $z == $extrema['max_z']) {
     return true;
   } else {
     return false;
@@ -442,83 +492,35 @@ function validate_board(&$data) {
  */
 function setup_board() {
 
+  // load the board shape
+  $board_shape = get_setting('board_shape');
+  if (!$board_shape) {
+    throw new Exception('Unable to load board.');
+  }
+
+  // convert basic arrays into Hex() objects
+  $hexes = parse_hex_coordinates($board_shape);
+
+  // calculate the maximum possible radius of each hex
+  $extrema = array(); $center = Pt(0,0);
+  $size = get_hex_radius($hexes, $center, $extrema);
+
   // default to not valid board arrangement
   $valid = false;
 
   // continuously attempt to setup the board until we achieve a valid configuration
   while (!$valid) {
 
-    // delete the $data from old attempts
-    unset($data);
-
-    // to store most of the variables, pass around references to it
-    $data = array('dirs'=>array(), 'tiles'=>array(), 'hexes'=>array(),
-      'pts'=>array(), 'nodes'=>array(), 'edges'=>array(), 'hex_count'=>0,
-      'node_count'=>0, 'edge_count'=>0);
-
-    // set up the valid directions (in hex coords)
-    $dirs = [[-1,1,0], [0,1,-1], [1,0,-1], [1,-1,0], [0,-1,1], [-1,0,1]];
-    foreach ($dirs as $dir) {
-      array_push($data['dirs'], Hex($dir[0], $dir[1], $dir[2]));
-    }
-
-    // load the board shape
-    $board_shape = get_setting('board_shape');
-    if (!$board_shape) {
-      throw new Exception('Unable to load board.');
-    }
-
-    // convert basic arrays into Hex() objects
-    $hexes = parse_hex_coordinates($board_shape);
-
-    // get min and max values in each coordinate direction
-    $min_x = 0; $max_x = 0;
-    $min_y = 0; $max_y = 0;
-    $min_z = 0; $max_z = 0;
-
-    // and each pixel direction
-    $min_width = 0; $max_width = 0;
-    $min_height= 0; $max_height= 0;
-
-    foreach ($hexes as $hex) {
-      $data['hex_count']++; // iterate the hex counter
-
-      if (x($hex) < $min_x) { $min_x = x($hex); }
-      if (x($hex) > $max_x) { $max_x = x($hex); }
-
-      if (y($hex) < $min_y) { $min_y = y($hex); }
-      if (y($hex) > $max_y) { $max_y = y($hex); }
-
-      if (z($hex) < $min_z) { $min_z = z($hex); }
-      if (z($hex) > $max_z) { $max_z = z($hex); }
-
-      $x = x(hex_to_pt($hex,1));
-      if ($x < $min_width) { $min_width = $x; }
-      if ($x > $max_width) { $max_width = $x; }
-
-      $y = y(hex_to_pt($hex,1));
-      if ($y <$min_height) { $min_height= $y; }
-      if ($y >$max_height) { $max_height= $y; }
-    }
-
-    // calculate the size (radius) of each hexagon based on number of hexes & container size
-    $width = get_setting('board_container_width');
-    $height= get_setting('board_container_height');
-    $center = Pt($width/2.0, $height/2.0);
-
-    $data['size'] = min($width / (2 + $max_width - $min_width), $height/ (2 + $max_height-$min_height));
+    // have one array to store most of the board state data
+    //   & pass around references to it
+    $data = array('tiles'=>array(), 'hexes'=>array(), 'nodes'=>array(), 'edges'=>array(),
+      'node_count'=>0, 'edge_count'=>0, 'size'=>$size);
 
     // load and shuffle the resource tiles
-    $data['tiles'] = get_setting('tiles');
-    shuffle($data['tiles']);
+    $data['tiles'] = get_setting('tiles');          shuffle($data['tiles']);
 
     // and do the same for the dicerolls
-    $data['dicerolls'] = get_setting('dicerolls');
-    shuffle($data['dicerolls']);
-
-    // and again for harbors
-    $data['harbors'] = get_setting('harbors');
-    shuffle($data['harbors']);
+    $data['dicerolls'] = get_setting('dicerolls');  shuffle($data['dicerolls']);
 
     // reset a local counter
     $count = 0;
@@ -528,7 +530,7 @@ function setup_board() {
 
       $h = array('i'=>$count, 'type'=>'', 'roll'=>0);
 
-      if (is_edge_hex($hex, $min_x, $max_x, $min_y, $max_y, $min_z, $max_z)) {
+      if (is_edge_hex($hex, $extrema)) {
         $h['type'] = 'ocean';
       } else {
         $h['type'] = array_pop($data['tiles']);
@@ -552,38 +554,37 @@ function setup_board() {
       $count++;
     }
 
-    // create the edges
-    foreach ($data['nodes'] as $node) {
-      if ($node['type'] != 'ocean') { // no edges should extend into the ocean
-        foreach ($data['nodes'] as $candidate) {
-          if ($candidate['type'] != 'ocean') {
-            if (is_neighbor($node['pt'], $candidate['pt'], $data['size'])) {
-              append_edge($data, $node, $candidate);
-            }
+    $valid = validate_board($data);
+  }
+
+  // create the edges
+  foreach ($data['nodes'] as $node) {
+    if ($node['type'] != 'ocean') { // no edges should extend into the ocean
+      foreach ($data['nodes'] as $candidate) {
+        if ($candidate['type'] != 'ocean') {
+          if (is_neighbor($node['pt'], $candidate['pt'], $data['size'])) {
+            append_edge($data, $node, $candidate);
           }
         }
       }
     }
+  }
 
-    // designate harbors (chosen randomly)
-    $harbors = array();
-    $harbor_places = get_setting('harbor_placement');
+  // designate harbors (chosen randomly)
+  $harbors = get_setting('harbors');      shuffle($harbors);
+  $harbor_places = get_setting('harbor_placement');
 
-    foreach ($harbor_places as $hp) {
-      $harbor = array('coords'=>array(), 'pt'=>array(), 'theta'=>0, 'type'=>'');
+  $data['harbors'] = array();
 
-      $harbor['coords'] = Hex($hp[0], $hp[1], $hp[2]);
-      $harbor['theta'] = $hp[3];
-      $harbor['pt'] = pt_add(hex_to_pt($harbor['coords'], $data['size']), $center);
-      $harbor['type'] = array_pop($data['harbors']);
+  foreach ($harbor_places as $hp) {
+    $harbor = array('coords'=>array(), 'pt'=>array(), 'theta'=>0, 'type'=>'');
 
-      array_push($harbors, $harbor);
-    }
+    $harbor['coords'] = Hex($hp[0], $hp[1], $hp[2]);
+    $harbor['theta'] = $hp[3];
+    $harbor['pt'] = pt_add(hex_to_pt($harbor['coords'], $data['size']), $center);
+    $harbor['type'] = array_pop($harbors);
 
-    // save the result into the data array
-    $data['harbors'] = $harbors;
-
-    $valid = validate_board($data);
+    array_push($data['harbors'], $harbor);
   }
 
   // output a valid game board
