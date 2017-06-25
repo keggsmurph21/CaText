@@ -70,6 +70,25 @@ function get_layout_file($filename='') {
 }
 
 /**
+ * begins keeping time
+ */
+function start_timer() {
+  $time = microtime();
+  $time = explode(' ', $time);
+  return $time[1] + $time[0];
+}
+
+/**
+ * stops keeping time
+ */
+function stop_timer($start) {
+  $time = microtime();
+  $time = explode(' ', $time);
+  $finish = $time[1] + $time[0];
+  return round(($finish - $start), 4);
+}
+
+/**
  * returns a Hex object
  */
 function Hex($x, $y, $z) {
@@ -151,6 +170,21 @@ function get_hex_radius(&$hexes, &$center, &$extrema) {
 }
 
 /**
+ * returns whether a given object is on the edge of the hexes
+ * ( helper function for setup_board() )
+ */
+function is_edge_hex($hex, &$extrema) {
+  $x = x($hex); $y = y($hex); $z = z($hex);
+
+  if ( $x == $extrema['min_x'] || $x == $extrema['max_x'] || $y == $extrema['min_y'] ||
+       $y == $extrema['max_y'] || $z == $extrema['min_z'] || $z == $extrema['max_z']) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
  * returns a Pt (Point) object
  */
 function Pt($x, $y) {
@@ -201,28 +235,28 @@ function pt_dist($a, $b) {
 /**
  * returns the x-coordinate of an object
  */
-function x($obj) {
+function x(&$obj) {
   return $obj['x'];
 }
 
 /**
  * returns the y-coordinate of an object
  */
-function y($obj) {
+function y(&$obj) {
   return $obj['y'];
 }
 
 /**
  * returns the z-coordinate of an object
  */
-function z($obj) {
+function z(&$obj) {
   return $obj['z'];
 }
 
 /**
  * transforms a Hex object into a Pt object for rendering
  */
-function hex_to_pt($hex, $size) {
+function hex_to_pt(&$hex, $size) {
   $x = $size * (x($hex) - y($hex)) * sqrt(3)/2;
   $y = $size * z($hex) * -1.5;
   return Pt($x,$y);
@@ -231,7 +265,7 @@ function hex_to_pt($hex, $size) {
 /**
  * transforms a Pt object into a Hex object for computation
  */
-function pt_to_hex($pt, $size) {
+function pt_to_hex(&$pt, $size) {
   $z = y($pt) / $size * -2.0 / 3.0;
   $y = x($pt) / $size * -1.0 / sqrt(3.0) - $z / 2.0;
   $x = - ($y + $z);
@@ -250,18 +284,28 @@ function is_neighbor($a, $b, $dist, $margin=0.001) {
 }
 
 /**
- * returns whether a given object is on the edge of the hexes
- * ( helper function for setup_board() )
+ * iterates over all the hexes and returns an array of all those hexes
+ * which neighbor a given hex.. if $filter_oceans==true, return only those
+ * hexes of type!='ocean'
  */
-function is_edge_hex($hex, &$extrema) {
-  $x = x($hex); $y = y($hex); $z = z($hex);
+function hex_get_neighbors(&$data, $hex, $filter_oceans=false) {
+  $neighbors = array();
 
-  if ( $x == $extrema['min_x'] || $x == $extrema['max_x'] || $y == $extrema['min_y'] ||
-       $y == $extrema['max_y'] || $z == $extrema['min_z'] || $z == $extrema['max_z']) {
-    return true;
-  } else {
-    return false;
+  // iterate over all the hexes and check each one
+  foreach ($data['hexes'] as $h) {
+    $dist = pt_dist($h['pt'], $hex['pt']);
+    if ($dist < 2*$data['size'] && $dist > 0) {
+      if ($filter_oceans) {
+        if ($h['type'] != 'ocean') {
+          array_push($neighbors, $h);
+        }
+      } else {
+        array_push($neighbors, $h);
+      }
+    }
   }
+
+  return $neighbors;
 }
 
 /**
@@ -342,7 +386,7 @@ function echo_objects(&$data) {
                  pt_add($harbor['pt'], pt_rotate(Pt($data['size'],0), $harbor['theta']+30)),
                  pt_add($harbor['pt'], pt_rotate(Pt($data['size'],0), $harbor['theta']-30)));
 
-    echo '<polygon id="' . $harbor['type'] . '-' . get_setting('background_style') . '" points="';
+    echo '<polygon class="harbor" id="' . $harbor['type'] . '-' . get_setting('background_style') . '" points="';
     foreach ($pts as $pt) {
       echo x($pt) . ' ' . y($pt) . ' ';
     }
@@ -436,31 +480,6 @@ function append_edge(&$data, $a, $b) {
 }
 
 /**
- * iterates over all the hexes and returns an array of all those hexes
- * which neighbor a given hex.. if $filter_oceans==true, return only those
- * hexes of type!='ocean'
- */
-function hex_get_neighbors(&$data, $hex, $filter_oceans=false) {
-  $neighbors = array();
-
-  // iterate over all the hexes and check each one
-  foreach ($data['hexes'] as $h) {
-    $dist = pt_dist($h['pt'], $hex['pt']);
-    if ($dist < 2*$data['size'] && $dist > 0) {
-      if ($filter_oceans) {
-        if ($h['type'] != 'ocean') {
-          array_push($neighbors, $h);
-        }
-      } else {
-        array_push($neighbors, $h);
-      }
-    }
-  }
-
-  return $neighbors;
-}
-
-/**
  * iterates over the board to make sure a red hex is not adjacent to another
  * red hex or to two 4-dot hexes
  */
@@ -507,6 +526,7 @@ function setup_board() {
 
   // default to not valid board arrangement
   $valid = false;
+  $attempts = 0;
 
   // continuously attempt to setup the board until we achieve a valid configuration
   while (!$valid) {
@@ -555,6 +575,7 @@ function setup_board() {
     }
 
     $valid = validate_board($data);
+    $attempts++;
   }
 
   // create the edges
@@ -589,6 +610,8 @@ function setup_board() {
 
   // output a valid game board
   echo_objects($data);
+
+  return $attempts;
 
 }
 ?>

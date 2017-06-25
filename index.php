@@ -10,6 +10,10 @@
 
   <body>
 
+    <?php // timing stuff
+    $start = start_timer();
+    ?>
+
     <?php
     require_once('core/includes/funcs.php');
     init_settings('setup/standard/'); // should eventually be able to change which style gets loaded
@@ -43,14 +47,29 @@
           </defs>
         <?php } ?>
 
-        <?php setup_board(); ?>
+        <?php $attempts = setup_board(); ?>
 
       </svg>
   	</div>
 
+    <?php
+    $time = stop_timer($start);
+
+    if (get_setting('debug')) {
+      echo 'Page generated in ' . $total_time . ' seconds (' . $attempts . ').';
+    }
+    ?>
+
   </body>
 
   <script>
+
+  roll_chips = d3.selectAll('.roll', '.roll_chip');
+  edges = d3.selectAll('.edge');
+  hexes = d3.selectAll('.hex');
+  nodes = d3.selectAll('.node');
+
+  nodes.style('display','none');
 
   </script>
 
