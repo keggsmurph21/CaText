@@ -64,6 +64,66 @@
 
   <script>
 
+  function take_turn() {
+    console.log('take turn');
+    play_dev_card();
+    roll_dice();
+    play_dev_card();
+    trade();
+    play_dev_card();
+    build();
+    play_dev_card();
+  }
+
+  function play_dev_card() {
+    console.log('play dev card');
+  }
+
+  function roll_dice() {
+    console.log('roll dice');
+    if (roll === 7) {
+      force_discard_half();
+      hex = move_robber();
+      while (!is_valid_move_robber(hex)) {
+        hex = move_robber();
+      }
+      steal_card();
+    } else {
+      collect_resources();
+    }
+  }
+
+  function trade() {
+    console.log('trade');
+    trade_with_players();
+    trade_with_bank();
+  }
+
+  function build() {
+    console.log('build');
+  }
+
+  function force_discard_half() {
+    console.log('force discard half');
+  }
+
+  function move_robber() {
+    console.log('move robber');
+  }
+
+  function is_valid_move_robber() {
+    console.log('is valid move robber');
+    return true;
+  }
+
+  function steal_card() {
+    console.log('steal card');
+  }
+
+  function collect_resources() {
+    console.log('collect resources');
+  }
+
   roll_chips = d3.selectAll('.roll', '.roll_chip');
   edges = d3.selectAll('.edge');
   hexes = d3.selectAll('.hex');
