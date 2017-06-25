@@ -10,13 +10,11 @@
 
   <body>
 
-    <?php // timing stuff
-    $start = start_timer();
-    ?>
-
     <?php
     require_once('core/includes/funcs.php');
     init_settings('setup/standard/'); // should eventually be able to change which style gets loaded
+
+    $start = start_timer();
     ?>
 
   	<div class="container">
@@ -56,13 +54,23 @@
     $time = stop_timer($start);
 
     if (get_setting('debug')) {
-      echo 'Page generated in ' . $total_time . ' seconds (' . $attempts . ').';
+      echo 'Page generated in ' . $time . ' seconds (' . $attempts . ').';
     }
     ?>
 
   </body>
 
   <script>
+
+  function init_board() {
+    
+    roll_chips = d3.selectAll('.roll', '.roll_chip');
+    edges = d3.selectAll('.edge');
+    hexes = d3.selectAll('.hex');
+    nodes = d3.selectAll('.node');
+
+    nodes.style('display','none');
+  }
 
   function take_turn() {
     console.log('take turn');
@@ -73,14 +81,29 @@
     play_dev_card();
     build();
     play_dev_card();
+
+    check_victory_points();
   }
 
   function play_dev_card() {
     console.log('play dev card');
+    type = 'progress_card'; // tmp
+    if (type === 'victory_point') {
+      console.log('victory_point');
+    } else if (type === 'progress_card') {
+      console.log('progress_card');
+    } else if (type === 'knight') {
+      console.log('knight');
+    } else {
+      console.log('warning: invalid dev card');
+    }
+
+    check_victory_points();
   }
 
   function roll_dice() {
     console.log('roll dice');
+    roll = 3; // tmp
     if (roll === 7) {
       force_discard_half();
       hex = move_robber();
@@ -101,6 +124,8 @@
 
   function build() {
     console.log('build');
+
+    check_victory_points();
   }
 
   function force_discard_half() {
@@ -124,12 +149,17 @@
     console.log('collect resources');
   }
 
-  roll_chips = d3.selectAll('.roll', '.roll_chip');
-  edges = d3.selectAll('.edge');
-  hexes = d3.selectAll('.hex');
-  nodes = d3.selectAll('.node');
+  function trade_with_players() {
+    console.log('trade with players');
+  }
 
-  nodes.style('display','none');
+  function trade_with_bank() {
+    console.log('trade with bank');
+  }
+
+  function check_victory_points() {
+    console.log('check victory points');
+  }
 
   </script>
 
