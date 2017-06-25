@@ -235,21 +235,21 @@ function pt_dist($a, $b) {
 /**
  * returns the x-coordinate of an object
  */
-function x(&$obj) {
+function x($obj) {
   return $obj['x'];
 }
 
 /**
  * returns the y-coordinate of an object
  */
-function y(&$obj) {
+function y($obj) {
   return $obj['y'];
 }
 
 /**
  * returns the z-coordinate of an object
  */
-function z(&$obj) {
+function z($obj) {
   return $obj['z'];
 }
 
