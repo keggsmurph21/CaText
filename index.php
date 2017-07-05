@@ -63,47 +63,81 @@
   <script>
 
   function init_board() {
+    var chip_data = { 'roll' : 0, 'center' : {'x':0, 'y':0}, 'hex' : null};
+    var chips = d3.select('#boardContainer').selectAll('.roll', '.roll_chip').datum(chip_data).on( 'click', function(d,i) { chip_clicked(this); });
 
-    var roll_chips = d3.selectAll('.roll', '.roll_chip').on( 'click', roll_chip_clicked ); // maybe add these methods in later
-    var edges = d3.selectAll('.edge').on( 'click', edge_clicked );
+    chips.each( function(d) {
+      d.roll = chip_get_roll(this);
+      d.center = chip_get_center(this);
+      d.hex = chip_get_hex(this);
+    });
 
-    var hex_data = { 'resource' : null, 'center' : {'x':0, 'y':0},
+    var edge_data = { 'owner' : null, 'center' : {'x':0, 'y':0}, 'neighbors' : [ null, null ]};
+    var edges = d3.select('#boardContainer').selectAll('.edge').datum(edge_data).on( 'click', function() { edge_clicked(this); });
+
+    edges.each( function(d) {
+      d.center = edge_get_center(this);
+      d.neighbors = edge_get_neighbors(this);
+    });
+
+    var hex_data = { 'resource' : null, 'center' : {'x':0, 'y':0}, 'chip' : null,
       'neighbors' : { '60' : null, '120' : null, '180' : null, '240' : null, '300' : null, '360' : null }};
+    var hexes = d3.select('#boardContainer').selectAll('.hex').datum(hex_data).on( 'click', function() { hex_clicked(this); });
 
-    var hexes = d3.select('#boardContainer').selectAll('.hex').datum(hex_data).on('click', hex_get_resource_type);
     hexes.each( function(d) {
       d.resource = hex_get_resource_type(this);
       d.center = hex_get_center(this);
-      //console.log(d);
-      //console.log(this);
+      d.chip = hex_get_chip(this);
     });
-    hexes.each( function(d) {
-      var a = this; var a_data = d;
+    /*hexes.each( function(d) {
+      //old_ctr = d.center.slice();
+
       hexes.each( function(d) {
         var b = this; var b_data = d;
         console.log(distance(a_data.center, b_data.center));
       })
-    })
+    })*/
 
     var nodes = d3.selectAll('.node').on( 'click', node_clicked );
 
-
+    return chips;
     //nodes.style('display','none');
   }
 
-  function roll_chip_clicked() {
-    console.log(this);
-    return this;
+  function chip_clicked(chip) {
+    console.log(chip);
+    console.log(d3.select(chip).data()[0]);
+    return chip;
   }
 
   function edge_clicked() {
-    console.log(this);
+    console.log(d3.select(this).data());
     return this;
   }
 
   function hex_clicked() {
-    //var resource = this.attr('id');
+    console.log(d3.select(this).data());
     return this;
+  }
+
+  function chip_get_roll(chip) {
+    return parseInt(d3.select(chip).text());
+  }
+
+  function chip_get_center(chip) {
+    return false;
+  }
+
+  function chip_get_hex(chip) {
+    return false;
+  }
+
+  function edge_get_center(edge) {
+    return false;
+  }
+
+  function edge_get_neighbors(edge) {
+    return false;
   }
 
   function hex_get_resource_type(hex) {
@@ -125,6 +159,10 @@
     }
 
     return {'x' : average(x_list), 'y' : average(y_list)};
+  }
+
+  function hex_get_chip(hex) {
+    return false;
   }
 
   function node_clicked() {
@@ -241,7 +279,7 @@
     console.log('check victory points');
   }
 
-  init_board();
+  chips = init_board();
 
   </script>
 
