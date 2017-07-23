@@ -1,4 +1,5 @@
 .DS_Store
+resources/*
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
