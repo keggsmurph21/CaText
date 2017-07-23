@@ -1,0 +1,21 @@
+{
+  "version": 1.0,
+  "debug": true,
+
+  "dice_num": 2,
+  "dice_min_roll": 1,
+  "dice_max_roll": 6,
+
+  "board_container_width": 600,
+  "board_container_height":600,
+  "background_style": "solid",
+  "display_nodes": true,
+  
+  "load_player_data_from_file": true,
+  "players_num_human": 4,
+  "players_num_cpu": 0,
+  "player_1_name": "Kevin",
+  "player_2_name": "Kegs",
+  "player_3_name": "Murph",
+  "player_4_name": "Jerome"
+}
