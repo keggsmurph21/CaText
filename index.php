@@ -12,7 +12,7 @@
 
   <body>
 
-    <?php
+    <?php /*
     require_once('core/includes/funcs.php');
     init_settings('setup/standard/'); // should eventually be able to change which style gets loaded
 
@@ -58,8 +58,13 @@
     if (get_setting('debug')) {
       echo 'Page generated in ' . $time . ' seconds (' . $attempts . ').';
     }
+    */
     ?>
 
   </body>
 
 </html>
+
+<script>
+  $(document).ready( test() );
+</script>

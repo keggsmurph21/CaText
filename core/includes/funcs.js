@@ -1,3 +1,7 @@
+function test() {
+  console.log('this is an init test');
+}
+
 function init_board() {
   var chip_data = { 'roll' : 0, 'center' : {'x':0, 'y':0}, 'hex' : null};
   var chips = d3.select('#boardContainer').selectAll('.roll', '.roll_chip').datum(chip_data).on( 'click', function(d,i) { chip_clicked(this); });
