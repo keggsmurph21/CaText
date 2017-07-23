@@ -1,5 +1,24 @@
-function test() {
-  console.log('this is an init test');
+function init() {
+  var settings = init_settings('./setup/standard/');
+  console.log(settings);
+}
+
+function init_settings(path, flavor='standard') {
+  var settings = {};
+
+  $.getJSON(path + 'settings.json', function(json) {
+    console.log(json);
+  });
+
+  $.getJSON(path + 'board.json', function(json) {
+    console.log(json);
+  });
+
+  return settings;
+}
+
+function init_settings_callback() {
+
 }
 
 function init_board() {

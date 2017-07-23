@@ -66,5 +66,5 @@
 </html>
 
 <script>
-  $(document).ready( test() );
+  $(document).ready( init() );
 </script>
