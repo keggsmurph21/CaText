@@ -101,7 +101,7 @@
     var nodes = d3.selectAll('.node').on( 'click', node_clicked );
 
     return chips;
-    //nodes.style('display','none');
+    //nodes.style('display','none'); 
   }
 
   function chip_clicked(chip) {
