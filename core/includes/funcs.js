@@ -8,12 +8,14 @@ function init_settings(path, flavor='standard') {
 
   $.getJSON(path + 'settings.json', function(json) {
     console.log(json);
+    Object.assign(settings, json);
   });
 
   $.getJSON(path + 'board.json', function(json) {
-    console.log(json);
+    Object.assign(settings, json);
   });
 
+  console.log(settings);
   return settings;
 }
 
