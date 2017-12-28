@@ -1,0 +1,8 @@
+# other branch stuff
+.elasticbeanstalk
+
+# system files
+*~
+*#
+.DS_Store
+
