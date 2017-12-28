@@ -1,1 +1,3 @@
 # catan
+
+$ python main.py

@@ -20,37 +20,12 @@ class Catan(object):
     def __init__(self):
         self.hexes = []
         self.nodes = []
-
         self.roads = []
         self.connections = []
-        self.channels = []
 
         self.players = []
 
-        diceValues = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
-        random.shuffle(diceValues)
-        resources = ['desert', 'wheat', 'wheat', 'wheat', 'wheat', 'sheep', 'sheep', 'sheep', 'sheep', 'brick', 'brick', 'brick', 'wood', 'wood', 'wood', 'wood', 'ore', 'ore', 'ore']
-        random.shuffle(resources)
-
-        for i in range(37):
-            if i in [0,1,2,3,4,8,9,14,15,21,22,27,28,32,33,34,35,36]: # ocean tiles
-                self.hexes.append( Hex(i,True,0,'') )
-            else:
-                resource = resources.pop()
-                if resource == 'desert':
-                    diceValue = 0
-                else:
-                    diceValue = diceValues.pop()
-                self.hexes.append( Hex(i,False,diceValue,resource) )
-
-        for i in range(54):
-            self.nodes.append( Node(i) )
-
-        for i in range(72):
-            self.roads.append( Road(i) )
-
-        for i in range(4):
-            self.players.append( Player(i) )
+        self.generate_board()
 
         self.h_index = {
             'd11':  5,
@@ -255,6 +230,65 @@ class Catan(object):
             'v30':  71
         }
 
+    def generate_board(self):
+        self.hexes = []
+        self.nodes = []
+        self.roads = []
+        self.connections = []
+
+        self.players = []
+
+        diceValues = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
+        random.shuffle(diceValues)
+        resources = ['desert', 'wheat', 'wheat', 'wheat', 'wheat', 'sheep', 'sheep', 'sheep', 'sheep', 'brick', 'brick', 'brick', 'wood', 'wood', 'wood', 'wood', 'ore', 'ore', 'ore']
+        random.shuffle(resources)
+
+        for i in range(37):
+            if i in [0,1,2,3,4,8,9,14,15,21,22,27,28,32,33,34,35,36]: # ocean tiles
+                self.hexes.append( Hex(i,True,0,'') )
+            else:
+                resource = resources.pop()
+                if resource == 'desert':
+                    diceValue = 0
+                else:
+                    diceValue = diceValues.pop()
+                self.hexes.append( Hex(i,False,diceValue,resource) )
+
+        for i in range(54):
+            self.nodes.append( Node(i) )
+
+        for i in range(72):
+            self.roads.append( Road(i) )
+
+        for i in range(4):
+            self.players.append( Player(i) )
+
+
+    def handle_input(self, args):
+        args = args.split(' ')
+        cmd = args[0]
+
+        if cmd == 'help':
+            if len(args) == 1:
+                msg = 'For help with a specific command, type "help {cmd}".\nAvailable commands: help, info'
+            elif len(args) == 2:
+                if args[1] == 'info':
+                    msg = u"Usage: info $1\t\u001b[38;5;244m1: coordinate (e.g. E24)\u001b[0m"
+            else:
+                msg = 'Command "help" requires one or two arguments.  For help, type "help".'
+        elif cmd == 'info':
+            if len(args) != 2:
+                msg = 'Command "info" requires one argument.  For help, type "help info".'
+            else:
+                msg = self.cmd_info(args[1])
+        elif cmd == '!reset': # hide this command from end users (i.e. not in help menus)
+            self.generate_board()
+            msg = "** regenerated board **"
+        else:
+            msg = 'Command "%s" not found.  For a list of commands, try "help".' % cmd
+
+        return msg
+
 
     def view(self, msg):
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -330,7 +364,6 @@ class Vertex(object):
         self.num = num
         self.roads = set()
         self.connections = set()
-        self.channels = set()
 
 class Hex(Vertex):
     def __init__(self, num, isOcean, diceValue, resource):
@@ -441,13 +474,6 @@ class Connection(Edge):
     def __repr__(self):
         return "Connection(%s)" % ("<-->".join(str(e) for e in self.vertices))
 
-class Channel(Edge):
-    def __init__(self, num):
-        Edge.__init__(self, num)
-
-    def __repr__(self):
-        return "Channel(%s)" % ("<-->".join(str(e) for e in self.vertices))
-
 def main():
     catan = Catan()
     catan.view('Welcome to Terminal Catan!  If this is your first time, trying typing "help".')
@@ -455,17 +481,7 @@ def main():
     while catan.isGameOver() != True:
 
         args = raw_input(': ')
-        args = args.split(' ')
-        cmd = args[0]
-        if cmd == 'help':
-            msg = 'THIS IS THE HELP MENU'
-        elif cmd == 'info':
-            if len(args) != 2:
-                msg = 'Command "info" requires one argument (coordinate).'
-            else:
-                msg = catan.cmd_info(args[1])
-        else:
-            msg = 'Command "%s" not found.  For a list of commands, try "help".' % cmd
+        msg = catan.handle_input(args)
 
         catan.view(msg)
 
