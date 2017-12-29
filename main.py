@@ -21,7 +21,7 @@ class Catan(object):
         self.hexes = []
         self.nodes = []
         self.roads = []
-        self.connections = []
+        self.conns = []
 
         self.players = []
 
@@ -73,7 +73,6 @@ class Catan(object):
             't27':  31,
             't28':  31
         }
-
         self.n_index = {
             'a12':  0,
             'a20':  1,
@@ -142,7 +141,6 @@ class Catan(object):
             'w20':  52,
             'w28':  53
         }
-
         self.r_index = {
             'b10':  0,
             'b14':  1,
@@ -234,7 +232,7 @@ class Catan(object):
         self.hexes = []
         self.nodes = []
         self.roads = []
-        self.connections = []
+        self.conns = []
 
         self.players = []
 
@@ -243,8 +241,11 @@ class Catan(object):
         resources = ['desert', 'wheat', 'wheat', 'wheat', 'wheat', 'sheep', 'sheep', 'sheep', 'sheep', 'brick', 'brick', 'brick', 'wood', 'wood', 'wood', 'wood', 'ore', 'ore', 'ore']
         random.shuffle(resources)
 
+        resourceTiles = [5,6,7,10,11,12,13,16,17,18,19,20,23,24,25,26,29,30,31]
+
+        # make the Hexes
         for i in range(37):
-            if i in [0,1,2,3,4,8,9,14,15,21,22,27,28,32,33,34,35,36]: # ocean tiles
+            if i not in resourceTiles: # ocean tiles
                 self.hexes.append( Hex(i,True,0,'') )
             else:
                 resource = resources.pop()
@@ -254,12 +255,31 @@ class Catan(object):
                     diceValue = diceValues.pop()
                 self.hexes.append( Hex(i,False,diceValue,resource) )
 
+        # makes the Nodes
         for i in range(54):
             self.nodes.append( Node(i) )
 
+        # make the Roads
+        road_vertices = [(3,0),(0,4),(4,1),(1,5),(5,2),(2,6),(3,7),(4,8),(5,9),(6,10),(11,7),(7,12),(12,8),(8,13),(13,9),(9,14),(14,10),(10,15),(11,16),(12,17),(13,18),(14,19),(15,20),(21,16),(16,22),(22,17),(17,23),(23,18),(18,24),(24,19),(19,25),(25,20),(20,26),(21,27),(22,28),(23,29),(24,30),(25,31),(26,32),(27,33),(33,28),(28,34),(34,29),(29,35),(35,30),(30,36),(36,31),(31,37),(37,32),(33,38),(34,39),(35,40),(36,41),(37,42),(38,43),(43,39),(39,44),(44,40),(40,45),(45,41),(41,46),(46,42),(43,47),(44,48),(45,49),(46,50),(47,51),(51,48),(48,52),(52,49),(49,53),(53,50)]
         for i in range(72):
             self.roads.append( Road(i) )
+            road_n0 = self.nodes[road_vertices[i][0]]
+            road_n1 = self.nodes[road_vertices[i][1]]
+            self.roads[i].set_vertices(road_n0, road_n1)
+            road_n0.add_road(self.roads[i])
+            road_n1.add_road(self.roads[i])
 
+        # make the Connections
+        conn_vertices = [(0,5),(4,5),(8,5),(12,5),(7,5),(3,5), (1,6),(5,6),(9,6),(13,6),(8,6),(4,6), (2,7),(6,7),(10,7),(14,7),(9,7),(5,7), (7,10),(12,10),(17,10),(22,10),(16,10),(11,10), (8,11),(13,11),(18,11),(23,11),(17,11),(12,11), (9,12),(14,12),(19,12),(24,12),(18,12),(13,12), (10,13),(15,13),(20,13),(25,13),(19,13),(14,13), (16,16),(22,16),(28,16),(33,16),(27,16),(21,16), (17,17),(23,17),(29,17),(34,17),(28,17),(22,17), (18,18),(24,18),(30,18),(35,18),(29,18),(23,18),(19,19),(25,19),(31,19),(36,19),(30,19),(24,19), (20,20),(26,20),(32,20),(37,20),(31,20),(25,20), (28,23),(34,23),(39,23),(43,23),(38,23),(33,23), (29,24),(35,24),(40,24),(44,24),(39,24),(34,24), (30,25),(36,25),(41,25),(45,25),(40,25),(35,25), (31,26),(37,26),(42,26),(46,26),(41,26),(36,26), (39,29),(44,29),(48,29),(51,29),(47,29),(43,29), (40,30),(45,30),(49,30),(52,30),(48,30),(44,30), (41,31),(46,31),(50,31),(53,31),(49,31),(45,31)]
+        for i in range(114):
+            self.conns.append( Connection(i) )
+            conn_node = self.nodes[conn_vertices[i][0]]
+            conn_hex = self.hexes[conn_vertices[i][1]]
+            self.conns[i].set_vertices(conn_node, conn_hex)
+            conn_node.add_conn(self.conns[i])
+            conn_hex.add_conn(self.conns[i])
+
+        # make the Players
         for i in range(4):
             self.players.append( Player(i) )
 
@@ -270,22 +290,33 @@ class Catan(object):
 
         if cmd == 'help':
             if len(args) == 1:
-                msg = 'For help with a specific command, type "help {cmd}".\nAvailable commands: help, info'
+                msg = u'For help with a specific command, type "help {cmd}".\n\u001b[38;5;244mavailable commands:\u001b[0m help, info'
             elif len(args) == 2:
-                if args[1] == 'info':
+                if args[1] == 'help':
+                    msg = u"Usage: help $1\t\u001b[38;5;244m1: command (e.g. info)\u001b[0m"
+                elif args[1] == 'info':
                     msg = u"Usage: info $1\t\u001b[38;5;244m1: coordinate (e.g. E24)\u001b[0m"
+                else:
+                    msg = '%s: Unrecognized command.  For a list of commands, type "help".' % args[1]
             else:
                 msg = 'Command "help" requires one or two arguments.  For help, type "help".'
+
         elif cmd == 'info':
             if len(args) != 2:
                 msg = 'Command "info" requires one argument.  For help, type "help info".'
             else:
                 msg = self.cmd_info(args[1])
+        elif cmd == '!n': # hide this command from end users (i.e. not in help menus)
+            if len(args) != 2:
+                msg = 'Command "!n" requires one argument.'
+            else:
+                msg = self.cmd_neighbors(args[1])
         elif cmd == '!reset': # hide this command from end users (i.e. not in help menus)
             self.generate_board()
             msg = "** regenerated board **"
+
         else:
-            msg = 'Command "%s" not found.  For a list of commands, try "help".' % cmd
+            msg = '%s: Unrecognized command.  For a list of commands, type "help".' % cmd
 
         return msg
 
@@ -349,6 +380,33 @@ class Catan(object):
         else:
             return obj.show_info(coord)
 
+    def cmd_neighbors(self, coord):
+        obj = self.lookup(coord)
+
+        if obj == False:
+            return 'Coordinate "%s" not found.' % coord
+        else:
+            s = obj.show_info(coord)
+            if type(obj) == type(self.hexes[0]):
+                s += "\n > connections:\t{"
+                for c in obj.conns:
+                    s += str(c.num) + ", "
+                s += "}"
+            elif type(obj) == type(self.nodes[0]):
+                s += "\n > connections:\t{"
+                for c in obj.conns:
+                    s += str(c.num) + ", "
+                s += "}\n > roads:\t{"
+                for r in obj.roads:
+                    s += str(r.num) + ", "
+                s += "}"
+            elif type(obj) == type(self.roads[0]):
+                s += "\n > nodes:\t{"
+                for v in obj.vertices:
+                    s += str(v.num) + ", "
+                s += "}"
+            return s
+
 class Player(object):
     def __init__(self, num):
         self.num = num
@@ -363,7 +421,13 @@ class Vertex(object):
     def __init__(self, num):
         self.num = num
         self.roads = set()
-        self.connections = set()
+        self.conns = set()
+
+    def add_road(self, road):
+        self.roads.add(road)
+
+    def add_conn(self, conn):
+        self.conns.add(conn)
 
 class Hex(Vertex):
     def __init__(self, num, isOcean, diceValue, resource):
@@ -476,7 +540,7 @@ class Connection(Edge):
 
 def main():
     catan = Catan()
-    catan.view('Welcome to Terminal Catan!  If this is your first time, trying typing "help".')
+    catan.view('Welcome to CaTEXT, a text-based Catan game for your terminal!  If this is your\nfirst time, try typing "help".')
 
     while catan.isGameOver() != True:
 
