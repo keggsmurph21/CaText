@@ -1,26 +1,66 @@
-import os, random
+import gui, random
 
-COLORS = {
-    'reset':    u"\u001b[0m",
-    'black':    u"\u001b[30m",
-    'desert':   u"\u001b[38;5;223m",
-    'wheat':    u"\u001b[38;5;226m",
-    'sheep':    u"\u001b[38;5;155m",
-    'brick':    u"\u001b[38;5;208m",
-    'wood':     u"\u001b[38;5;22m",
-    'ore':      u"\u001b[38;5;240m",
-    '0':        u"\u001b[38;5;1m",
-    '1':        u"\u001b[38;5;26m",
-    '2':        u"\u001b[38;5;202m",
-    '3':        u"\u001b[38;5;14m",
-    'b_white':  u"\u001b[47m",
-    'grey':     u"\u001b[38;5;244m",
-    'ocean':    u"\u001b[38;5;234m",
-    'b0':       u"\u001b[48;5;1m",
-    'b1':       u"\u001b[48;5;26m",
-    'b2':       u"\u001b[48;5;202m",
-    'b3':       u"\u001b[48;5;14m"
-}
+SETTINGS_BY_STYLE = {
+    'standard': {
+        'views': {'narrow', 'wide', },
+        'narrow':{},
+        'wide': {
+            'border': True,
+            'lpad':1,
+            'mpad':3,
+            'rpad':1,
+            'order': [('tbanner',), ('game',('info',45,0),), ('lbanner',), ('pMsgs',), ('msg',),('prompt',),],
+            'tbanner': u"&g/"+"="*33+" [ CaTEXT ] "+"="*33+"\\&&",
+            'lbanner': u"&g\\"+"="*78+"/&&", },
+        'prompt':" >",
+        'genc':"  ObNdO5NdO5NdOb  \n  O9RsHtRbO1RsHtRbO1RsHtRbO9  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O5RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO5  \n  O3NdHfNdHfNdHfNdHfNdO3  \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O1RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO1  \nNdHfNdHfNdHfNdHfNdHfNd\nRvHxRvHxRvHxRvHxRvHxRv\nNdHgNdHgNdHgNdHgNdHgNd\n  O1RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO1  \n  O3NdHfNdHfNdHfNdHfNdO3 \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O5RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO5  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O9RbHbRsO1RbHbRsO1RbHbRsO9  \n  ObNdO5NdO5NdOb  ",
+        'ienc':"s7Tas8\ns7Tbs8\nIt\nI s=|__NAME____VPs_Res_DCs_Army_|\nIm\nIb\ns7Das8\ns7Dbs8\nRt\nRss=|__RESOURCES_________Num____|\nRm\nRb\nVss=|__DEV CARDS_____Up__Down___|\nVm\nVb",
+        'diceValues': [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12],
+        'resources': {
+            'desert':   {'name':'Desert','tColor':'&dt','bColor':'&db','num':1,'isZero':True},
+            'wheat':    {'name':'Wheat','tColor':'&at','bColor':'&ab','num':4,'isZero':False},
+            'sheep':    {'name':'Sheep','tColor':'&st','bColor':'&sb','num':4,'isZero':False},
+            'brick':    {'name':'Brick','tColor':'&rt','bColor':'&rb','num':3,'isZero':False},
+            'wood':     {'name':'Wood','tColor':'&wt','bColor':'&wb','num':4,'isZero':False},
+            'ore':      {'name':'Ore','tColor':'&ot','bColor':'&ob','num':3,'isZero':False}
+        },
+        'devCards': {
+            'vp':       {'nameShort':'VP','nameLong':'Victory Point','namePlural':'VPs','num':5,'textColor':'&at'},
+            'knight':   {'nameShort':'Knight','nameLong':'Knight','namePlural':'Knights','num':14,'textColor':'&p0'},
+            'yop':      {'nameShort':'YoP','nameLong':'Year of Plenty','namePlural':'YoPs','num':32,'textColor':'&wt'},
+            'monopoly': {'nameShort':'Monopoly','nameLong':'Monopoly','namePlural':'Monopolies','num':2,'textColor':'&wt'},
+            'rb':       {'nameShort':'RB','nameLong':'Road Building','namePlural':'Road Builders','num':2,'textColor':'&wt'}
+        },
+        'colors':  {
+            '&&':   u"\u001b[0m",           # RESET
+
+            '&b':   u"\u001b[30m",          # black text
+            '&g':   u"\u001b[38;5;244m",    # grey text
+            '&~':   u"\u001b[38;5;234m\u001b[40m",    # ocean text
+            '&_':   u"\u001b[47m",          # white bkg
+            '&x':   u"\u001b[40m",          # robber
+
+            '&dt':   u"\u001b[38;5;223m",   # desert text
+            '&at':   u"\u001b[38;5;226m",   # wheat text
+            '&st':   u"\u001b[38;5;155m",   # sheep text
+            '&rt':   u"\u001b[38;5;208m",   # brick text
+            '&wt':   u"\u001b[38;5;22m" ,   # wood text
+            '&ot':   u"\u001b[38;5;240m",   # ore text
+            '&db':   u"\u001b[48;5;223m\u001b[30m",    # desert bkg
+            '&ab':   u"\u001b[48;5;226m\u001b[30m",    # wheat bkg
+            '&sb':   u"\u001b[48;5;155m\u001b[30m",    # sheep bkg
+            '&rb':   u"\u001b[48;5;208m",   # brick bkg
+            '&wb':   u"\u001b[48;5;22m",    # wood bkg
+            '&ob':   u"\u001b[48;5;240m",   # ore bkg
+
+            '&p0':  u"\u001b[38;5;1m",      # player0 text
+            '&p1':  u"\u001b[38;5;26m",     # player1 text
+            '&p2':  u"\u001b[38;5;202m",    # player2 text
+            '&p3':  u"\u001b[38;5;14m",     # player3 text
+            '&P0':  u"\u001b[48;5;1m",      # player0 bkg
+            '&P1':  u"\u001b[48;5;26m",     # player1 bkg
+            '&P2':  u"\u001b[48;5;202m",    # player2 bkg
+            '&P3':  u"\u001b[48;5;14m", } } }  # player3 bkg
 DEBUG = True
 
 class Cmd(object):
@@ -56,9 +96,6 @@ class Die(object):
     def __init__(self, initialValue=0):
         self.value = 0
 
-    def __repr__(self):
-        return str(self.value)
-
     def roll(self):
         self.value = random.randint(1,6)
 
@@ -76,11 +113,34 @@ class Dice(object):
         return self.get_value()
 
     def view(self,i):
-        return self.dice[i]
+        return self.dice[i].value
+
+class Resource(object):
+    def __init__(self, argv):
+        self.resource = argv['name'].lower()
+        self.name = argv['name']
+        self.text = argv['tColor']
+        self.bkg = argv['bColor']
+
+class DevCard(object):
+    def __init__(self, argv, func):
+        self.name = argv['nameShort'].lower()
+        self.short = argv['nameShort']
+        self.long = argv['nameLong']
+        self.plural = argv['namePlural']
+        self.text = argv['textColor']
+        self.func = func
+
+    def do(player,action='draw'):
+        return self.func(player,action)
 
 class Catan(object):
     def __init__(self, numHumans, numCPUs):
+        self.settings = SETTINGS_BY_STYLE['standard']
+
+        self.turn = 0
         self.vpGoal = 10
+        self.gui = gui.GUI(self)
 
         self.dice = Dice()
         self.hexes = []
@@ -95,6 +155,7 @@ class Catan(object):
         self.hasLargestArmy = None
         self.hasLongestRoad = None
         self.isFirstTurn = True
+        self.nonePlayer = Player(-1, self)
 
         self.h_index = {
             'd11':  5,
@@ -140,8 +201,7 @@ class Catan(object):
             't19':  30,
             't20':  30,
             't27':  31,
-            't28':  31
-        }
+            't28':  31}
         self.n_index = {
             'a12':  0,
             'a20':  1,
@@ -208,8 +268,7 @@ class Catan(object):
             'u32':  50,
             'w12':  51,
             'w20':  52,
-            'w28':  53
-        }
+            'w28':  53}
         self.r_index = {
             'b10':  0,
             'b14':  1,
@@ -294,9 +353,8 @@ class Catan(object):
             'v18':  68,
             'v22':  69,
             'v26':  70,
-            'v30':  71
-        }
-        self.hex_dots = { 0:0, 2:1, 3:2, 4:3, 5:4, 6:5, 8:5, 9:4, 10:3, 11:2, 12:1 }
+            'v30':  71}
+        self.hex_dots = { 0:0, 2:1, 3:2, 4:3, 5:4, 6:5, 8:5, 9:4, 10:3, 11:2, 12:1 } # for the computer
 
         self.cmds = {
             'info':     Cmd('info', ["coordinate (e.g. E24)"], self.cmd_info),
@@ -306,26 +364,37 @@ class Catan(object):
             'n':        Cmd('n', ["coordinate (e.g. E24)"], self.cmd_neighbors, True),
             'roll':     Cmd('roll', [], self.roll),
             'reset':    Cmd('reset', [], self.reseed, True),
-            'settle':   Cmd('settle', ["coordinate (e.g. E24)"], self.cmd_settle),
-            'pave':     Cmd('pave', ["coordinate (e.g. F26)"], self.cmd_pave),
+            'settle':   Cmd('settle', ["coordinate (e.g. E24) or opts"], self.cmd_settle),
+            'pave':     Cmd('pave', ["coordinate (e.g. F26) or opts"], self.cmd_pave),
             'setname':  Cmd('setname', ["name (8 chars or less)"], self.cmd_setname),
-            'setcpuname': Cmd('setcpuname', ["id (e.g. '4' for 'CPU 4')","name (8 chars or less)"], self.cmd_setcpuname)
-        }
+            'setcpuname': Cmd('setcpuname', ["id (e.g. '4' for 'CPU 4')","name (8 chars or less)"], self.cmd_setcpuname)}
 
-        self.devCardDeck = []
+        self.devCards = {}
+        self.resources = {}
+        self.dcDeck = []
 
         self.reseed()
 
     def take_first_turn(self):
+        self.turn += 1
         for p in self.players:
             self.currentPlayer = p
             p.settle()
+
+        self.turn += 1
         for p in self.players[::-1]:
             self.currentPlayer = p
             p.settle()
 
         self.isFirstTurn = False
-        self.view('awaiting command')
+
+    def take_turn(self):
+        self.turn += 1
+        for p in self.players:
+            self.currentPlayer = p
+            p.take_turn()
+
+        self.take_turn()
 
     def roll(self):
         diceValue = self.dice.roll()
@@ -346,9 +415,26 @@ class Catan(object):
     def reseed(self):
         self.generate_board()
         self.generate_players()
+
         self.take_first_turn()
+        self.take_turn()
 
         return "** RESEED **"
+
+    def dc_vp(self, player, action):
+        raise NotImplementedError
+
+    def dc_knight(self, player, action):
+        raise NotImplementedError
+
+    def dc_yop(self, player, action):
+        raise NotImplementedError
+
+    def dc_monopoly(self, player, action):
+        raise NotImplementedError
+
+    def dc_rb(self, player, action):
+        raise NotImplementedError
 
     def generate_board(self):
         self.hexes = []
@@ -356,33 +442,52 @@ class Catan(object):
         self.roads = []
         self.conns = []
 
-        diceValues = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
+        # make the Dev Cards
+        for key in self.settings['devCards'].keys():
+            dc = self.settings['devCards'][key]
+            if key == 'vp':
+                func = self.dc_vp
+            elif key == 'knight':
+                func = self.dc_knight
+            elif key == 'yop':
+                func = self.dc_yop
+            elif key == 'monopoly':
+                func = self.dc_monopoly
+            elif key == 'rb':
+                func = self.dc_rb
+            for num in range( dc['num'] ):
+                devCard = DevCard( dc, func )
+                self.devCards[key] = devCard
+                self.dcDeck.append( devCard )
+
+
+        # make the Hexes and Resources
+        diceValues = self.settings['diceValues']
         random.shuffle(diceValues)
-        resources = ['desert', 'wheat', 'wheat', 'wheat', 'wheat', 'sheep', 'sheep', 'sheep', 'sheep', 'brick', 'brick', 'brick', 'wood', 'wood', 'wood', 'wood', 'ore', 'ore', 'ore']
+        resources = []
+        for key in self.settings['resources'].keys():
+            for num in range( self.settings['resources'][key]['num'] ):
+                resources.append( key )
         random.shuffle(resources)
-
-        resourceTiles = [5,6,7,10,11,12,13,16,17,18,19,20,23,24,25,26,29,30,31]
-
-        # make the Hexes
-        for i in range(37):
-            if i not in resourceTiles: # ocean tiles
-                self.hexes.append( Hex(i,True,0,'') )
+        for i in range(19):
+            resource = resources.pop()
+            resource = self.settings['resources'][resource]
+            if resource['isZero']:
+                diceValue = 0
             else:
-                resource = resources.pop()
-                if resource == 'desert':
-                    diceValue = 0
-                else:
-                    diceValue = diceValues.pop()
-                self.hexes.append( Hex(i,False,diceValue,resource) )
+                diceValue = diceValues.pop()
+            resource = Resource( resource )
+            self.hexes.append( Hex(i,False,diceValue,resource) )
+            self.resources[resource.resource] = resource
 
         # makes the Nodes
         for i in range(54):
-            self.nodes.append( Node(i) )
+            self.nodes.append( Node(i, self.nonePlayer) )
 
         # make the Roads
         road_vertices = [(3,0),(0,4),(4,1),(1,5),(5,2),(2,6),(3,7),(4,8),(5,9),(6,10),(11,7),(7,12),(12,8),(8,13),(13,9),(9,14),(14,10),(10,15),(11,16),(12,17),(13,18),(14,19),(15,20),(21,16),(16,22),(22,17),(17,23),(23,18),(18,24),(24,19),(19,25),(25,20),(20,26),(21,27),(22,28),(23,29),(24,30),(25,31),(26,32),(27,33),(33,28),(28,34),(34,29),(29,35),(35,30),(30,36),(36,31),(31,37),(37,32),(33,38),(34,39),(35,40),(36,41),(37,42),(38,43),(43,39),(39,44),(44,40),(40,45),(45,41),(41,46),(46,42),(43,47),(44,48),(45,49),(46,50),(47,51),(51,48),(48,52),(52,49),(49,53),(53,50)]
         for i in range(72):
-            self.roads.append( Road(i) )
+            self.roads.append( Road(i, self.nonePlayer) )
             road_n0 = self.nodes[road_vertices[i][0]]
             road_n1 = self.nodes[road_vertices[i][1]]
             self.roads[i].set_vertices(road_n0, road_n1)
@@ -390,7 +495,7 @@ class Catan(object):
             road_n1.add_road(self.roads[i])
 
         # make the Connections
-        conn_vertices = [(0,5),(4,5),(8,5),(12,5),(7,5),(3,5), (1,6),(5,6),(9,6),(13,6),(8,6),(4,6), (2,7),(6,7),(10,7),(14,7),(9,7),(5,7), (7,10),(12,10),(17,10),(22,10),(16,10),(11,10), (8,11),(13,11),(18,11),(23,11),(17,11),(12,11), (9,12),(14,12),(19,12),(24,12),(18,12),(13,12), (10,13),(15,13),(20,13),(25,13),(19,13),(14,13), (16,16),(22,16),(28,16),(33,16),(27,16),(21,16), (17,17),(23,17),(29,17),(34,17),(28,17),(22,17), (18,18),(24,18),(30,18),(35,18),(29,18),(23,18),(19,19),(25,19),(31,19),(36,19),(30,19),(24,19), (20,20),(26,20),(32,20),(37,20),(31,20),(25,20), (28,23),(34,23),(39,23),(43,23),(38,23),(33,23), (29,24),(35,24),(40,24),(44,24),(39,24),(34,24), (30,25),(36,25),(41,25),(45,25),(40,25),(35,25), (31,26),(37,26),(42,26),(46,26),(41,26),(36,26), (39,29),(44,29),(48,29),(51,29),(47,29),(43,29), (40,30),(45,30),(49,30),(52,30),(48,30),(44,30), (41,31),(46,31),(50,31),(53,31),(49,31),(45,31)]
+        conn_vertices = [(0,0),(4,0),(8,0),(12,0),(7,0),(3,0), (1,1),(5,1),(9,1),(13,1),(8,1),(4,1), (2,2),(6,2),(10,2),(14,2),(9,2),(5,2), (7,3),(12,3),(17,3),(22,3),(16,3),(11,3), (8,4),(13,4),(18,4),(23,4),(17,4),(12,4), (9,5),(14,5),(19,5),(24,5),(18,5),(13,5), (10,6),(15,6),(20,6),(25,6),(19,6),(14,6), (16,7),(22,7),(28,7),(33,7),(27,7),(21,7), (17,8),(23,8),(29,8),(34,8),(28,8),(22,8), (18,9),(24,9),(30,9),(35,9),(29,9),(23,9),(19,10),(25,10),(31,10),(36,10),(30,10),(24,10), (20,11),(26,11),(32,11),(37,11),(31,11),(25,11), (28,12),(34,12),(39,12),(43,12),(38,12),(33,12), (29,13),(35,13),(40,13),(44,13),(39,13),(34,13), (30,14),(36,14),(41,14),(45,14),(40,14),(35,14), (31,15),(37,15),(42,15),(46,15),(41,15),(36,15), (39,16),(44,16),(48,16),(51,16),(47,16),(43,16), (40,17),(45,17),(49,17),(52,17),(48,17),(44,17), (41,18),(46,18),(50,18),(53,18),(49,18),(45,18)]
         for i in range(114):
             self.conns.append( Connection(i) )
             conn_node = self.nodes[conn_vertices[i][0]]
@@ -404,24 +509,23 @@ class Catan(object):
         self.players += [ CPU(self.numHumans + i, self) for i in range(self.numCPUs)]
         random.shuffle(self.players)
 
-    def handle_input(self, in_msg="", msg=None, options={}):
+    def handle_input(self, msg=None, options={}):
         persistentOptions = {'info', 'clear', 'help', 'abbrev', 'setname', 'setcpuname'}
 
         if msg != None:
-            self.view( in_msg + "\n" + self.printf(msg) )
-        else:
-            self.view( in_msg )
-        args = raw_input('> ').split(' ')
+            self.gui.set_msg( msg )
+        self.gui.render()
+        args = self.gui.prompt().split(' ')
         cmd = args[0]
 
         if cmd in self.cmds.keys():
             cmd = self.cmds[cmd]
 
             if options != {} and cmd.name not in options and cmd.name not in persistentOptions:
-                msg = u'%s: Could not execute.  GRYCurrently available commands:PLY ' % cmd.name
+                msg = u'%s: Could not execute.  &gCurrently available commands:PLY ' % cmd.name
                 for opt in options:
                     msg += opt + ", "
-                msg += "ReS"
+                msg += "&&"
                 for opt in persistentOptions:
                     msg += opt + ", "
 
@@ -430,7 +534,7 @@ class Catan(object):
                 if cmd.name == 'help':
                     keys = sorted(self.cmds.keys())
                     if len(args) == 1:
-                        msg = u'For help with a specific command, type "help {command}".\nGRYCommands:ReS '
+                        msg = u'For help with a specific command, type "help {command}".\n&gCommands:&& '
                         for key in keys:
                             if DEBUG == True or self.cmds[key].isDevCmd == False:
                                 msg += self.cmds[key].name + ", "
@@ -460,60 +564,8 @@ class Catan(object):
         else:
             msg = '%s: Unrecognized command.  For a list of commands, type "help".' % cmd
 
-        self.handle_input( in_msg, msg, options )
 
-    def printf(self, line):
-        line = line.replace(u"ReS", COLORS['reset'])
-        line = line.replace(u"GRY", COLORS['grey'])
-        line = line.replace(u"RED", COLORS['0'])
-        line = line.replace(u"BLU", COLORS['1'])
-        line = line.replace(u"YEL", COLORS['wheat'])
-        line = line.replace(u"LGR", COLORS['sheep'])
-        line = line.replace(u"ORA", COLORS['brick'])
-        line = line.replace(u"DGR", COLORS['wood'])
-        line = line.replace(u"ORE", COLORS['ore'])
-        line = line.replace(u"OCE", COLORS['ocean'])
-        line = line.replace(u"PLY", self.currentPlayer.color)
-
-        return line
-
-    def view(self, msg):
-        os.system('cls' if os.name == 'nt' else 'clear')
-
-        board = u""
-
-        board += self.printf( u"GRY/================================ [ CaTEXT ] ==================================\\\n")
-        board += self.printf( u"   0         1         2         3         4\n" )
-        board += self.printf( u"   01234567890123456789012345678901234567890ReS    .___________________________.GRY\n" )
-        board += self.printf( u" AOCE ~~~~~~~~~~~ReS%sOCE~~~~~ReS%sOCE~~~~~ReS%sOCE~~~~~~~~~~~ GRYAReS  |__NAME____VPs_Res_DCs_Army_|GRY\n" %                                              (self.nodes[0], self.nodes[1], self.nodes[2]) )
-        board += self.printf( u" BOCE ~~~~~~~~~ReS%s %sOCE~ReS%s %sOCE~ReS%s %sOCE~~~~~~~~~ GRYBReS  |%s|GRY\n" %                                           (self.roads[0], self.roads[1], self.roads[2], self.roads[3], self.roads[4], self.roads[5], self.players[0].print_line()) )
-        board += self.printf( u" COCE ~~~~~~~ReS%s     %s     %s     %sOCE~~~~~~~ GRYCReS  |%s|GRY\n" %                                                         (self.nodes[3], self.nodes[4], self.nodes[5], self.nodes[6], self.players[1].print_line()) )
-        board += self.printf( u" DOCE ~~~~~~~ReS%s %s  %s %s  %s %s  %sOCE~~~~~~~ GRYDReS  |%s|GRY\n" %                                                         (self.roads[6], self.hexes[5], self.roads[7], self.hexes[6], self.roads[8], self.hexes[7], self.roads[9], self.players[2].print_line()) )
-        board += self.printf( u" EOCE ~~~~~~~ReS%s     %s     %s     %sOCE~~~~~~~ GRYEReS  |%s|GRY\n" %                    (self.nodes[7], self.nodes[8], self.nodes[9], self.nodes[10], self.players[3].print_line()) )
-        board += self.printf( u" FOCE ~~~~~ReS%s %s %s %s %s %s %s %sOCE~~~~~ GRYFReS  |___________________________|GRY\n" %                (self.roads[10], self.roads[11], self.roads[12], self.roads[13], self.roads[14], self.roads[15], self.roads[16], self.roads[17]) )
-        board += self.printf( u" GOCE ~~~ReS%s     %s     %s     %s     %sOCE~~~ GRYGReS                ._. ._.GRY\n" %                                     (self.nodes[11], self.nodes[12], self.nodes[13],  self.nodes[14], self.nodes[15]) )
-        board += self.printf( u" HOCE ~~~ReS%s %s  %s %s  %s %s  %s %s  %sOCE~~~ GRYHReS         Dice:  |%s| |%s|GRY\n" %                                               (self.roads[18], self.hexes[10], self.roads[19], self.hexes[11], self.roads[20], self.hexes[12], self.roads[21], self.hexes[13], self.roads[22],self.dice.view(0),self.dice.view(1)) )
-        board += self.printf( u" IOCE ~~~ReS%s     %s     %s     %s     %sOCE~~~ GRYI\n" %                                            (self.nodes[16], self.nodes[17], self.nodes[18], self.nodes[19], self.nodes[20]) )
-        board += self.printf( u" JOCE ~ReS%s %s %s %s %s %s %s %s %s %sOCE~ GRYJ  PLY.___________________________.GRY\n" %                                       (self.roads[23], self.roads[24], self.roads[25], self.roads[26], self.roads[27], self.roads[28], self.roads[29], self.roads[30], self.roads[31], self.roads[32]) )
-        board += self.printf( u" KReS%s     %s     %s     %s     %s     %sGRYK  PLY|__RESOURCES_________Num____|GRY\n" %                        (self.nodes[21], self.nodes[22], self.nodes[23], self.nodes[24], self.nodes[25], self.nodes[26]) )
-        board += self.printf( u" LReS%s %s  %s %s  %s %s  %s %s  %s %s  %sGRYL  PLY|YEL Wheat               %s    PLY|GRY\n" %                        (self.roads[33], self.hexes[16], self.roads[34], self.hexes[17], self.roads[35], self.hexes[18], self.roads[36], self.hexes[19], self.roads[37], self.hexes[20], self.roads[38], self.currentPlayer.count('wheat')) )
-        board += self.printf( u" MReS%s     %s     %s     %s     %s     %sGRYM  PLY|LGR Sheep               %s    PLY|GRY\n" %                  (self.nodes[27], self.nodes[28], self.nodes[29], self.nodes[30], self.nodes[31], self.nodes[32], self.currentPlayer.count('sheep')) )
-        board += self.printf( u" NOCE ~ReS%s %s %s %s %s %s %s %s %s %sOCE~ GRYN  PLY|ORA Brick               %s    PLY|GRY\n" %        (self.roads[39], self.roads[40], self.roads[41], self.roads[42], self.roads[43], self.roads[44], self.roads[45], self.roads[46], self.roads[47], self.roads[48], self.currentPlayer.count('brick')) )
-        board += self.printf( u" OOCE ~~~ReS%s     %s     %s     %s     %sOCE~~~ GRYO  PLY|DGR Wood                %s    PLY|GRY\n" %             (self.nodes[33], self.nodes[34], self.nodes[35], self.nodes[36], self.nodes[37], self.currentPlayer.count('wood')) )
-        board += self.printf( u" POCE ~~~ReS%s %s  %s %s  %s %s  %s %s  %sOCE~~~ GRYP  PLY|ORE Ore                 %s    PLY|GRY\n" %             (self.roads[49], self.hexes[23], self.roads[50], self.hexes[24], self.roads[51], self.hexes[25], self.roads[52], self.hexes[26], self.roads[53], self.currentPlayer.count('ore')) )
-        board += self.printf( u" QOCE ~~~ReS%s     %s     %s     %s     %sOCE~~~ GRYQ  PLY|___________________________|GRY\n" %             (self.nodes[38], self.nodes[39], self.nodes[40], self.nodes[41], self.nodes[42]) )
-        board += self.printf( u" ROCE ~~~~~ReS%s %s %s %s %s %s %s %sOCE~~~~~ GRYR  PLY|__DEV CARDS_____Up__Down___|GRY\n" %                (self.roads[54], self.roads[55], self.roads[56], self.roads[57], self.roads[58], self.roads[59], self.roads[60], self.roads[61]) )
-        board += self.printf( u" SOCE ~~~~~~~ReS%s     %s     %s     %sOCE~~~~~~~ GRYS  PLY|YEL VPs            %s   %s    PLY|GRY\n" %                    (self.nodes[43], self.nodes[44], self.nodes[45], self.nodes[46], self.currentPlayer.count('vp','up'), self.currentPlayer.count('vp','down')) )
-        board += self.printf( u" TOCE ~~~~~~~ReS%s %s  %s %s  %s %s  %sOCE~~~~~~~ GRYT  PLY|RED Knights        %s   %s    PLY|GRY\n" %              (self.roads[62], self.hexes[29], self.roads[63], self.hexes[30], self.roads[64], self.hexes[31], self.roads[65], self.currentPlayer.count('knight','up'), self.currentPlayer.count('knight','down')) )
-        board += self.printf( u" UOCE ~~~~~~~ReS%s     %s     %s     %sOCE~~~~~~~ GRYU  PLY|DGR YoPs           %s   %s    PLY|GRY\n" %              (self.nodes[47], self.nodes[48], self.nodes[49], self.nodes[50], self.currentPlayer.count('yop','up'), self.currentPlayer.count('yop','down')) )
-        board += self.printf( u" VOCE ~~~~~~~~~ReS%s %sOCE~ReS%s %sOCE~ReS%s %sOCE~~~~~~~~~ GRYV  PLY|DGR Monopolies     %s   %s    PLY|GRY\n" % (self.roads[66], self.roads[67], self.roads[68], self.roads[69], self.roads[70], self.roads[71], self.currentPlayer.count('monopoly','up'), self.currentPlayer.count('monopoly','down')) )
-        board += self.printf( u" WOCE ~~~~~~~~~~~ReS%sOCE~~~~~ReS%sOCE~~~~~ReS%sOCE~~~~~~~~~~~ GRYW  PLY|DGR Road Builders  %s   %s    PLY|GRY\n" %   (self.nodes[51], self.nodes[52], self.nodes[53], self.currentPlayer.count('rb','up'), self.currentPlayer.count('rb','down')) )
-        board += self.printf( u"   01234567890123456789012345678901234567890    PLY|___________________________|GRY\n" % () )
-        board += self.printf( u"   0         1         2         3         4  \n" % () )
-        board += self.printf( u"\\==============================================================================/ReS\t\n" )
-        board += self.printf( u"%s" % msg )
-
-        print board
+        self.handle_input( msg, options )
 
     def is_game_over(self):
         for player in self.players:
@@ -547,17 +599,25 @@ class Catan(object):
                 return p
         return False
 
-    def lookup(self, coord):
-        coord = coord.lower()
+    def lookup(self, coord, look=None):
+        lists = { 'hexes' : self.h_index, 'nodes' : self.n_index, 'roads' : self.r_index }
+        ret = False
 
-        if coord in self.h_index:
-            return self.hexes[self.h_index[coord]]
-        elif coord in self.n_index:
-            return self.nodes[self.n_index[coord]]
-        elif coord in self.r_index:
-            return self.roads[self.r_index[coord]]
+        if look != None and look in lists:
+            for item in lists[look].keys():
+                if coord == lists[look][item]:
+                    return item
         else:
-            return False
+            coord = coord.lower()
+
+            if coord in self.h_index:
+                ret = self.hexes[self.h_index[coord]]
+            elif coord in self.n_index:
+                ret = self.nodes[self.n_index[coord]]
+            elif coord in self.r_index:
+                ret = self.roads[self.r_index[coord]]
+
+        return ret
 
     def cmd_info(self, coord):
         obj = self.lookup(coord)
@@ -598,19 +658,33 @@ class Catan(object):
         return "List of abbreviations:\nVPs=Victory points, Res=Resource cards, DCs=(Unplayed) development cards,\nArmy=Number of knights (player with largest army has a star *),\nUp=Unplayed development cards, Down=Played development cards"
 
     def cmd_settle(self, coord):
-        node = self.lookup(coord)
-        if node == False or type(node) != type(self.nodes[0]):
-            return False
-        if node.settle(self.currentPlayer) == False:
-            return False
+        if coord == 'opts':
+            msg = '&gAvailable locations to settle:&& '
+            for node in self.nodes:
+                if node.settle(self.currentPlayer, False) != False:
+                    msg += '%s, ' % self.lookup(node.num, 'nodes')
+            self.gui.set_msg( msg )
+        else:
+            node = self.lookup(coord)
+            if node == False or type(node) != type(self.nodes[0]):
+                return False
+            if node.settle(self.currentPlayer) == False:
+                return False
 
     def cmd_pave(self, coord):
-        road = self.lookup(coord)
-        if road == False or type(road) != type(self.roads[0]):
-            return False
-        if road.pave(self.currentPlayer) == False:
-            return False
-        return self.currentPlayer.add_road(road)
+        if coord == 'opts':
+            msg = '&gAvailable locations to build a road:&& '
+            for road in self.roads:
+                if road.pave(self.currentPlayer, False) != False:
+                    msg += '%s, ' % self.lookup(road.num, 'roads')
+            self.gui.set_msg( msg )
+        else:
+            road = self.lookup(coord)
+            if road == False or type(road) != type(self.roads[0]):
+                return False
+            if road.pave(self.currentPlayer) == False:
+                return False
+            return self.currentPlayer.add_road(road)
 
     def cmd_setname(self, name):
         self.currentPlayer.name = name[:8]
@@ -619,32 +693,52 @@ class Catan(object):
         p = self.get_player_by_id(int(i)-1)
         if p != False:
             if type(p) == type(CPU(0, self)):
-                msg = "Successfully changed %s%sReS to %s%sReS" % (p.color, p.name, p.color, name[:8])
+                msg = "Successfully changed %s%s&& to %s%s&&" % (p.color, p.name, p.color, name[:8])
                 p.name = name[:8]
                 return msg
         return False
 
 class Player(object):
     def __init__(self, num, catan):
-        self.num = num
-        self.score = 0
-        self.resCards = { 'wheat':0, 'sheep':0, 'brick':0, 'wood':0, 'ore':0 } # resource cards
-        self.devCardsU = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # played
-        self.devCardsP = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # unplayed
-        self.numKnights = 0
-        self.hasLargestArmy = False
-        self.color = COLORS[str(num)]
-        self.bcolor = COLORS['b' + str(num)]
-        self.name = ''
-        self.isHuman = False
-        self.catan = catan
-        self.settlements = []
-        self.roads = []
-        self.longestRoad = 0
-        self.hasLongestRoad = False
+        if num < 0:
+            self.num = num
+            self.score = 0
+            self.resCards = { 'wheat':0, 'sheep':0, 'brick':0, 'wood':0, 'ore':0 } # resource cards
+            self.devCardsU = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # played
+            self.devCardsP = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # unplayed
+            self.numKnights = 0
+            self.hasLargestArmy = False
+            self.color = u'&&'
+            self.bcolor = u'&&'
+            self.name = ''
+            self.isHuman = False
+            self.catan = catan
+            self.settlements = []
+            self.roads = []
+            self.longestRoad = 0
+            self.hasLongestRoad = False
+            self.isNone = True
+        else:
+            self.num = num
+            self.score = 0
+            self.resCards = { 'wheat':0, 'sheep':0, 'brick':0, 'wood':0, 'ore':0 } # resource cards
+            self.devCardsU = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # played
+            self.devCardsP = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # unplayed
+            self.numKnights = 0
+            self.hasLargestArmy = False
+            self.color = u'&p' + str(num)
+            self.bcolor = u'&P' + str(num)
+            self.name = ''
+            self.isHuman = False
+            self.catan = catan
+            self.settlements = []
+            self.roads = []
+            self.longestRoad = 0
+            self.hasLongestRoad = False
+            self.isNone = False
 
     def print_line(self):
-        return "%s %s %s  %s  %s   %s  %s" % (self.color, self.name.ljust(8), self.f(self.score), self.total(self.resCards), self.total(self.devCardsU), self.f(self.numKnights), COLORS['reset'])
+        return "%s %s %s  %s  %s   %s  &&" % (self.color, self.name.ljust(8), self.f(self.score), self.total(self.resCards), self.total(self.devCardsU), self.f(self.numKnights))
 
     def total(self, dic):
         acc = 0
@@ -684,9 +778,16 @@ class Human(Player):
         self.name = "Player " + str(self.num + 1)
 
     def settle(self):
-        self.catan.handle_input( u"PLY%s please choose a settlement (settle $1).ReS" % self.name, None, {'settle'} )
+
+        self.catan.gui.add_pMsg( u"%s%s please choose a settlement (settle opts).&&" % (self.color, self.name) )
+        self.catan.handle_input( None, {'settle'} )
+        self.catan.gui.remove_pMsg()
+
         if self.catan.isFirstTurn:
-            self.catan.handle_input( u"PLY%s please choose a road (pave $1).ReS" % self.name, None, {'pave'})
+
+            self.catan.gui.add_pMsg( u"%s%s please choose a road (pave opts).&&" % (self.color, self.name) )
+            self.catan.handle_input( None, {'pave'} )
+            self.catan.gui.remove_pMsg()
 
 class CPU(Player):
     def __init__(self, num, catan):
@@ -730,22 +831,23 @@ class Hex(Vertex):
     def __init__(self, num, isOcean, diceValue, resource):
         Vertex.__init__(self, num)
         self.resource = resource
+        self.color = resource.bkg
         self.diceValue = diceValue
         self.isOcean = isOcean
         self.isBlocked = False
         if diceValue == 0 and isOcean == False:
             self.isBlocked = True
 
-    def __repr__(self):
-        s = u""
-        if self.isBlocked:
-            s += COLORS['b_white']
-            s += COLORS['black']
-            s += str(self.diceValue).rjust(2)
-        elif not(self.isOcean):
-            s += COLORS[self.resource]
-            s += str(self.diceValue).rjust(2)
-        s += COLORS['reset']
+    def escape(self, shape):
+        s = self.color
+        if shape == 'Hx':
+            if self.isBlocked:
+                s = '&x'
+            s += " %2d  " % self.diceValue
+        elif shape == 'Hf':
+            s += "&& "
+        elif shape == 'HF':
+            s += "&& %s   && " % self.color
         return s
 
     def show_info(self, coord):
@@ -766,11 +868,21 @@ class Hex(Vertex):
         return nodes
 
 class Node(Vertex):
-    def __init__(self, num):
+    def __init__(self, num, owner):
         Vertex.__init__(self, num)
-        self.owner = None
+        self.owner = owner
         self.isCity = False
         self.isSettleable = True
+
+    def escape(self, shape=''):
+        s = self.owner.bcolor
+        if self.owner.isNone:
+            s += u' . '
+        elif self.isCity:
+            s += u' C '
+        else:
+            s += u' s '
+        return s
 
     def __repr__(self):
         s = u""
@@ -804,13 +916,14 @@ class Node(Vertex):
         s += COLORS['reset'] + " }"
         return s
 
-    def settle(self, player):
+    def settle(self, player, save=True):
         if self.isSettleable:
-            self.owner = player
-            self.isSettleable = False
-            for adj_node in self.get_adj_nodes():
-                adj_node.isSettleable = False
-            player.add_settlement(self)
+            if save:
+                self.owner = player
+                self.isSettleable = False
+                for adj_node in self.get_adj_nodes():
+                    adj_node.isSettleable = False
+                player.add_settlement(self)
             return True
 
         return False
@@ -842,16 +955,17 @@ class Edge(object):
         self.vertices = [u,v]
 
 class Road(Edge):
-    def __init__(self, num):
+    def __init__(self, num, owner):
         Edge.__init__(self, num)
-        self.owner = None
+        self.owner = owner
 
-    def pave(self, player):
+    def pave(self, player, save=True):
         if self.owner == None:
             if player.catan.isFirstTurn:
-                if self in player.settlements[-1].roads: # check if adjacent to most recently placed city
-                    self.owner = player
-                    player.add_road(self)
+                if True:#self in player.settlements[-1].roads: # check if adjacent to most recently placed settlement
+                    if save:
+                        self.owner = player
+                        player.add_road(self)
                     return True
             else:
                 for r in player.roads:
@@ -861,6 +975,16 @@ class Road(Edge):
                         return True
 
         return False
+
+    def escape(self, shape):
+        s = self.owner.bcolor
+        if shape == 'Rs':
+            s += u' / '
+        elif shape == 'Rb':
+            s += u' \\ '
+        elif shape == 'Rv':
+            s += u' | '
+        return s
 
     def __repr__(self):
         s = u""
