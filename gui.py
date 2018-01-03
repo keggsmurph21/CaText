@@ -5,17 +5,11 @@ class GUI(object):
 
         self.catan = catan
         self.settings = self.catan.settings
-        self.view = self.settings[view]
-        print self.settings.keys()
-        self.colors = self.settings['colors']
+        self.view = self.settings.get(view)
+        self.colors = self.settings.get('colors')
 
         self.pMsgs = [] # persistent messages
         self.msg = None
-
-        if view in self.settings['views']:
-            self.view = self.settings[view]
-        else:
-            return False
 
         self.gameText = None
         self.gameEscs = None
@@ -66,7 +60,7 @@ class GUI(object):
             screen = []
 
             for row in self.view['order']:
-                if row != ('prompt',):
+                if 'prompt' not in row:
                     left = self.render( row[0] )
                     for col in row[1:]:
                         right = self.render( col[0] )
@@ -84,7 +78,7 @@ class GUI(object):
             chunk = []
 
             if self.gameText == None or self.gameEscs == None:
-                genc = self.settings['genc'].split("\n")
+                genc = self.view['genc'].split("\n")
 
                 gameText = []
                 gameEscs = [ [] for line in genc ]
@@ -163,7 +157,7 @@ class GUI(object):
             chunk = []
 
             if self.infoText == None or self.infoEscs == None:
-                ienc = self.settings['ienc'].split("\n")
+                ienc = self.view['ienc'].split("\n")
 
                 infoText = []
                 infoEscs = []
@@ -304,7 +298,7 @@ class GUI(object):
 
     def prompt(self, prompt=None, color='&&'):
         if prompt == None:
-            prompt = self.settings['prompt']
+            prompt = self.settings.get('prompt')
         prompt = self.escape( color + prompt + ' ' )
         return raw_input(prompt)
 

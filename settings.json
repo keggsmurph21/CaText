@@ -1,0 +1,478 @@
+{
+  "standard": {
+    "victoryPointsGoal": 10,
+    "wide": {
+      "rpad": 1,
+      "tbanner": "&g/================================= [ CaTEXT ] =================================\\&&",
+      "lpad": 1,
+      "mpad": 3,
+      "ienc": "s7Tas8\ns7Tbs8\nIt\nI s=|__NAME____VPs_Res_DCs_Army_|\nIm\nIb\ns7Das8\ns7Dbs8\nRt\nRss=|__RESOURCES_________Num____|\nRm\nRb\nVss=|__DEV CARDS_____Up__Down___|\nVm\nVb",
+      "border": true,
+      "order": [
+        [
+          "tbanner"
+        ],
+        [
+          "game",
+          [
+            "info",
+            45,
+            0
+          ]
+        ],
+        [
+          "lbanner"
+        ],
+        [
+          "pMsgs"
+        ],
+        [
+          "msg"
+        ],
+        [
+          "prompt"
+        ]
+      ],
+      "lbanner": "&g\\==============================================================================/&&",
+      "genc": "  ObNdO5NdO5NdOb  \n  O9RsHtRbO1RsHtRbO1RsHtRbO9  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O5RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO5  \n  O3NdHfNdHfNdHfNdHfNdO3  \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O1RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO1  \nNdHfNdHfNdHfNdHfNdHfNd\nRvHxRvHxRvHxRvHxRvHxRv\nNdHgNdHgNdHgNdHgNdHgNd\n  O1RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO1  \n  O3NdHfNdHfNdHfNdHfNdO3 \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O5RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO5  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O9RbHbRsO1RbHbRsO1RbHbRsO9  \n  ObNdO5NdO5NdOb  "
+    },
+    "prompt": " >",
+    "devCards": {
+      "vp": {
+        "nameShort": "VP",
+        "namePlural": "VPs",
+        "num": 5,
+        "textColor": "&at",
+        "nameLong": "Victory Point"
+      },
+      "knight": {
+        "nameShort": "Knight",
+        "namePlural": "Knights",
+        "num": 14,
+        "textColor": "&p0",
+        "nameLong": "Knight"
+      },
+      "monopoly": {
+        "nameShort": "Monopoly",
+        "namePlural": "Monopolies",
+        "num": 2,
+        "textColor": "&wt",
+        "nameLong": "Monopoly"
+      },
+      "rb": {
+        "nameShort": "RB",
+        "namePlural": "Road Builders",
+        "num": 2,
+        "textColor": "&wt",
+        "nameLong": "Road Building"
+      },
+      "yop": {
+        "nameShort": "YoP",
+        "namePlural": "YoPs",
+        "num": 32,
+        "textColor": "&wt",
+        "nameLong": "Year of Plenty"
+      }
+    },
+    "colors": {
+      "&P3": "\u001b[48;5;14m",
+      "&x": "\u001b[40m",
+      "&at": "\u001b[38;5;226m",
+      "&bt": "\u001b[30m",
+      "&hb": "\u001b[107m",
+      "&g": "\u001b[38;5;244m",
+      "&ab": "\u001b[48;5;226m\u001b[30m",
+      "&sb": "\u001b[48;5;155m\u001b[30m",
+      "&db": "\u001b[48;5;223m\u001b[30m",
+      "&wb": "\u001b[48;5;22m",
+      "&_": "\u001b[47m",
+      "&st": "\u001b[38;5;155m",
+      "&dt": "\u001b[38;5;223m",
+      "&p3": "\u001b[38;5;14m",
+      "&p2": "\u001b[38;5;202m",
+      "&wt": "\u001b[38;5;22m",
+      "&p1": "\u001b[38;5;26m",
+      "&p0": "\u001b[38;5;1m",
+      "&P1": "\u001b[48;5;26m",
+      "&~": "\u001b[38;5;234m\u001b[40m",
+      "&&": "\u001b[0m",
+      "&P2": "\u001b[48;5;202m",
+      "&ot": "\u001b[38;5;240m",
+      "&rb": "\u001b[48;5;208m",
+      "&ob": "\u001b[48;5;240m",
+      "&rt": "\u001b[38;5;208m",
+      "&P0": "\u001b[48;5;1m"
+    },
+    "diceValues": [
+      2,
+      3,
+      3,
+      4,
+      4,
+      5,
+      5,
+      6,
+      6,
+      8,
+      8,
+      9,
+      9,
+      10,
+      10,
+      11,
+      11,
+      12
+    ],
+    "narrow": {},
+    "resources": {
+      "sheep": {
+        "isZero": false,
+        "bColor": "&sb",
+        "num": 4,
+        "name": "Sheep",
+        "tColor": "&st"
+      },
+      "wheat": {
+        "isZero": false,
+        "bColor": "&ab",
+        "num": 4,
+        "name": "Wheat",
+        "tColor": "&at"
+      },
+      "wood": {
+        "isZero": false,
+        "bColor": "&wb",
+        "num": 4,
+        "name": "Wood",
+        "tColor": "&wt"
+      },
+      "brick": {
+        "isZero": false,
+        "bColor": "&rb",
+        "num": 3,
+        "name": "Brick",
+        "tColor": "&rt"
+      },
+      "ore": {
+        "isZero": false,
+        "bColor": "&ob",
+        "num": 3,
+        "name": "Ore",
+        "tColor": "&ot"
+      },
+      "desert": {
+        "isZero": true,
+        "bColor": "&db",
+        "num": 1,
+        "name": "Desert",
+        "tColor": "&dt"
+      }
+    },
+    "commands": {
+      "force": {
+        "args": [],
+        "isAdminCommand": true,
+        "isPersistentCommand": true
+      },
+      "build": {
+        "args": [
+          "thing (e.g. road)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "flip": {
+        "args": [
+          "dev_card (e.g. knight)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "end": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "info": {
+        "args": [
+          "coordinate (e.g. E24)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "clear": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "help": {
+        "args": [
+          "command (e.g. info)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "abbrev": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "neighbors": {
+        "args": [
+          "coordinate (e.g. E24)"
+        ],
+        "isAdminCommand": true,
+        "isPersistentCommand": false
+      },
+      "roll": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "reset": {
+        "args": [],
+        "isAdminCommand": true,
+        "isPersistentCommand": false
+      },
+      "settle": {
+        "args": [
+          "coordinate (e.g. E24) or opts"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "pave": {
+        "args": [
+          "coordinate (e.g. F26) or opts"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "setname": {
+        "args": [
+          "name (8 chars or less)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "setcpuname": {
+        "args": [
+          "id (e.g. '4' for 'CPU 4')",
+          "name (8 chars or less)"
+        ],
+        "isAdminCommand": true,
+        "isPersistentCommand": true
+      }
+    },
+    "h_index": {
+        "d11":  5,
+        "d12":  5,
+        "d19":  6,
+        "d20":  6,
+        "d27":  7,
+        "d28":  7,
+        "h7":   10,
+        "h07":  10,
+        "h8":   10,
+        "h08":  10,
+        "h15":  11,
+        "h16":  11,
+        "h23":  12,
+        "h24":  12,
+        "h31":  13,
+        "h32":  13,
+        "l4":   16,
+        "l04":  16,
+        "l5":   16,
+        "l6":   16,
+        "l11":  17,
+        "l12":  17,
+        "l19":  18,
+        "l20":  18,
+        "l27":  19,
+        "l28":  19,
+        "l35":  20,
+        "l36":  20,
+        "p7":   23,
+        "p07":  23,
+        "p8":   23,
+        "p08":  23,
+        "p15":  24,
+        "p16":  24,
+        "p23":  25,
+        "p24":  25,
+        "p31":  26,
+        "p32":  26,
+        "t11":  29,
+        "t12":  29,
+        "t19":  30,
+        "t20":  30,
+        "t27":  31,
+        "t28":  31},
+    "n_index": {
+        "a12":  0,
+        "a20":  1,
+        "a28":  2,
+        "c8":   3,
+        "c08":  3,
+        "c16":  4,
+        "c24":  5,
+        "c32":  6,
+        "e8":   7,
+        "e08":  7,
+        "e16":  8,
+        "e24":  9,
+        "e32":  10,
+        "g4":   11,
+        "g04":  11,
+        "g12":  12,
+        "g20":  13,
+        "g28":  14,
+        "g36":  15,
+        "i4":   16,
+        "i04":  16,
+        "i12":  17,
+        "i20":  18,
+        "i28":  19,
+        "i36":  20,
+        "k0":   21,
+        "k00":  21,
+        "k8":   22,
+        "k08":  22,
+        "k16":  23,
+        "k24":  24,
+        "k32":  25,
+        "k40":  26,
+        "m0":   27,
+        "m00":  27,
+        "m8":   28,
+        "m08":  28,
+        "m16":  29,
+        "m24":  30,
+        "m32":  31,
+        "m40":  32,
+        "o4":   33,
+        "o04":  33,
+        "o12":  34,
+        "o20":  35,
+        "o28":  36,
+        "o36":  37,
+        "q4":   38,
+        "q04":  38,
+        "q12":  39,
+        "q20":  40,
+        "q28":  41,
+        "q36":  42,
+        "s8":   43,
+        "s08":  43,
+        "s16":  44,
+        "s24":  45,
+        "s32":  46,
+        "u8":   47,
+        "u08":  47,
+        "u16":  48,
+        "u24":  49,
+        "u32":  50,
+        "w12":  51,
+        "w20":  52,
+        "w28":  53},
+    "r_index": {
+        "b10":  0,
+        "b14":  1,
+        "b18":  2,
+        "b22":  3,
+        "b26":  4,
+        "b30":  5,
+        "d8":   6,
+        "d08":  6,
+        "d16":  7,
+        "d24":  8,
+        "d32":  9,
+        "f6":   10,
+        "f06":  10,
+        "f10":  11,
+        "f14":  12,
+        "f18":  13,
+        "f22":  14,
+        "f26":  15,
+        "f30":  16,
+        "f34":  17,
+        "h4":   18,
+        "h04":  18,
+        "h12":  19,
+        "h20":  20,
+        "h28":  21,
+        "h36":  22,
+        "j2":   23,
+        "j02":  23,
+        "j6":   24,
+        "j06":  24,
+        "j10":  25,
+        "j14":  26,
+        "j18":  27,
+        "j22":  28,
+        "j26":  29,
+        "j30":  30,
+        "j34":  31,
+        "j38":  32,
+        "l0":   33,
+        "l00":  33,
+        "l8":   34,
+        "l08":  34,
+        "l16":  35,
+        "l24":  36,
+        "l32":  37,
+        "l40":  38,
+        "n2":   39,
+        "n02":  39,
+        "n6":   40,
+        "n06":  40,
+        "n10":  41,
+        "n14":  42,
+        "n18":  43,
+        "n22":  44,
+        "n26":  45,
+        "n30":  46,
+        "n34":  47,
+        "n38":  48,
+        "p4":   49,
+        "p04":  49,
+        "p12":  50,
+        "p20":  51,
+        "p28":  52,
+        "p36":  53,
+        "r6":   54,
+        "r06":  54,
+        "r10":  55,
+        "r14":  56,
+        "r18":  57,
+        "r22":  58,
+        "r26":  59,
+        "r30":  60,
+        "r34":  61,
+        "t8":   62,
+        "t08":  62,
+        "t16":  63,
+        "t24":  64,
+        "t32":  65,
+        "v10":  66,
+        "v14":  67,
+        "v18":  68,
+        "v22":  69,
+        "v26":  70,
+        "v30":  71},
+    "hex_dots": {
+      "0":0,
+      "2":1,
+      "3":2,
+      "4":3,
+      "5":4,
+      "6":5,
+      "8":5,
+      "9":4,
+      "10":3,
+      "11":2,
+      "12":1
+    }
+  }
+}
