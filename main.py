@@ -1,4 +1,4 @@
-import datetime, gui, json, os, random
+import datetime, gui, json, os, random, shutil
 
 DEBUG = True
 STYLE = 'standard'
@@ -10,18 +10,17 @@ class Settings(object):
         self.data = data[style]
         self.data['numHumans'] = numHumans
         self.data['numCPUs'] = numCPUs
-        if savepath == None:
-            self.data['savepath'] = self.make_save_path()
-        else:
-            self.data['savepath'] = savepath
+        self.data['savepath'] = self.make_save_path()
 
     def make_save_path(self):
         # generate a new save directory
+        if os.path.exists('tmp') == False:
+            os.mkdir( 'tmp' )
         num = 0
-        path = './saves/game_%d/' % num
+        path = './tmp/game_%s/' % str(num).zfill(3)
         while os.path.exists( path ):
             num += 1
-            path = './saves/game_%d/' % num
+            path = './tmp/game_%s/' % str(num).zfill(3)
         os.mkdir( path )
 
         with open( '%sdata.txt' % path, 'w' ) as f:
@@ -147,6 +146,7 @@ class Options(object):
         self.catan = catan
         funcs = {
             'quit':         self.c_quit,
+            'save':         self.c_save,
             'load':         self.c_load,
             'force':        self.c_force,
             'info':         self.c_info,
@@ -198,6 +198,26 @@ class Options(object):
     def c_quit(self, args):
         exit()
 
+    def c_save(self, args):
+        if len(args) == 2:
+            dest = './saves/game_%s' % args[1]
+            if os.path.exists(dest):
+                confirm = raw_input('Warning: file %s already exists.  To overwrite, type `y`.')
+                if confirm.lower() == 'y':
+                    self.catan.set_msg( 'save: Overwriting file %s' )
+                else:
+                    self.catan.set_msg( 'save: Error file already exists')
+                    return False
+
+        else:
+            num = 0
+            dest = './saves/game_%s/' % str(num).zfill(3)
+            while os.path.exists( dest ):
+                num += 1
+                dest = './saves/game_%s/' % str(num).zfill(3)
+
+        shutil.copytree( self.catan.settings.get('savepath'), dest )
+
     def c_load(self, args):
         if len(args) < 3:
             if len(args) == 2:
@@ -210,40 +230,18 @@ class Options(object):
                         msg += ' ),\n  '
                     self.catan.gui.set_msg( msg )
                     return False
+
                 try:
-                    path = 'saves/game_%d/' % int(args[1])
+                    path = 'saves/game_%s/' % str(int(args[1])).zfill(3)
                 except ValueError:
-                    self.catan.gui.set_msg( "load: Unable to load game `%s`. For a list of available options, try load opts." % args[1])
-                    return False
+                    path = 'saves/game_%s/' % args[1]
+
             else:
                 path = 'saves/%s/' % sorted(os.listdir('saves')).pop()
 
             path = '%s%s/' % ( path, sorted(os.listdir(path)).pop() )
             ret = self.catan.loadGame( path )
             if ret == True:
-                if self.catan.turn == 1:
-                    self.catan()
-                self.catan.gui.set_msg( "load: Successfully loaded %s." % args[1] )
-                return True
-            else:
-                self.catan.gui.set_msg( ret )
-                return False
-
-        elif len(args) == 3 and self.catan.isAuthenticated( args[0] ) and args[1] == 'h':
-            try:
-                path = 'hardsaves/game_%d/' % int(args[2])
-                for f in os.listdir( 'tmp' ):
-                    os.remove(f)
-            except ValueError:
-                self.catan.gui.set_msg( "load: Unable to load game `%s`.  For a list of available options, try load opts." % args[2])
-
-            ret = self.catan.loadGame( path )
-            if ret == True:
-                if self.catan.turn == 1:
-                    self.catan()
-                self.catan.gui.set_msg( "load: Successfully loaded %s." % args[1] )
-                self.catan.settings.set( 'savepath', 'tmp' )
-                print self.catan.settings.get( 'savepath' )
                 return True
             else:
                 self.catan.gui.set_msg( ret )
@@ -508,12 +506,12 @@ class Catan(object):
     def saveGame(self):
         # get filepath
         path = self.settings.get('savepath')
+        print path
         with open( '%sdata.txt' % path, 'w' ) as f:
             f.write( 'humans:%d, CPUs:%d, turn:%d, modified:%s' % (self.settings.get('numHumans'), self.settings.get('numCPUs'), self.turn, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") ) )
-        path = '%sturn_%d/' % ( path, self.turn )
+        path = '%sturn_%s/' % ( path, str(self.turn).zfill(3) )
         if os.path.exists( path ) == False:
             os.mkdir( path )
-        print path
 
         # save hidden game
         kw = 'hidden'
@@ -1218,7 +1216,7 @@ class Connection(Edge):
         self.set_vertices( catan.nodes[ data['vertices'][0] ], catan.hexes[ data['vertices'][1] ] )
 
 def main():
-    catan = Catan(1,2)
+    catan = Catan(1,3)
     return 0
 
 if __name__ == "__main__":

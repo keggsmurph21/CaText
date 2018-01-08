@@ -176,6 +176,11 @@
         "isAdminCommand": false,
         "isPersistentCommand": true
       },
+      "save": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
       "load": {
         "args": [],
         "isAdminCommand": false,

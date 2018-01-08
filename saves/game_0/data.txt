@@ -1,1 +1,0 @@
-humans:1, CPUs:3, turn:10, modified:2018-01-08 15:19:06
