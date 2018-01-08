@@ -1,12 +1,25 @@
-import gui, json, random
+import datetime, gui, json, os, random
 
 DEBUG = True
+STYLE = 'standard'
 
 class Settings(object):
     def __init__(self, style):
         with open('settings.json', 'r') as f:
             data = json.load( f )
         self.data = data[style]
+        self.data['savepath'] = self.make_save_path()
+
+    def make_save_path(self):
+        # generate a new save directory
+        num = 0
+        path = './saves/game_%d/' % num
+        while os.path.exists( path ):
+            num += 1
+            path = './saves/game_%d/' % num
+        os.mkdir( path )
+
+        return path
 
     def get(self, key):
         return self.data[key]
@@ -50,6 +63,21 @@ class Dice(object):
     def __init__(self):
         self.dice = [ Die(), Die() ]
 
+    def save(self, keyword):
+        if keyword == 'hidden':
+            d = {}
+        elif keyword == 'public':
+            d = {
+                '0': self.view(0),
+                '1': self.view(1)}
+        elif keyword == 'private':
+            d = {}
+        return d
+
+    def load(self, data):
+        self.dice[0].value = data[0]
+        self.dice[1].value = data[1]
+
     def get_value(self):
         return self.dice[0].value + self.dice[1].value
 
@@ -70,16 +98,41 @@ class Resource(object):
         self.bkg = argv['bColor']
 
 class DevCard(object):
-    def __init__(self, argv, func):
+    def __init__(self, argv):
         self.name = argv['nameShort'].lower()
         self.short = argv['nameShort']
         self.long = argv['nameLong']
         self.plural = argv['namePlural']
         self.text = argv['textColor']
-        self.func = func
+
+        if self.name == 'vp':
+            self.func = self.dc_vp
+        elif self.name == 'knight':
+            self.func = self.dc_knight
+        elif self.name == 'yop':
+            self.func = self.dc_yop
+        elif self.name == 'monopoly':
+            self.func = self.dc_monopoly
+        elif self.name == 'rb':
+            self.func = self.dc_rb
 
     def do(player,action='draw'):
         return self.func(player,action)
+
+    def dc_vp(self, player, action):
+        raise NotImplementedError
+
+    def dc_knight(self, player, action):
+        raise NotImplementedError
+
+    def dc_yop(self, player, action):
+        raise NotImplementedError
+
+    def dc_monopoly(self, player, action):
+        raise NotImplementedError
+
+    def dc_rb(self, player, action):
+        raise NotImplementedError
 
 class Options(object):
     def __init__(self, catan):
@@ -87,6 +140,9 @@ class Options(object):
         self.catan = catan
 
         funcs = {
+            'quit':         self.c_quit,
+            'load':         self.c_load,
+            'save':         self.c_save,
             'force':        self.c_force,
             'info':         self.c_info,
             'clear':        self.c_clear,
@@ -125,6 +181,46 @@ class Options(object):
         for opt in options:
             self.data['available'][opt] = self.get( opt )
         return self.data['available']
+
+    def add(self, opt):
+        self.data['available'][opt] = self.get( opt )
+
+    def remove(self, options={}):
+        for opt in options:
+            self.data['available'].pop( opt, None )
+
+    def c_quit(self, args):
+        self.catan.saveGame()
+        exit()
+
+    def c_load(self, args):
+        if len(args) < 3:
+            if len(args) == 2:
+                if args[1] == 'opts':
+                    msg = '&gAvailable save files:&& '
+                    for f in sorted( os.listdir('saves') ):
+                        msg += '%s, ' % f.replace('game_', '')
+                    self.catan.gui.set_msg( msg )
+                    return False
+                path = 'saves/game_%d/' % int(args[1])
+            else:
+                path = 'saves/%s/' % sorted(os.listdir('saves')).pop()
+
+            path = '%s%s/' % ( path, sorted(os.listdir(path).pop() )
+            ret = self.catan.loadGame( path )
+            if ret == True:
+                if self.catan.turn == 1:
+                    self.catan()
+                self.catan.gui.set_msg( "load: Successfully loaded %s." % args[1] )
+                return True
+            else:
+                self.catan.gui.set_msg( ret )
+                return False
+        else:
+            self.catan.gui.set_msg( "load: Invalid number of arguments.  Expected 0 or 1, got %d." % (len(args)-1) )
+
+    def c_save(self, args):
+        self.catan.saveGame()
 
     def c_force(self, args):
         if len(args) > 1:
@@ -297,7 +393,7 @@ class Options(object):
 
 class Catan(object):
     def __init__(self, numHumans, numCPUs):
-        self.settings = Settings( 'standard' )
+        self.settings = Settings( STYLE )
         self.options = Options( self )
         self.gui = gui.GUI( self )
 
@@ -309,6 +405,116 @@ class Catan(object):
         self.history = []
         self.reseed()
 
+    def loadGame(self, path):
+        if os.path.isdir( path ):
+            # retrieve hidden game data
+            if os.path.exists( path+'hidden.json' ):
+                with open( path + 'hidden.json', 'r' ) as f:
+                    hiddenData = json.load( f )
+            else:
+                return '%s: Error retrieving hidden data. File missing or corrupted.' % path
+
+            # retrieve public game data
+            if os.path.exists( path+'public.json' ):
+                with open( path + 'public.json', 'r' ) as f:
+                    publicData = json.load( f )
+            else:
+                return '%s: Error retrieving public data. File missing or corrupted.' % path
+
+            # retrieve private game data
+            if os.path.exists( path+'private.json' ):
+                with open( path + 'private.json', 'r' ) as f:
+                    privateData = json.load( f )
+            else:
+                return '%s: Error retrieving private data. File missing or corrupted.' % path
+
+            # overwrite stuff from the constructor
+            self.settings = Settings( publicData['style'] )
+            self.options = Options( self )
+            self.gui = gui.GUI( self )
+            self.vpGoal = self.settings.get( 'victoryPointsGoal' )
+            self.numHumans = publicData['numHumans']
+            self.numCPUs = publicData['numCPUs']
+            self.history = publicData['history']
+            self.reseed()
+
+            # build hidden data
+            self.dcDeck = [ self.devCards[dc] for dc in hiddenData['dcDeck'] ]
+
+            # build public data
+            self.turn = publicData['turn']
+            self.isFirstTurn = publicData['isFirstTurn']
+            self.players = [ self.get_player_by_id(p) for p in publicData['playerOrder'] ]
+            self.currentPlayer = self.get_player_by_id( publicData['currentPlayer'] )
+            self.hasLargestArmy = self.get_player_by_id( publicData['hasLargestArmy'] )
+            self.hasLongestRoad = self.get_player_by_id( publicData['hasLongestRoad'] )
+            self.dice.load( publicData['dice'] )
+            for p in self.players:
+                p.load( 'public', publicData['players'][str(p.num)], self )
+            for h in publicData['hexes']:
+                self.hexes[h['num']].load( 'public', h, self )
+            for n in publicData['nodes']:
+                self.nodes[n['num']].load( 'public', n, self )
+            for r in publicData['roads']:
+                self.roads[r['num']].load( 'public', r, self )
+            for c in publicData['conns']:
+                self.conns[c['num']].load( 'public', c, self )
+
+            # build private data
+            for p in self.players:
+                p.load( 'private', privateData[str(p.num)], self )
+
+            return True
+
+        else:
+            return '%s: Error retrieving save files.  Files missing or corrupted.' % path
+
+    def saveGame(self):
+        # get filepath
+        path = '%sturn_%d/' % ( self.settings.get('savepath'), self.turn )
+        os.mkdir( path )
+
+        # save hidden game
+        kw = 'hidden'
+        data = { 'dcDeck': [ dc.name for dc in self.dcDeck ] }
+        with open( path + kw + '.json', 'w' ) as f:
+            json.dump( data, f, indent=4 )
+
+        # save public game
+        kw = 'public'
+        data = { 'players':{}, 'dice':{}, 'hexes':[], 'nodes':[], 'roads':[], 'conns':[] }
+        data['style'] = STYLE
+        data['numHumans'] = self.numHumans
+        data['numCPUs'] = self.numCPUs
+        data['history'] = self.history
+        data['turn'] = self.turn
+        data['isFirstTurn'] = self.isFirstTurn
+        data['playerOrder'] = [ p.num for p in self.players ]
+        data['currentPlayer'] = self.currentPlayer.num
+        data['hasLargestArmy'] = self.hasLargestArmy.num
+        data['hasLongestRoad'] = self.hasLongestRoad.num
+        data['dice'] = self.dice.save( kw )
+        for p in self.players:
+            data['players'][p.num] = p.save( kw )
+        for h in self.hexes:
+            data['hexes'].append( h.save(kw) )
+        for n in self.nodes:
+            data['nodes'].append( n.save(kw) )
+        for r in self.roads:
+            data['roads'].append( r.save(kw) )
+        for c in self.conns:
+            data['conns'].append( c.save(kw) )
+        with open( path + kw + '.json', 'w' ) as f:
+            json.dump( data, f, indent=4 )
+
+        # save private games
+        kw = 'private'
+        data = {}
+        for p in self.players:
+            data[p.num] = p.save( kw )
+        with open( path + kw + '.json', 'w' ) as f:
+            json.dump( data, f, indent=4 )
+
     def reseed(self):
         self.nonePlayer = Player(-1, self)
         self.nonePlayer.color = "&hb&bt"
@@ -317,11 +523,7 @@ class Catan(object):
 
         self.generate_board()
         self.generate_players()
-
-        self.turn = 0
-        self.isFirstTurn = True
-        self.take_first_turn()
-        self.take_turn()
+        self.loop()
 
     def generate_board(self):
         self.dice = Dice()
@@ -338,24 +540,15 @@ class Catan(object):
         # make the Dev Cards
         for key in self.settings.get('devCards').keys():
             dc = self.settings.get('devCards')[key]
-            if key == 'vp':
-                func = self.dc_vp
-            elif key == 'knight':
-                func = self.dc_knight
-            elif key == 'yop':
-                func = self.dc_yop
-            elif key == 'monopoly':
-                func = self.dc_monopoly
-            elif key == 'rb':
-                func = self.dc_rb
             for num in range( dc['num'] ):
-                devCard = DevCard( dc, func )
+                devCard = DevCard( dc )
                 self.devCards[key] = devCard
                 self.dcDeck.append( devCard )
+                random.shuffle( self.dcDeck )
 
         # make the Hexes and Resources
         diceValues = self.settings.get('diceValues')
-        random.shuffle(diceValues)
+        random.shuffle( diceValues )
         resources = []
         for key in self.settings.get('resources').keys():
             for num in range( self.settings.get('resources')[key]['num'] ):
@@ -398,39 +591,48 @@ class Catan(object):
 
     def generate_players(self):
         self.players = []
-        self.currentPlayer = None
-        self.hasLargestArmy = None
-        self.hasLongestRoad = None
+        self.currentPlayer = self.nonePlayer
+        self.hasLargestArmy = self.nonePlayer
+        self.hasLongestRoad = self.nonePlayer
 
         self.players  = [ Human(i, self) for i in range(self.numHumans) ]
         self.players += [ CPU(self.numHumans + i, self) for i in range(self.numCPUs)]
         random.shuffle(self.players)
 
-    def take_first_turn(self):
-        self.turn += 1
-        for p in self.players:
-            self.currentPlayer = p
-            p.settle()
+    def take_turn(self, current=None):
+        if self.turn < 2 * len(self.players):
+            if self.turn == 0:
+                self.firstTwoTurnsQueue = [ p for p in self.players ] + [ p for p in self.players[::-1] ]
+                self.isFirstTurn = True
 
-        self.turn += 1
-        for p in self.players[::-1]:
-            self.currentPlayer = p
-            p.settle()
-            s = self.currentPlayer.settlements[-1]
-            for conn in s.conns:
-                r = conn.vertices[1].resource.resource
-                self.currentPlayer.resCards[r] += 1
+            self.currentPlayer = self.firstTwoTurnsQueue[ self.turn ]
+            self.turn += 1
+            self.currentPlayer.settle()
 
-        self.isFirstTurn = False
-        self.gui.render()
+            if self.turn >= len(self.players): # each player's second turn collect resources
+                s = self.currentPlayer.settlements[-1]
+                for conn in s.conns:
+                    r = conn.vertices[1].resource.resource
+                    self.currentPlayer.harvest(r)
 
-    def take_turn(self):
-        self.turn += 1
-        for p in self.players:
-            self.currentPlayer = p
-            p.take_turn()
+            if self.turn == 2 * len(self.players) - 1:
+                self.isFirstTurn = False
 
-        self.take_turn()
+        else:
+            self.currentPlayer = self.players[ self.turn % len(self.players) ]
+            self.turn += 1
+            self.hasRolled = False
+            self.hasPlayedDC = False
+            self.hasPassed = False
+
+            self.currentPlayer.take_turn()
+
+    def loop(self):
+        self.turn = 0
+        while self.is_game_over() == False:
+            self.take_turn()
+            self.saveGame()
+        print "%s wins!" % player.name
 
     def roll(self):
         diceValue = self.dice.roll()
@@ -447,21 +649,6 @@ class Catan(object):
             if diceValue in {8,11}:
                 return "You rolled an %d." % diceValue
             return "You rolled a %d." % diceValue
-
-    def dc_vp(self, player, action):
-        raise NotImplementedError
-
-    def dc_knight(self, player, action):
-        raise NotImplementedError
-
-    def dc_yop(self, player, action):
-        raise NotImplementedError
-
-    def dc_monopoly(self, player, action):
-        raise NotImplementedError
-
-    def dc_rb(self, player, action):
-        raise NotImplementedError
 
     def isAuthenticated(self, opt):
         return DEBUG or opt not in self.options.dump( 'admin' ) or not( self.currentPlayer.isAdmin )
@@ -499,9 +686,7 @@ class Catan(object):
 
     def is_game_over(self):
         for player in self.players:
-            if player.score >= self.vpGoal:
-                print "%s wins!" % player.name
-                exit()
+            return player.privateScore >= self.vpGoal
 
     def checkLongestRoad(self):
         if self.hasLongestRoad != None:
@@ -516,10 +701,12 @@ class Catan(object):
         if currentLongestRoad > 4:
             if currentHolder != self.hasLongestRoad:
                 currentHolder.hasLongestRoad = True
-                currentHolder.score += 2
+                currentHolder.publicScore += 2
+                currentHolder.privateScore += 2
                 if self.hasLongestRoad != None:
                     self.hasLongestRoad.hasLongestRoad = False
-                    self.hasLongestRoad.score -= 2
+                    self.hasLongestRoad.publicScore -= 2
+                    self.hasLongestRoad.privateScore -= 2
                 self.hasLongestRoad = currentHolder
         self.is_game_over()
 
@@ -527,7 +714,7 @@ class Catan(object):
         for p in self.players:
             if p.num == i:
                 return p
-        return False
+        return self.nonePlayer
 
     def lookup(self, coord, look=None):
         h_index = self.settings.get("h_index")
@@ -559,7 +746,8 @@ class Catan(object):
 class Player(object):
     def __init__(self, num, catan):
         self.num = num
-        self.score = 0
+        self.publicScore = 0
+        self.privateScore = 0
         self.resCards = { 'wheat':0, 'sheep':0, 'brick':0, 'wood':0, 'ore':0 } # resource cards
         self.devCardsU = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # played
         self.devCardsP = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # unplayed
@@ -578,8 +766,65 @@ class Player(object):
             self.bcolor = u'&&'
         else:
             self.isNonePlayer = False
-            self.color = u'&p' + str(num)
-            self.bcolor = u'&P' + str(num)
+            self.color = u'&p%dt' % num
+            self.bcolor = u'&p%db' % num
+
+    def save(self, keyword): # score, catan, nonePlayer, connect settlements/roads
+        if keyword == 'hidden':
+            d = {}
+        elif keyword == 'public':
+            d = {
+                'num': self.num,
+                'devCardsP': self.devCardsP,
+                'numKnights': self.numKnights,
+                'hasLargestArmy': self.hasLargestArmy,
+                'name': self.name,
+                'isHuman': self.isHuman,
+                'settlements': [ s.num for s in self.settlements ],
+                'roads': [ r.num for r in self.roads ],
+                'hasLongestRoad': self.hasLongestRoad,
+                'color': self.color,
+                'bcolor': self.bcolor }
+        elif keyword == 'private':
+            d = {
+                'resCards': self.resCards,
+                'devCardsU': self.devCardsU}
+        return d
+
+    def load(self, keyword, data, catan):
+        if keyword == 'public':
+            self.isNonePlayer = False
+            self.catan = catan
+
+            self.devCardsP = data['devCardsP']
+            self.numKnights = data['numKnights']
+            self.hasLargestArmy = data['hasLargestArmy']
+            self.name = data['name']
+            self.isHuman = data['isHuman']
+            self.settlements = [ catan.nodes[num] for num in data['settlements'] ]
+            self.roads = [ catan.roads[num] for num in data['roads'] ]
+            self.hasLongestRoad = data['hasLongestRoad']
+            self.color = data['color']
+            self.bcolor = data['bcolor']
+
+            self.publicScore = 0
+            for s in self.settlements:
+                self.publicScore += 1
+                if s.isCity:
+                    self.publicScore += 1
+            if self.hasLargestArmy:
+                self.publicScore += 2
+            if self.hasLongestRoad:
+                self.publicScore += 2
+            self.privateScore = self.publicScore
+
+        elif keyword == 'private':
+            self.resCards = data['resCards']
+            self.devCardsU = data['devCardsU']
+
+            for dc in self.devCardsU:
+                if dc == 'vp':
+                    self.privateScore += 1
 
     def harvest(self, resource):
         if resource in self.resCards:
@@ -588,7 +833,10 @@ class Player(object):
             return False
 
     def print_line(self):
-        return "%s %-8s %2d  %2d  %2d   %2d  &&" % (self.color, self.name.ljust(8), self.score, self.total(self.resCards), self.total(self.devCardsU), self.numKnights)
+        score = self.publicScore
+        if self == self.catan.currentPlayer:
+            score = self.privateScore
+        return "%s %-8s %2d  %2d  %2d   %2d  &&" % (self.color, self.name, score, self.total(self.resCards), self.total(self.devCardsU), self.numKnights)
 
     def total(self, dic):
         acc = 0
@@ -611,7 +859,8 @@ class Player(object):
         self.catan.checkLongestRoad()
 
     def add_settlement(self, node):
-        self.score += 1
+        self.publicScore += 1
+        self.privateScore += 1
         self.settlements.append(node)
 
     def add_road(self, road):
@@ -639,13 +888,16 @@ class Human(Player):
             self.catan.gui.remove_pMsg()
 
     def take_turn(self):
-        hasRolled = False
-        hasPlayedDC = False
+        self.hasRolled = False
+        self.hasPlayedDC = False
+        self.hasPassed = False
+
         self.catan.gui.add_pMsg( u"%s%s please roll or flip a development card (roll, flip)" % (self.color, self.name) )
         self.catan.options.set( {'build','flip'} )
-        self.catan.handle_input()
-        self.catan.gui.remove_pMsg()
+        while hasPassed == False:
+            self.catan.handle_input()
 
+        self.catan.gui.remove_pMsg()
 
 class CPU(Player):
     def __init__(self, num, catan):
@@ -699,6 +951,25 @@ class Hex(Vertex):
         if diceValue == 0 and isOcean == False:
             self.isBlocked = True
 
+    def save(self, keyword):
+        if keyword == 'public':
+            d = {
+                'num': self.num,
+                'resource': self.resource.resource,
+                'diceValue': self.diceValue,
+                'isOcean': self.isOcean,
+                'isBlocked': self.isBlocked,
+                'conns': [ c.num for c in self.conns ]}
+        return d
+
+    def load(self, keyword, data, catan):
+        if keyword == 'public':
+            self.resource = catan.resources[ data['resource'] ]
+            self.diceValue = data['diceValue']
+            self.isOcean = data['isOcean']
+            #self.isBlocked = data['isBlocked']
+            self.conns = [ catan.conns[num] for num in data['conns'] ]
+
     def escape(self, shape):
         s = self.color
         if shape == 'Hx':
@@ -733,6 +1004,24 @@ class Node(Vertex):
         self.owner = owner
         self.isCity = False
         self.isSettleable = True
+
+    def save(self, keyword):
+        if keyword == 'public':
+            d = {
+                'num': self.num,
+                'owner': self.owner.num,
+                'isCity': self.isCity,
+                'isSettleable': self.isSettleable,
+                'roads': [ r.num for r in self.roads ],
+                'conns': [ c.num for c in self.conns ]}
+        return d
+
+    def load(self, keyword, data, catan):
+        self.owner = catan.get_player_by_id( data['owner'] )
+        self.isCity = data['isCity']
+        self.isSettleable = data['isSettleable']
+        self.roads = [ catan.roads[num] for num in data['roads'] ]
+        self.conns = [ catan.conns[num] for num in data['conns'] ]
 
     def escape(self, shape=''):
         s = self.owner.bcolor
@@ -801,6 +1090,18 @@ class Road(Edge):
         Edge.__init__(self, num)
         self.owner = owner
 
+    def save(self, keyword):
+        if keyword == 'public':
+            d = {
+                'num': self.num,
+                'vertices': (self.vertices[0].num, self.vertices[1].num),
+                'owner': self.owner.num }
+        return d
+
+    def load(self, keyword, data, catan):
+        self.owner = catan.get_player_by_id( data['owner'] )
+        self.set_vertices( catan.nodes[ data['vertices'][1] ], catan.nodes[ data['vertices'][1] ] )
+
     def pave(self, player, save=True):
         if self.owner.isNonePlayer:
             if player.catan.isFirstTurn:
@@ -839,6 +1140,17 @@ class Road(Edge):
 class Connection(Edge):
     def __init__(self, num):
         Edge.__init__(self, num)
+
+    def save(self, keyword):
+        if keyword == 'public':
+            d = {
+                'num': self.num,
+                'vertices': (self.vertices[0].num, self.vertices[1].num)}
+        return d
+
+    def load(self, keyword, data, catan):
+        self.owner = catan.get_player_by_id( data['owner'] )
+        self.set_vertices( catan.nodes[ data['vertices'][1] ], catan.hexes[ data['vertices'][1] ] )
 
     def __repr__(self):
         return "Connection(%s)" % ("<-->".join(str(e) for e in self.vertices))

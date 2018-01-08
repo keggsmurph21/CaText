@@ -99,17 +99,17 @@ class GUI(object):
                                 tline += "~"
 
                         elif line[i] == 'N':
-                            tline += "%s"
+                            tline += "&&%s"
                             gameEscs[l].append(('n', counts[ line[i:i+2] ]))
                             counts[ line[i:i+2] ] += 1
 
                         elif line[i] == 'R':
-                            tline += "%s"
+                            tline += "&&%s"
                             gameEscs[l].append((line[i:i+2], counts[ 'Rd' ]))
                             counts[ 'Rd' ] += 1
 
                         elif line[i] == 'H':
-                            tline += "%s"
+                            tline += "&&%s"
                             if line[i+1] == 'x':
                                 gameEscs[l].append(('Hx', counts[ 'Hx' ]))
                             elif line[i+1] == 't' or line[i+1] == 'b':

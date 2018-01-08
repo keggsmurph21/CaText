@@ -49,7 +49,7 @@
         "nameShort": "Knight",
         "namePlural": "Knights",
         "num": 14,
-        "textColor": "&p0",
+        "textColor": "&p0t",
         "nameLong": "Knight"
       },
       "monopoly": {
@@ -69,13 +69,13 @@
       "yop": {
         "nameShort": "YoP",
         "namePlural": "YoPs",
-        "num": 32,
+        "num": 2,
         "textColor": "&wt",
         "nameLong": "Year of Plenty"
       }
     },
     "colors": {
-      "&P3": "\u001b[48;5;14m",
+      "&p3b": "\u001b[48;5;14m",
       "&x": "\u001b[40m",
       "&at": "\u001b[38;5;226m",
       "&bt": "\u001b[30m",
@@ -88,20 +88,20 @@
       "&_": "\u001b[47m",
       "&st": "\u001b[38;5;155m",
       "&dt": "\u001b[38;5;223m",
-      "&p3": "\u001b[38;5;14m",
-      "&p2": "\u001b[38;5;202m",
+      "&p3t": "\u001b[38;5;14m",
+      "&rt": "\u001b[38;5;202m", 
       "&wt": "\u001b[38;5;22m",
-      "&p1": "\u001b[38;5;26m",
-      "&p0": "\u001b[38;5;1m",
-      "&P1": "\u001b[48;5;26m",
+      "&p1t": "\u001b[38;5;26m",
+      "&p0t": "\u001b[38;5;1m",
+      "&p1b": "\u001b[48;5;26m",
       "&~": "\u001b[38;5;234m\u001b[40m",
       "&&": "\u001b[0m",
-      "&P2": "\u001b[48;5;202m",
+      "&rb": "\u001b[48;5;202m",
       "&ot": "\u001b[38;5;240m",
-      "&rb": "\u001b[48;5;208m",
+      "&p2b": "\u001b[48;5;208m",
       "&ob": "\u001b[48;5;240m",
-      "&rt": "\u001b[38;5;208m",
-      "&P0": "\u001b[48;5;1m"
+      "&p2t": "\u001b[38;5;208m",
+      "&p0b": "\u001b[48;5;1m"
     },
     "diceValues": [
       2,
@@ -169,6 +169,21 @@
       }
     },
     "commands": {
+      "quit": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "load": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "save": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
       "force": {
         "args": [],
         "isAdminCommand": true,
