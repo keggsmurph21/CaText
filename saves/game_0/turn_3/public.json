@@ -4,7 +4,7 @@
         "1": 0, 
         "0": 0
     }, 
-    "turn": 1, 
+    "turn": 3, 
     "hasLargestArmy": -1, 
     "hasLongestRoad": -1, 
     "hexes": [
@@ -1100,10 +1100,14 @@
             "hasLargestArmy": false, 
             "color": "&p0t", 
             "hasLongestRoad": false, 
-            "settlements": [], 
+            "settlements": [
+                0
+            ], 
             "num": 0, 
             "bcolor": "&p0b", 
-            "roads": [], 
+            "roads": [
+                0
+            ], 
             "devCardsP": {
                 "vp": 0, 
                 "knight": 0, 
@@ -1119,10 +1123,14 @@
             "hasLargestArmy": false, 
             "color": "&p1t", 
             "hasLongestRoad": false, 
-            "settlements": [], 
+            "settlements": [
+                25
+            ], 
             "num": 1, 
             "bcolor": "&p1b", 
-            "roads": [], 
+            "roads": [
+                30
+            ], 
             "devCardsP": {
                 "vp": 0, 
                 "knight": 0, 
@@ -1186,7 +1194,7 @@
     ], 
     "roads": [
         {
-            "owner": -1, 
+            "owner": 0, 
             "num": 0, 
             "vertices": [
                 3, 
@@ -1426,7 +1434,7 @@
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 1, 
             "num": 30, 
             "vertices": [
                 19, 
@@ -1773,8 +1781,8 @@
                 1
             ], 
             "num": 0, 
-            "owner": -1, 
-            "isSettleable": true
+            "owner": 0, 
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -1813,7 +1821,7 @@
             ], 
             "num": 3, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -1828,7 +1836,7 @@
             ], 
             "num": 4, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2070,7 +2078,7 @@
             ], 
             "num": 20, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2146,8 +2154,8 @@
                 37
             ], 
             "num": 25, 
-            "owner": -1, 
-            "isSettleable": true
+            "owner": 1, 
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2237,7 +2245,7 @@
             ], 
             "num": 31, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2562,7 +2570,22 @@
             "isSettleable": true
         }
     ], 
-    "currentPlayer": 3, 
+    "currentPlayer": 0, 
     "numCPUs": 3, 
-    "history": []
+    "history": [
+        {
+            "command": [
+                "settle", 
+                "a12"
+            ], 
+            "pid": 0
+        }, 
+        {
+            "command": [
+                "pave", 
+                "b10"
+            ], 
+            "pid": 0
+        }
+    ]
 }

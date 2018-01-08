@@ -4,10 +4,12 @@ DEBUG = True
 STYLE = 'standard'
 
 class Settings(object):
-    def __init__(self, style):
+    def __init__(self, style, numHumans, numCPUs):
         with open('settings.json', 'r') as f:
             data = json.load( f )
         self.data = data[style]
+        self.data['numHumans'] = numHumans
+        self.data['numCPUs'] = numCPUs
         self.data['savepath'] = self.make_save_path()
 
     def make_save_path(self):
@@ -18,6 +20,9 @@ class Settings(object):
             num += 1
             path = './saves/game_%d/' % num
         os.mkdir( path )
+
+        with open( '%sdata.txt' % path, 'w' ) as f:
+            f.write( 'humans:%d, CPUs:%d, turn:%d' % (self.data['numHumans'], self.data['numCPUs'], 0) )
 
         return path
 
@@ -197,16 +202,19 @@ class Options(object):
         if len(args) < 3:
             if len(args) == 2:
                 if args[1] == 'opts':
-                    msg = '&gAvailable save files:&& '
+                    msg = '&gAvailable save files:&&\n  '
                     for f in sorted( os.listdir('saves') ):
-                        msg += '%s, ' % f.replace('game_', '')
+                        msg += '%s (' % f.replace('game_', '')
+                        with open( 'saves/%s/data.txt' % f, 'r' ) as g:
+                            msg += g.readline()
+                        msg += '),\n  '
                     self.catan.gui.set_msg( msg )
                     return False
                 path = 'saves/game_%d/' % int(args[1])
             else:
                 path = 'saves/%s/' % sorted(os.listdir('saves')).pop()
 
-            path = '%s%s/' % ( path, sorted(os.listdir(path).pop() )
+            path = '%s%s/' % ( path, sorted(os.listdir(path).pop()) )
             ret = self.catan.loadGame( path )
             if ret == True:
                 if self.catan.turn == 1:
@@ -393,14 +401,11 @@ class Options(object):
 
 class Catan(object):
     def __init__(self, numHumans, numCPUs):
-        self.settings = Settings( STYLE )
+        self.settings = Settings( STYLE, numHumans, numCPUs )
         self.options = Options( self )
         self.gui = gui.GUI( self )
 
         self.vpGoal = self.settings.get( "victoryPointsGoal" )
-
-        self.numHumans = numHumans
-        self.numCPUs = numCPUs
 
         self.history = []
         self.reseed()
@@ -429,12 +434,10 @@ class Catan(object):
                 return '%s: Error retrieving private data. File missing or corrupted.' % path
 
             # overwrite stuff from the constructor
-            self.settings = Settings( publicData['style'] )
+            self.settings = Settings( publicData['style'], publicData['numHumans'], publicData['numCPUs'] )
             self.options = Options( self )
             self.gui = gui.GUI( self )
             self.vpGoal = self.settings.get( 'victoryPointsGoal' )
-            self.numHumans = publicData['numHumans']
-            self.numCPUs = publicData['numCPUs']
             self.history = publicData['history']
             self.reseed()
 
@@ -471,7 +474,10 @@ class Catan(object):
 
     def saveGame(self):
         # get filepath
-        path = '%sturn_%d/' % ( self.settings.get('savepath'), self.turn )
+        path = self.settings.get('savepath')
+        with open( '%sdata.txt' % path, 'w' ) as f:
+            f.write( 'humans:%d, CPUs:%d, turn:%d' % (self.settings.get('numHumans'), self.settings.get('numCPUs'), self.turn) )
+        path = '%sturn_%d/' % ( path, self.turn )
         os.mkdir( path )
 
         # save hidden game
@@ -484,8 +490,8 @@ class Catan(object):
         kw = 'public'
         data = { 'players':{}, 'dice':{}, 'hexes':[], 'nodes':[], 'roads':[], 'conns':[] }
         data['style'] = STYLE
-        data['numHumans'] = self.numHumans
-        data['numCPUs'] = self.numCPUs
+        data['numHumans'] = self.settings.get('numHumans')
+        data['numCPUs'] = self.settings.get('numCPUs')
         data['history'] = self.history
         data['turn'] = self.turn
         data['isFirstTurn'] = self.isFirstTurn
@@ -595,8 +601,8 @@ class Catan(object):
         self.hasLargestArmy = self.nonePlayer
         self.hasLongestRoad = self.nonePlayer
 
-        self.players  = [ Human(i, self) for i in range(self.numHumans) ]
-        self.players += [ CPU(self.numHumans + i, self) for i in range(self.numCPUs)]
+        self.players  = [ Human(i, self) for i in range(self.settings.get('numHumans')) ]
+        self.players += [ CPU(self.settings.get('numHumans') + i, self) for i in range(self.settings.get('numCPUs'))]
         random.shuffle(self.players)
 
     def take_turn(self, current=None):
