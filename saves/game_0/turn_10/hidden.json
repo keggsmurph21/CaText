@@ -1,22 +1,19 @@
 {
     "dcDeck": [
+        "knight", 
+        "knight", 
+        "knight", 
+        "knight", 
+        "knight", 
+        "vp", 
         "yop", 
-        "vp", 
-        "knight", 
-        "knight", 
-        "knight", 
-        "knight", 
-        "knight", 
-        "vp", 
-        "knight", 
-        "knight", 
-        "monopoly", 
-        "knight", 
         "rb", 
+        "knight", 
+        "knight", 
         "monopoly", 
+        "vp", 
         "knight", 
-        "knight", 
-        "knight", 
+        "vp", 
         "knight", 
         "knight", 
         "knight", 
@@ -24,6 +21,9 @@
         "rb", 
         "yop", 
         "vp", 
-        "vp"
+        "knight", 
+        "knight", 
+        "knight", 
+        "monopoly"
     ]
 }

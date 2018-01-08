@@ -6,3 +6,8 @@
 *#
 .DS_Store
 
+# compiled python files
+*.pyc
+
+# temporary stuff
+tmp

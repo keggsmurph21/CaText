@@ -4,13 +4,16 @@ DEBUG = True
 STYLE = 'standard'
 
 class Settings(object):
-    def __init__(self, style, numHumans, numCPUs):
+    def __init__(self, style, numHumans, numCPUs, savepath=None):
         with open('settings.json', 'r') as f:
             data = json.load( f )
         self.data = data[style]
         self.data['numHumans'] = numHumans
         self.data['numCPUs'] = numCPUs
-        self.data['savepath'] = self.make_save_path()
+        if savepath == None:
+            self.data['savepath'] = self.make_save_path()
+        else:
+            self.data['savepath'] = savepath
 
     def make_save_path(self):
         # generate a new save directory
@@ -22,7 +25,7 @@ class Settings(object):
         os.mkdir( path )
 
         with open( '%sdata.txt' % path, 'w' ) as f:
-            f.write( 'humans:%d, CPUs:%d, turn:%d' % (self.data['numHumans'], self.data['numCPUs'], 0) )
+            f.write( 'humans:%d, CPUs:%d, turn:%d, modified:%s' % (self.data['numHumans'], self.data['numCPUs'], 0, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") ) )
 
         return path
 
@@ -69,19 +72,15 @@ class Dice(object):
         self.dice = [ Die(), Die() ]
 
     def save(self, keyword):
-        if keyword == 'hidden':
-            d = {}
-        elif keyword == 'public':
+        if keyword == 'public':
             d = {
                 '0': self.view(0),
                 '1': self.view(1)}
-        elif keyword == 'private':
-            d = {}
         return d
 
     def load(self, data):
-        self.dice[0].value = data[0]
-        self.dice[1].value = data[1]
+        self.dice[0].value = data['0']
+        self.dice[1].value = data['1']
 
     def get_value(self):
         return self.dice[0].value + self.dice[1].value
@@ -147,7 +146,6 @@ class Options(object):
         funcs = {
             'quit':         self.c_quit,
             'load':         self.c_load,
-            'save':         self.c_save,
             'force':        self.c_force,
             'info':         self.c_info,
             'clear':        self.c_clear,
@@ -195,7 +193,6 @@ class Options(object):
             self.data['available'].pop( opt, None )
 
     def c_quit(self, args):
-        self.catan.saveGame()
         exit()
 
     def c_load(self, args):
@@ -204,17 +201,21 @@ class Options(object):
                 if args[1] == 'opts':
                     msg = '&gAvailable save files:&&\n  '
                     for f in sorted( os.listdir('saves') ):
-                        msg += '%s (' % f.replace('game_', '')
+                        msg += '%s ( ' % f.replace('game_', '')
                         with open( 'saves/%s/data.txt' % f, 'r' ) as g:
                             msg += g.readline()
-                        msg += '),\n  '
+                        msg += ' ),\n  '
                     self.catan.gui.set_msg( msg )
                     return False
-                path = 'saves/game_%d/' % int(args[1])
+                try:
+                    path = 'saves/game_%d/' % int(args[1])
+                except ValueError:
+                    self.catan.gui.set_msg( "load: Unable to load game `%s`. For a list of available options, try load opts." % args[1])
+                    return False
             else:
                 path = 'saves/%s/' % sorted(os.listdir('saves')).pop()
 
-            path = '%s%s/' % ( path, sorted(os.listdir(path).pop()) )
+            path = '%s%s/' % ( path, sorted(os.listdir(path)).pop() )
             ret = self.catan.loadGame( path )
             if ret == True:
                 if self.catan.turn == 1:
@@ -226,9 +227,6 @@ class Options(object):
                 return False
         else:
             self.catan.gui.set_msg( "load: Invalid number of arguments.  Expected 0 or 1, got %d." % (len(args)-1) )
-
-    def c_save(self, args):
-        self.catan.saveGame()
 
     def c_force(self, args):
         if len(args) > 1:
@@ -334,7 +332,7 @@ class Options(object):
                     return True
                 else:
                     self.catan.gui.set_msg( ret )
-                    return Falsepav
+                    return False
         else:
             self.catan.gui.set_msg( "settle: Invalid number of arguments.  Expected 1, got %d." % (len(args)-1) )
 
@@ -404,11 +402,10 @@ class Catan(object):
         self.settings = Settings( STYLE, numHumans, numCPUs )
         self.options = Options( self )
         self.gui = gui.GUI( self )
-
-        self.vpGoal = self.settings.get( "victoryPointsGoal" )
-
         self.history = []
         self.reseed()
+
+        self.loop()
 
     def loadGame(self, path):
         if os.path.isdir( path ):
@@ -434,10 +431,9 @@ class Catan(object):
                 return '%s: Error retrieving private data. File missing or corrupted.' % path
 
             # overwrite stuff from the constructor
-            self.settings = Settings( publicData['style'], publicData['numHumans'], publicData['numCPUs'] )
+            self.settings = Settings( publicData['style'], publicData['numHumans'], publicData['numCPUs'], publicData['savepath'] )
             self.options = Options( self )
             self.gui = gui.GUI( self )
-            self.vpGoal = self.settings.get( 'victoryPointsGoal' )
             self.history = publicData['history']
             self.reseed()
 
@@ -445,6 +441,7 @@ class Catan(object):
             self.dcDeck = [ self.devCards[dc] for dc in hiddenData['dcDeck'] ]
 
             # build public data
+            self.savepath = publicData['savepath']
             self.turn = publicData['turn']
             self.isFirstTurn = publicData['isFirstTurn']
             self.players = [ self.get_player_by_id(p) for p in publicData['playerOrder'] ]
@@ -467,6 +464,7 @@ class Catan(object):
             for p in self.players:
                 p.load( 'private', privateData[str(p.num)], self )
 
+            self.loop( self.turn, self.currentPlayer )
             return True
 
         else:
@@ -476,9 +474,10 @@ class Catan(object):
         # get filepath
         path = self.settings.get('savepath')
         with open( '%sdata.txt' % path, 'w' ) as f:
-            f.write( 'humans:%d, CPUs:%d, turn:%d' % (self.settings.get('numHumans'), self.settings.get('numCPUs'), self.turn) )
+            f.write( 'humans:%d, CPUs:%d, turn:%d, modified:%s' % (self.settings.get('numHumans'), self.settings.get('numCPUs'), self.turn, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") ) )
         path = '%sturn_%d/' % ( path, self.turn )
-        os.mkdir( path )
+        if os.path.exists( path ) == False:
+            os.mkdir( path )
 
         # save hidden game
         kw = 'hidden'
@@ -488,8 +487,9 @@ class Catan(object):
 
         # save public game
         kw = 'public'
-        data = { 'players':{}, 'dice':{}, 'hexes':[], 'nodes':[], 'roads':[], 'conns':[] }
+        data = {}
         data['style'] = STYLE
+        data['savepath'] = self.settings.get('savepath')
         data['numHumans'] = self.settings.get('numHumans')
         data['numCPUs'] = self.settings.get('numCPUs')
         data['history'] = self.history
@@ -500,16 +500,13 @@ class Catan(object):
         data['hasLargestArmy'] = self.hasLargestArmy.num
         data['hasLongestRoad'] = self.hasLongestRoad.num
         data['dice'] = self.dice.save( kw )
+        data['players'] = {}
         for p in self.players:
             data['players'][p.num] = p.save( kw )
-        for h in self.hexes:
-            data['hexes'].append( h.save(kw) )
-        for n in self.nodes:
-            data['nodes'].append( n.save(kw) )
-        for r in self.roads:
-            data['roads'].append( r.save(kw) )
-        for c in self.conns:
-            data['conns'].append( c.save(kw) )
+        data['hexes'] = [ h.save(kw) for h in self.hexes ]
+        data['nodes'] = [ n.save(kw) for n in self.nodes ]
+        data['roads'] = [ r.save(kw) for r in self.roads ]
+        data['conns'] = [ c.save(kw) for c in self.conns ]
         with open( path + kw + '.json', 'w' ) as f:
             json.dump( data, f, indent=4 )
 
@@ -529,7 +526,6 @@ class Catan(object):
 
         self.generate_board()
         self.generate_players()
-        self.loop()
 
     def generate_board(self):
         self.dice = Dice()
@@ -606,6 +602,9 @@ class Catan(object):
         random.shuffle(self.players)
 
     def take_turn(self, current=None):
+        if DEBUG == True: # if debugging we want to see all the CPU steps
+            self.gui.render()
+
         if self.turn < 2 * len(self.players):
             if self.turn == 0:
                 self.firstTwoTurnsQueue = [ p for p in self.players ] + [ p for p in self.players[::-1] ]
@@ -615,13 +614,13 @@ class Catan(object):
             self.turn += 1
             self.currentPlayer.settle()
 
-            if self.turn >= len(self.players): # each player's second turn collect resources
+            if self.turn > len(self.players): # each player's second turn collect resources
                 s = self.currentPlayer.settlements[-1]
                 for conn in s.conns:
                     r = conn.vertices[1].resource.resource
                     self.currentPlayer.harvest(r)
 
-            if self.turn == 2 * len(self.players) - 1:
+            if self.turn == 2 * len(self.players):
                 self.isFirstTurn = False
 
         else:
@@ -633,10 +632,10 @@ class Catan(object):
 
             self.currentPlayer.take_turn()
 
-    def loop(self):
-        self.turn = 0
+    def loop(self, turn=0, current=None):
+        self.turn = turn
         while self.is_game_over() == False:
-            self.take_turn()
+            self.take_turn(current)
             self.saveGame()
         print "%s wins!" % player.name
 
@@ -692,7 +691,7 @@ class Catan(object):
 
     def is_game_over(self):
         for player in self.players:
-            return player.privateScore >= self.vpGoal
+            return player.privateScore >= self.settings.get('victoryPointsGoal')
 
     def checkLongestRoad(self):
         if self.hasLongestRoad != None:
@@ -775,10 +774,8 @@ class Player(object):
             self.color = u'&p%dt' % num
             self.bcolor = u'&p%db' % num
 
-    def save(self, keyword): # score, catan, nonePlayer, connect settlements/roads
-        if keyword == 'hidden':
-            d = {}
-        elif keyword == 'public':
+    def save(self, keyword):
+        if keyword == 'public':
             d = {
                 'num': self.num,
                 'devCardsP': self.devCardsP,
@@ -894,13 +891,9 @@ class Human(Player):
             self.catan.gui.remove_pMsg()
 
     def take_turn(self):
-        self.hasRolled = False
-        self.hasPlayedDC = False
-        self.hasPassed = False
-
         self.catan.gui.add_pMsg( u"%s%s please roll or flip a development card (roll, flip)" % (self.color, self.name) )
         self.catan.options.set( {'build','flip'} )
-        while hasPassed == False:
+        while self.catan.hasPassed == False:
             self.catan.handle_input()
 
         self.catan.gui.remove_pMsg()
@@ -971,9 +964,10 @@ class Hex(Vertex):
     def load(self, keyword, data, catan):
         if keyword == 'public':
             self.resource = catan.resources[ data['resource'] ]
+            self.color = self.resource.bkg
             self.diceValue = data['diceValue']
             self.isOcean = data['isOcean']
-            #self.isBlocked = data['isBlocked']
+            self.isBlocked = data['isBlocked']
             self.conns = [ catan.conns[num] for num in data['conns'] ]
 
     def escape(self, shape):
@@ -1155,14 +1149,13 @@ class Connection(Edge):
         return d
 
     def load(self, keyword, data, catan):
-        self.owner = catan.get_player_by_id( data['owner'] )
         self.set_vertices( catan.nodes[ data['vertices'][1] ], catan.hexes[ data['vertices'][1] ] )
 
     def __repr__(self):
         return "Connection(%s)" % ("<-->".join(str(e) for e in self.vertices))
 
 def main():
-    catan = Catan(1,3)
+    catan = Catan(1,2)
     return 0
 
 if __name__ == "__main__":

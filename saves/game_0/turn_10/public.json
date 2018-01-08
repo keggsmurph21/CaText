@@ -1,17 +1,114 @@
 {
     "style": "standard", 
-    "dice": {
-        "1": 0, 
-        "0": 0
-    }, 
-    "turn": 5, 
     "hasLargestArmy": -1, 
+    "players": {
+        "0": {
+            "numKnights": 0, 
+            "hasLargestArmy": false, 
+            "color": "&p0t", 
+            "hasLongestRoad": false, 
+            "settlements": [
+                36, 
+                40
+            ], 
+            "num": 0, 
+            "bcolor": "&p0b", 
+            "roads": [
+                46, 
+                57
+            ], 
+            "devCardsP": {
+                "vp": 0, 
+                "knight": 0, 
+                "yop": 0, 
+                "rb": 0, 
+                "monopoly": 0
+            }, 
+            "name": "Player 1", 
+            "isHuman": true
+        }, 
+        "1": {
+            "numKnights": 0, 
+            "hasLargestArmy": false, 
+            "color": "&p1t", 
+            "hasLongestRoad": false, 
+            "settlements": [
+                19, 
+                39
+            ], 
+            "num": 1, 
+            "bcolor": "&p1b", 
+            "roads": [
+                29, 
+                55
+            ], 
+            "devCardsP": {
+                "vp": 0, 
+                "knight": 0, 
+                "yop": 0, 
+                "rb": 0, 
+                "monopoly": 0
+            }, 
+            "name": "CPU 2", 
+            "isHuman": false
+        }, 
+        "2": {
+            "numKnights": 0, 
+            "hasLargestArmy": false, 
+            "color": "&p2t", 
+            "hasLongestRoad": false, 
+            "settlements": [
+                9, 
+                7
+            ], 
+            "num": 2, 
+            "bcolor": "&p2b", 
+            "roads": [
+                14, 
+                11
+            ], 
+            "devCardsP": {
+                "vp": 0, 
+                "knight": 0, 
+                "yop": 0, 
+                "rb": 0, 
+                "monopoly": 0
+            }, 
+            "name": "CPU 3", 
+            "isHuman": false
+        }, 
+        "3": {
+            "numKnights": 0, 
+            "hasLargestArmy": false, 
+            "color": "&p3t", 
+            "hasLongestRoad": false, 
+            "settlements": [
+                8, 
+                18
+            ], 
+            "num": 3, 
+            "bcolor": "&p3b", 
+            "roads": [
+                12, 
+                20
+            ], 
+            "devCardsP": {
+                "vp": 0, 
+                "knight": 0, 
+                "yop": 0, 
+                "rb": 0, 
+                "monopoly": 0
+            }, 
+            "name": "CPU 4", 
+            "isHuman": false
+        }
+    }, 
     "hasLongestRoad": -1, 
     "hexes": [
         {
             "resource": "brick", 
             "isOcean": false, 
-            "diceValue": 10, 
+            "diceValue": 8, 
             "num": 0, 
             "isBlocked": false, 
             "conns": [
@@ -24,9 +121,9 @@
             ]
         }, 
         {
-            "resource": "ore", 
+            "resource": "sheep", 
             "isOcean": false, 
-            "diceValue": 10, 
+            "diceValue": 6, 
             "num": 1, 
             "isBlocked": false, 
             "conns": [
@@ -39,9 +136,9 @@
             ]
         }, 
         {
-            "resource": "brick", 
+            "resource": "wood", 
             "isOcean": false, 
-            "diceValue": 6, 
+            "diceValue": 8, 
             "num": 2, 
             "isBlocked": false, 
             "conns": [
@@ -54,9 +151,9 @@
             ]
         }, 
         {
-            "resource": "ore", 
+            "resource": "brick", 
             "isOcean": false, 
-            "diceValue": 3, 
+            "diceValue": 11, 
             "num": 3, 
             "isBlocked": false, 
             "conns": [
@@ -69,9 +166,9 @@
             ]
         }, 
         {
-            "resource": "wheat", 
+            "resource": "sheep", 
             "isOcean": false, 
-            "diceValue": 11, 
+            "diceValue": 12, 
             "num": 4, 
             "isBlocked": false, 
             "conns": [
@@ -84,9 +181,9 @@
             ]
         }, 
         {
-            "resource": "brick", 
+            "resource": "sheep", 
             "isOcean": false, 
-            "diceValue": 8, 
+            "diceValue": 6, 
             "num": 5, 
             "isBlocked": false, 
             "conns": [
@@ -101,7 +198,7 @@
         {
             "resource": "ore", 
             "isOcean": false, 
-            "diceValue": 6, 
+            "diceValue": 3, 
             "num": 6, 
             "isBlocked": false, 
             "conns": [
@@ -114,11 +211,11 @@
             ]
         }, 
         {
-            "resource": "wheat", 
+            "resource": "desert", 
             "isOcean": false, 
-            "diceValue": 5, 
+            "diceValue": 0, 
             "num": 7, 
-            "isBlocked": false, 
+            "isBlocked": true, 
             "conns": [
                 42, 
                 43, 
@@ -129,9 +226,9 @@
             ]
         }, 
         {
-            "resource": "wood", 
+            "resource": "wheat", 
             "isOcean": false, 
-            "diceValue": 11, 
+            "diceValue": 2, 
             "num": 8, 
             "isBlocked": false, 
             "conns": [
@@ -144,9 +241,9 @@
             ]
         }, 
         {
-            "resource": "wood", 
+            "resource": "wheat", 
             "isOcean": false, 
-            "diceValue": 2, 
+            "diceValue": 11, 
             "num": 9, 
             "isBlocked": false, 
             "conns": [
@@ -159,9 +256,9 @@
             ]
         }, 
         {
-            "resource": "wheat", 
+            "resource": "wood", 
             "isOcean": false, 
-            "diceValue": 5, 
+            "diceValue": 4, 
             "num": 10, 
             "isBlocked": false, 
             "conns": [
@@ -174,7 +271,7 @@
             ]
         }, 
         {
-            "resource": "sheep", 
+            "resource": "wheat", 
             "isOcean": false, 
             "diceValue": 9, 
             "num": 11, 
@@ -189,9 +286,9 @@
             ]
         }, 
         {
-            "resource": "sheep", 
+            "resource": "wood", 
             "isOcean": false, 
-            "diceValue": 4, 
+            "diceValue": 10, 
             "num": 12, 
             "isBlocked": false, 
             "conns": [
@@ -204,9 +301,9 @@
             ]
         }, 
         {
-            "resource": "wood", 
+            "resource": "wheat", 
             "isOcean": false, 
-            "diceValue": 9, 
+            "diceValue": 4, 
             "num": 13, 
             "isBlocked": false, 
             "conns": [
@@ -219,11 +316,11 @@
             ]
         }, 
         {
-            "resource": "desert", 
+            "resource": "ore", 
             "isOcean": false, 
-            "diceValue": 0, 
+            "diceValue": 5, 
             "num": 14, 
-            "isBlocked": true, 
+            "isBlocked": false, 
             "conns": [
                 84, 
                 85, 
@@ -234,9 +331,9 @@
             ]
         }, 
         {
-            "resource": "sheep", 
+            "resource": "brick", 
             "isOcean": false, 
-            "diceValue": 8, 
+            "diceValue": 10, 
             "num": 15, 
             "isBlocked": false, 
             "conns": [
@@ -251,7 +348,7 @@
         {
             "resource": "sheep", 
             "isOcean": false, 
-            "diceValue": 12, 
+            "diceValue": 5, 
             "num": 16, 
             "isBlocked": false, 
             "conns": [
@@ -264,7 +361,7 @@
             ]
         }, 
         {
-            "resource": "wheat", 
+            "resource": "wood", 
             "isOcean": false, 
             "diceValue": 3, 
             "num": 17, 
@@ -279,9 +376,9 @@
             ]
         }, 
         {
-            "resource": "wood", 
+            "resource": "ore", 
             "isOcean": false, 
-            "diceValue": 4, 
+            "diceValue": 9, 
             "num": 18, 
             "isBlocked": false, 
             "conns": [
@@ -305,35 +402,35 @@
         {
             "num": 1, 
             "vertices": [
-                4, 
+                0, 
                 0
             ]
         }, 
         {
             "num": 2, 
             "vertices": [
-                8, 
+                0, 
                 0
             ]
         }, 
         {
             "num": 3, 
             "vertices": [
-                12, 
+                0, 
                 0
             ]
         }, 
         {
             "num": 4, 
             "vertices": [
-                7, 
+                0, 
                 0
             ]
         }, 
         {
             "num": 5, 
             "vertices": [
-                3, 
+                0, 
                 0
             ]
         }, 
@@ -347,35 +444,35 @@
         {
             "num": 7, 
             "vertices": [
-                5, 
+                1, 
                 1
             ]
         }, 
         {
             "num": 8, 
             "vertices": [
-                9, 
+                1, 
                 1
             ]
         }, 
         {
             "num": 9, 
             "vertices": [
-                13, 
+                1, 
                 1
             ]
         }, 
         {
             "num": 10, 
             "vertices": [
-                8, 
+                1, 
                 1
             ]
         }, 
         {
             "num": 11, 
             "vertices": [
-                4, 
+                1, 
                 1
             ]
         }, 
@@ -389,821 +486,731 @@
         {
             "num": 13, 
             "vertices": [
-                6, 
+                2, 
                 2
             ]
         }, 
         {
             "num": 14, 
             "vertices": [
-                10, 
+                2, 
                 2
             ]
         }, 
         {
             "num": 15, 
             "vertices": [
-                14, 
+                2, 
                 2
             ]
         }, 
         {
             "num": 16, 
             "vertices": [
-                9, 
+                2, 
                 2
             ]
         }, 
         {
             "num": 17, 
             "vertices": [
-                5, 
+                2, 
                 2
             ]
         }, 
         {
             "num": 18, 
             "vertices": [
-                7, 
+                3, 
                 3
             ]
         }, 
         {
             "num": 19, 
             "vertices": [
-                12, 
+                3, 
                 3
             ]
         }, 
         {
             "num": 20, 
             "vertices": [
-                17, 
+                3, 
                 3
             ]
         }, 
         {
             "num": 21, 
             "vertices": [
-                22, 
+                3, 
                 3
             ]
         }, 
         {
             "num": 22, 
             "vertices": [
-                16, 
+                3, 
                 3
             ]
         }, 
         {
             "num": 23, 
             "vertices": [
-                11, 
+                3, 
                 3
             ]
         }, 
         {
             "num": 24, 
             "vertices": [
-                8, 
+                4, 
                 4
             ]
         }, 
         {
             "num": 25, 
             "vertices": [
-                13, 
+                4, 
                 4
             ]
         }, 
         {
             "num": 26, 
             "vertices": [
-                18, 
+                4, 
                 4
             ]
         }, 
         {
             "num": 27, 
             "vertices": [
-                23, 
+                4, 
                 4
             ]
         }, 
         {
             "num": 28, 
             "vertices": [
-                17, 
+                4, 
                 4
             ]
         }, 
         {
             "num": 29, 
             "vertices": [
-                12, 
+                4, 
                 4
             ]
         }, 
         {
             "num": 30, 
             "vertices": [
-                9, 
+                5, 
                 5
             ]
         }, 
         {
             "num": 31, 
             "vertices": [
-                14, 
+                5, 
                 5
             ]
         }, 
         {
             "num": 32, 
             "vertices": [
-                19, 
+                5, 
                 5
             ]
         }, 
         {
             "num": 33, 
             "vertices": [
-                24, 
+                5, 
                 5
             ]
         }, 
         {
             "num": 34, 
             "vertices": [
-                18, 
+                5, 
                 5
             ]
         }, 
         {
             "num": 35, 
             "vertices": [
-                13, 
+                5, 
                 5
             ]
         }, 
         {
             "num": 36, 
             "vertices": [
-                10, 
+                6, 
                 6
             ]
         }, 
         {
             "num": 37, 
             "vertices": [
-                15, 
+                6, 
                 6
             ]
         }, 
         {
             "num": 38, 
             "vertices": [
-                20, 
+                6, 
                 6
             ]
         }, 
         {
             "num": 39, 
             "vertices": [
-                25, 
+                6, 
                 6
             ]
         }, 
         {
             "num": 40, 
             "vertices": [
-                19, 
+                6, 
                 6
             ]
         }, 
         {
             "num": 41, 
             "vertices": [
-                14, 
+                6, 
                 6
             ]
         }, 
         {
             "num": 42, 
             "vertices": [
-                16, 
+                7, 
                 7
             ]
         }, 
         {
             "num": 43, 
             "vertices": [
-                22, 
+                7, 
                 7
             ]
         }, 
         {
             "num": 44, 
             "vertices": [
-                28, 
+                7, 
                 7
             ]
         }, 
         {
             "num": 45, 
             "vertices": [
-                33, 
+                7, 
                 7
             ]
         }, 
         {
             "num": 46, 
             "vertices": [
-                27, 
+                7, 
                 7
             ]
         }, 
         {
             "num": 47, 
             "vertices": [
-                21, 
+                7, 
                 7
             ]
         }, 
         {
             "num": 48, 
             "vertices": [
-                17, 
+                8, 
                 8
             ]
         }, 
         {
             "num": 49, 
             "vertices": [
-                23, 
+                8, 
                 8
             ]
         }, 
         {
             "num": 50, 
             "vertices": [
-                29, 
+                8, 
                 8
             ]
         }, 
         {
             "num": 51, 
             "vertices": [
-                34, 
+                8, 
                 8
             ]
         }, 
         {
             "num": 52, 
             "vertices": [
-                28, 
+                8, 
                 8
             ]
         }, 
         {
             "num": 53, 
             "vertices": [
-                22, 
+                8, 
                 8
             ]
         }, 
         {
             "num": 54, 
             "vertices": [
-                18, 
+                9, 
                 9
             ]
         }, 
         {
             "num": 55, 
             "vertices": [
-                24, 
+                9, 
                 9
             ]
         }, 
         {
             "num": 56, 
             "vertices": [
-                30, 
+                9, 
                 9
             ]
         }, 
         {
             "num": 57, 
             "vertices": [
-                35, 
+                9, 
                 9
             ]
         }, 
         {
             "num": 58, 
             "vertices": [
-                29, 
+                9, 
                 9
             ]
         }, 
         {
             "num": 59, 
             "vertices": [
-                23, 
+                9, 
                 9
             ]
         }, 
         {
             "num": 60, 
             "vertices": [
-                19, 
+                10, 
                 10
             ]
         }, 
         {
             "num": 61, 
             "vertices": [
-                25, 
+                10, 
                 10
             ]
         }, 
         {
             "num": 62, 
             "vertices": [
-                31, 
+                10, 
                 10
             ]
         }, 
         {
             "num": 63, 
             "vertices": [
-                36, 
+                10, 
                 10
             ]
         }, 
         {
             "num": 64, 
             "vertices": [
-                30, 
+                10, 
                 10
             ]
         }, 
         {
             "num": 65, 
             "vertices": [
-                24, 
+                10, 
                 10
             ]
         }, 
         {
             "num": 66, 
             "vertices": [
-                20, 
+                11, 
                 11
             ]
         }, 
         {
             "num": 67, 
             "vertices": [
-                26, 
+                11, 
                 11
             ]
         }, 
         {
             "num": 68, 
             "vertices": [
-                32, 
+                11, 
                 11
             ]
         }, 
         {
             "num": 69, 
             "vertices": [
-                37, 
+                11, 
                 11
             ]
         }, 
         {
             "num": 70, 
             "vertices": [
-                31, 
+                11, 
                 11
             ]
         }, 
         {
             "num": 71, 
             "vertices": [
-                25, 
+                11, 
                 11
             ]
         }, 
         {
             "num": 72, 
             "vertices": [
-                28, 
+                12, 
                 12
             ]
         }, 
         {
             "num": 73, 
             "vertices": [
-                34, 
+                12, 
                 12
             ]
         }, 
         {
             "num": 74, 
             "vertices": [
-                39, 
+                12, 
                 12
             ]
         }, 
         {
             "num": 75, 
             "vertices": [
-                43, 
+                12, 
                 12
             ]
         }, 
         {
             "num": 76, 
             "vertices": [
-                38, 
+                12, 
                 12
             ]
         }, 
         {
             "num": 77, 
             "vertices": [
-                33, 
+                12, 
                 12
             ]
         }, 
         {
             "num": 78, 
             "vertices": [
-                29, 
+                13, 
                 13
             ]
         }, 
         {
             "num": 79, 
             "vertices": [
-                35, 
+                13, 
                 13
             ]
         }, 
         {
             "num": 80, 
             "vertices": [
-                40, 
+                13, 
                 13
             ]
         }, 
         {
             "num": 81, 
             "vertices": [
-                44, 
+                13, 
                 13
             ]
         }, 
         {
             "num": 82, 
             "vertices": [
-                39, 
+                13, 
                 13
             ]
         }, 
         {
             "num": 83, 
             "vertices": [
-                34, 
+                13, 
                 13
             ]
         }, 
         {
             "num": 84, 
             "vertices": [
-                30, 
+                14, 
                 14
             ]
         }, 
         {
             "num": 85, 
             "vertices": [
-                36, 
+                14, 
                 14
             ]
         }, 
         {
             "num": 86, 
             "vertices": [
-                41, 
+                14, 
                 14
             ]
         }, 
         {
             "num": 87, 
             "vertices": [
-                45, 
+                14, 
                 14
             ]
         }, 
         {
             "num": 88, 
             "vertices": [
-                40, 
+                14, 
                 14
             ]
         }, 
         {
             "num": 89, 
             "vertices": [
-                35, 
+                14, 
                 14
             ]
         }, 
         {
             "num": 90, 
             "vertices": [
-                31, 
+                15, 
                 15
             ]
         }, 
         {
             "num": 91, 
             "vertices": [
-                37, 
+                15, 
                 15
             ]
         }, 
         {
             "num": 92, 
             "vertices": [
-                42, 
+                15, 
                 15
             ]
         }, 
         {
             "num": 93, 
             "vertices": [
-                46, 
+                15, 
                 15
             ]
         }, 
         {
             "num": 94, 
             "vertices": [
-                41, 
+                15, 
                 15
             ]
         }, 
         {
             "num": 95, 
             "vertices": [
-                36, 
+                15, 
                 15
             ]
         }, 
         {
             "num": 96, 
             "vertices": [
-                39, 
+                16, 
                 16
             ]
         }, 
         {
             "num": 97, 
             "vertices": [
-                44, 
+                16, 
                 16
             ]
         }, 
         {
             "num": 98, 
             "vertices": [
-                48, 
+                16, 
                 16
             ]
         }, 
         {
             "num": 99, 
             "vertices": [
-                51, 
+                16, 
                 16
             ]
         }, 
         {
             "num": 100, 
             "vertices": [
-                47, 
+                16, 
                 16
             ]
         }, 
         {
             "num": 101, 
             "vertices": [
-                43, 
+                16, 
                 16
             ]
         }, 
         {
             "num": 102, 
             "vertices": [
-                40, 
+                17, 
                 17
             ]
         }, 
         {
             "num": 103, 
             "vertices": [
-                45, 
+                17, 
                 17
             ]
         }, 
         {
             "num": 104, 
             "vertices": [
-                49, 
+                17, 
                 17
             ]
         }, 
         {
             "num": 105, 
             "vertices": [
-                52, 
+                17, 
                 17
             ]
         }, 
         {
             "num": 106, 
             "vertices": [
-                48, 
+                17, 
                 17
             ]
         }, 
         {
             "num": 107, 
             "vertices": [
-                44, 
+                17, 
                 17
             ]
         }, 
         {
             "num": 108, 
             "vertices": [
-                41, 
+                18, 
                 18
             ]
         }, 
         {
             "num": 109, 
             "vertices": [
-                46, 
+                18, 
                 18
             ]
         }, 
         {
             "num": 110, 
             "vertices": [
-                50, 
+                18, 
                 18
             ]
         }, 
         {
             "num": 111, 
             "vertices": [
-                53, 
+                18, 
                 18
             ]
         }, 
         {
             "num": 112, 
             "vertices": [
-                49, 
+                18, 
                 18
             ]
         }, 
         {
             "num": 113, 
             "vertices": [
-                45, 
+                18, 
                 18
             ]
         }
     ], 
-    "players": {
-        "0": {
-            "numKnights": 0, 
-            "hasLargestArmy": false, 
-            "color": "&p0t", 
-            "hasLongestRoad": false, 
-            "settlements": [
-                0
-            ], 
-            "num": 0, 
-            "bcolor": "&p0b", 
-            "roads": [
-                0
-            ], 
-            "devCardsP": {
-                "vp": 0, 
-                "knight": 0, 
-                "monopoly": 0, 
-                "rb": 0, 
-                "yop": 0
-            }, 
-            "name": "Player 1", 
-            "isHuman": true
-        }, 
-        "1": {
-            "numKnights": 0, 
-            "hasLargestArmy": false, 
-            "color": "&p1t", 
-            "hasLongestRoad": false, 
-            "settlements": [
-                25
-            ], 
-            "num": 1, 
-            "bcolor": "&p1b", 
-            "roads": [
-                30
-            ], 
-            "devCardsP": {
-                "vp": 0, 
-                "knight": 0, 
-                "monopoly": 0, 
-                "rb": 0, 
-                "yop": 0
-            }, 
-            "name": "CPU 2", 
-            "isHuman": false
-        }, 
-        "2": {
-            "numKnights": 0, 
-            "hasLargestArmy": false, 
-            "color": "&p2t", 
-            "hasLongestRoad": false, 
-            "settlements": [
-                13, 
-                24
-            ], 
-            "num": 2, 
-            "bcolor": "&p2b", 
-            "roads": [
-                14, 
-                36
-            ], 
-            "devCardsP": {
-                "vp": 0, 
-                "knight": 0, 
-                "monopoly": 0, 
-                "rb": 0, 
-                "yop": 0
-            }, 
-            "name": "CPU 3", 
-            "isHuman": false
-        }, 
-        "3": {
-            "numKnights": 0, 
-            "hasLargestArmy": false, 
-            "color": "&p3t", 
-            "hasLongestRoad": false, 
-            "settlements": [
-                14
-            ], 
-            "num": 3, 
-            "bcolor": "&p3b", 
-            "roads": [
-                21
-            ], 
-            "devCardsP": {
-                "vp": 0, 
-                "knight": 0, 
-                "monopoly": 0, 
-                "rb": 0, 
-                "yop": 0
-            }, 
-            "name": "CPU 4", 
-            "isHuman": false
-        }
+    "dice": {
+        "1": 0, 
+        "0": 0
     }, 
+    "turn": 10, 
+    "savepath": "./saves/game_0/", 
     "numHumans": 1, 
-    "isFirstTurn": true, 
+    "isFirstTurn": false, 
     "playerOrder": [
+        2, 
         3, 
-        1, 
         0, 
-        2
+        1
     ], 
     "roads": [
         {
-            "owner": 0, 
+            "owner": -1, 
             "num": 0, 
             "vertices": [
-                3, 
+                0, 
                 0
             ]
         }, 
@@ -1211,7 +1218,7 @@
             "owner": -1, 
             "num": 1, 
             "vertices": [
-                0, 
+                4, 
                 4
             ]
         }, 
@@ -1219,7 +1226,7 @@
             "owner": -1, 
             "num": 2, 
             "vertices": [
-                4, 
+                1, 
                 1
             ]
         }, 
@@ -1227,7 +1234,7 @@
             "owner": -1, 
             "num": 3, 
             "vertices": [
-                1, 
+                5, 
                 5
             ]
         }, 
@@ -1235,7 +1242,7 @@
             "owner": -1, 
             "num": 4, 
             "vertices": [
-                5, 
+                2, 
                 2
             ]
         }, 
@@ -1243,7 +1250,7 @@
             "owner": -1, 
             "num": 5, 
             "vertices": [
-                2, 
+                6, 
                 6
             ]
         }, 
@@ -1251,7 +1258,7 @@
             "owner": -1, 
             "num": 6, 
             "vertices": [
-                3, 
+                7, 
                 7
             ]
         }, 
@@ -1259,7 +1266,7 @@
             "owner": -1, 
             "num": 7, 
             "vertices": [
-                4, 
+                8, 
                 8
             ]
         }, 
@@ -1267,7 +1274,7 @@
             "owner": -1, 
             "num": 8, 
             "vertices": [
-                5, 
+                9, 
                 9
             ]
         }, 
@@ -1275,7 +1282,7 @@
             "owner": -1, 
             "num": 9, 
             "vertices": [
-                6, 
+                10, 
                 10
             ]
         }, 
@@ -1283,23 +1290,23 @@
             "owner": -1, 
             "num": 10, 
             "vertices": [
-                11, 
+                7, 
                 7
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 2, 
             "num": 11, 
             "vertices": [
-                7, 
+                12, 
                 12
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 3, 
             "num": 12, 
             "vertices": [
-                12, 
+                8, 
                 8
             ]
         }, 
@@ -1307,7 +1314,7 @@
             "owner": -1, 
             "num": 13, 
             "vertices": [
-                8, 
+                13, 
                 13
             ]
         }, 
@@ -1315,7 +1322,7 @@
             "owner": 2, 
             "num": 14, 
             "vertices": [
-                13, 
+                9, 
                 9
             ]
         }, 
@@ -1323,7 +1330,7 @@
             "owner": -1, 
             "num": 15, 
             "vertices": [
-                9, 
+                14, 
                 14
             ]
         }, 
@@ -1331,7 +1338,7 @@
             "owner": -1, 
             "num": 16, 
             "vertices": [
-                14, 
+                10, 
                 10
             ]
         }, 
@@ -1339,7 +1346,7 @@
             "owner": -1, 
             "num": 17, 
             "vertices": [
-                10, 
+                15, 
                 15
             ]
         }, 
@@ -1347,7 +1354,7 @@
             "owner": -1, 
             "num": 18, 
             "vertices": [
-                11, 
+                16, 
                 16
             ]
         }, 
@@ -1355,23 +1362,23 @@
             "owner": -1, 
             "num": 19, 
             "vertices": [
-                12, 
+                17, 
                 17
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 3, 
             "num": 20, 
             "vertices": [
-                13, 
+                18, 
                 18
             ]
         }, 
         {
-            "owner": 3, 
+            "owner": -1, 
             "num": 21, 
             "vertices": [
-                14, 
+                19, 
                 19
             ]
         }, 
@@ -1379,7 +1386,7 @@
             "owner": -1, 
             "num": 22, 
             "vertices": [
-                15, 
+                20, 
                 20
             ]
         }, 
@@ -1387,7 +1394,7 @@
             "owner": -1, 
             "num": 23, 
             "vertices": [
-                21, 
+                16, 
                 16
             ]
         }, 
@@ -1395,7 +1402,7 @@
             "owner": -1, 
             "num": 24, 
             "vertices": [
-                16, 
+                22, 
                 22
             ]
         }, 
@@ -1403,7 +1410,7 @@
             "owner": -1, 
             "num": 25, 
             "vertices": [
-                22, 
+                17, 
                 17
             ]
         }, 
@@ -1411,7 +1418,7 @@
             "owner": -1, 
             "num": 26, 
             "vertices": [
-                17, 
+                23, 
                 23
             ]
         }, 
@@ -1419,7 +1426,7 @@
             "owner": -1, 
             "num": 27, 
             "vertices": [
-                23, 
+                18, 
                 18
             ]
         }, 
@@ -1427,23 +1434,23 @@
             "owner": -1, 
             "num": 28, 
             "vertices": [
-                18, 
+                24, 
                 24
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 1, 
             "num": 29, 
             "vertices": [
-                24, 
+                19, 
                 19
             ]
         }, 
         {
-            "owner": 1, 
+            "owner": -1, 
             "num": 30, 
             "vertices": [
-                19, 
+                25, 
                 25
             ]
         }, 
@@ -1451,7 +1458,7 @@
             "owner": -1, 
             "num": 31, 
             "vertices": [
-                25, 
+                20, 
                 20
             ]
         }, 
@@ -1459,7 +1466,7 @@
             "owner": -1, 
             "num": 32, 
             "vertices": [
-                20, 
+                26, 
                 26
             ]
         }, 
@@ -1467,7 +1474,7 @@
             "owner": -1, 
             "num": 33, 
             "vertices": [
-                21, 
+                27, 
                 27
             ]
         }, 
@@ -1475,7 +1482,7 @@
             "owner": -1, 
             "num": 34, 
             "vertices": [
-                22, 
+                28, 
                 28
             ]
         }, 
@@ -1483,15 +1490,15 @@
             "owner": -1, 
             "num": 35, 
             "vertices": [
-                23, 
+                29, 
                 29
             ]
         }, 
         {
-            "owner": 2, 
+            "owner": -1, 
             "num": 36, 
             "vertices": [
-                24, 
+                30, 
                 30
             ]
         }, 
@@ -1499,7 +1506,7 @@
             "owner": -1, 
             "num": 37, 
             "vertices": [
-                25, 
+                31, 
                 31
             ]
         }, 
@@ -1507,7 +1514,7 @@
             "owner": -1, 
             "num": 38, 
             "vertices": [
-                26, 
+                32, 
                 32
             ]
         }, 
@@ -1515,7 +1522,7 @@
             "owner": -1, 
             "num": 39, 
             "vertices": [
-                27, 
+                33, 
                 33
             ]
         }, 
@@ -1523,7 +1530,7 @@
             "owner": -1, 
             "num": 40, 
             "vertices": [
-                33, 
+                28, 
                 28
             ]
         }, 
@@ -1531,7 +1538,7 @@
             "owner": -1, 
             "num": 41, 
             "vertices": [
-                28, 
+                34, 
                 34
             ]
         }, 
@@ -1539,7 +1546,7 @@
             "owner": -1, 
             "num": 42, 
             "vertices": [
-                34, 
+                29, 
                 29
             ]
         }, 
@@ -1547,7 +1554,7 @@
             "owner": -1, 
             "num": 43, 
             "vertices": [
-                29, 
+                35, 
                 35
             ]
         }, 
@@ -1555,7 +1562,7 @@
             "owner": -1, 
             "num": 44, 
             "vertices": [
-                35, 
+                30, 
                 30
             ]
         }, 
@@ -1563,15 +1570,15 @@
             "owner": -1, 
             "num": 45, 
             "vertices": [
-                30, 
+                36, 
                 36
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 0, 
             "num": 46, 
             "vertices": [
-                36, 
+                31, 
                 31
             ]
         }, 
@@ -1579,7 +1586,7 @@
             "owner": -1, 
             "num": 47, 
             "vertices": [
-                31, 
+                37, 
                 37
             ]
         }, 
@@ -1587,7 +1594,7 @@
             "owner": -1, 
             "num": 48, 
             "vertices": [
-                37, 
+                32, 
                 32
             ]
         }, 
@@ -1595,7 +1602,7 @@
             "owner": -1, 
             "num": 49, 
             "vertices": [
-                33, 
+                38, 
                 38
             ]
         }, 
@@ -1603,7 +1610,7 @@
             "owner": -1, 
             "num": 50, 
             "vertices": [
-                34, 
+                39, 
                 39
             ]
         }, 
@@ -1611,7 +1618,7 @@
             "owner": -1, 
             "num": 51, 
             "vertices": [
-                35, 
+                40, 
                 40
             ]
         }, 
@@ -1619,7 +1626,7 @@
             "owner": -1, 
             "num": 52, 
             "vertices": [
-                36, 
+                41, 
                 41
             ]
         }, 
@@ -1627,7 +1634,7 @@
             "owner": -1, 
             "num": 53, 
             "vertices": [
-                37, 
+                42, 
                 42
             ]
         }, 
@@ -1635,15 +1642,15 @@
             "owner": -1, 
             "num": 54, 
             "vertices": [
-                38, 
+                43, 
                 43
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 1, 
             "num": 55, 
             "vertices": [
-                43, 
+                39, 
                 39
             ]
         }, 
@@ -1651,15 +1658,15 @@
             "owner": -1, 
             "num": 56, 
             "vertices": [
-                39, 
+                44, 
                 44
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 0, 
             "num": 57, 
             "vertices": [
-                44, 
+                40, 
                 40
             ]
         }, 
@@ -1667,7 +1674,7 @@
             "owner": -1, 
             "num": 58, 
             "vertices": [
-                40, 
+                45, 
                 45
             ]
         }, 
@@ -1675,7 +1682,7 @@
             "owner": -1, 
             "num": 59, 
             "vertices": [
-                45, 
+                41, 
                 41
             ]
         }, 
@@ -1683,7 +1690,7 @@
             "owner": -1, 
             "num": 60, 
             "vertices": [
-                41, 
+                46, 
                 46
             ]
         }, 
@@ -1691,7 +1698,7 @@
             "owner": -1, 
             "num": 61, 
             "vertices": [
-                46, 
+                42, 
                 42
             ]
         }, 
@@ -1699,7 +1706,7 @@
             "owner": -1, 
             "num": 62, 
             "vertices": [
-                43, 
+                47, 
                 47
             ]
         }, 
@@ -1707,7 +1714,7 @@
             "owner": -1, 
             "num": 63, 
             "vertices": [
-                44, 
+                48, 
                 48
             ]
         }, 
@@ -1715,7 +1722,7 @@
             "owner": -1, 
             "num": 64, 
             "vertices": [
-                45, 
+                49, 
                 49
             ]
         }, 
@@ -1723,7 +1730,7 @@
             "owner": -1, 
             "num": 65, 
             "vertices": [
-                46, 
+                50, 
                 50
             ]
         }, 
@@ -1731,7 +1738,7 @@
             "owner": -1, 
             "num": 66, 
             "vertices": [
-                47, 
+                51, 
                 51
             ]
         }, 
@@ -1739,7 +1746,7 @@
             "owner": -1, 
             "num": 67, 
             "vertices": [
-                51, 
+                48, 
                 48
             ]
         }, 
@@ -1747,7 +1754,7 @@
             "owner": -1, 
             "num": 68, 
             "vertices": [
-                48, 
+                52, 
                 52
             ]
         }, 
@@ -1755,7 +1762,7 @@
             "owner": -1, 
             "num": 69, 
             "vertices": [
-                52, 
+                49, 
                 49
             ]
         }, 
@@ -1763,7 +1770,7 @@
             "owner": -1, 
             "num": 70, 
             "vertices": [
-                49, 
+                53, 
                 53
             ]
         }, 
@@ -1771,7 +1778,7 @@
             "owner": -1, 
             "num": 71, 
             "vertices": [
-                53, 
+                50, 
                 50
             ]
         }
@@ -1787,8 +1794,8 @@
                 1
             ], 
             "num": 0, 
-            "owner": 0, 
-            "isSettleable": false
+            "owner": -1, 
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -1857,7 +1864,7 @@
             ], 
             "num": 5, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -1884,8 +1891,8 @@
                 11
             ], 
             "num": 7, 
-            "owner": -1, 
-            "isSettleable": true
+            "owner": 2, 
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -1900,7 +1907,7 @@
                 13
             ], 
             "num": 8, 
-            "owner": -1, 
+            "owner": 3, 
             "isSettleable": false
         }, 
         {
@@ -1916,7 +1923,7 @@
                 15
             ], 
             "num": 9, 
-            "owner": -1, 
+            "owner": 2, 
             "isSettleable": false
         }, 
         {
@@ -1932,7 +1939,7 @@
             ], 
             "num": 10, 
             "owner": -1, 
-            "isSettleable": false
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -1945,7 +1952,7 @@
             ], 
             "num": 11, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -1961,7 +1968,7 @@
             ], 
             "num": 12, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -1976,7 +1983,7 @@
                 20
             ], 
             "num": 13, 
-            "owner": 2, 
+            "owner": -1, 
             "isSettleable": false
         }, 
         {
@@ -1992,7 +1999,7 @@
                 21
             ], 
             "num": 14, 
-            "owner": 3, 
+            "owner": -1, 
             "isSettleable": false
         }, 
         {
@@ -2052,7 +2059,7 @@
                 28
             ], 
             "num": 18, 
-            "owner": -1, 
+            "owner": 3, 
             "isSettleable": false
         }, 
         {
@@ -2068,7 +2075,7 @@
                 30
             ], 
             "num": 19, 
-            "owner": -1, 
+            "owner": 1, 
             "isSettleable": false
         }, 
         {
@@ -2084,7 +2091,7 @@
             ], 
             "num": 20, 
             "owner": -1, 
-            "isSettleable": false
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -2129,7 +2136,7 @@
             ], 
             "num": 23, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2144,7 +2151,7 @@
                 36
             ], 
             "num": 24, 
-            "owner": 2, 
+            "owner": -1, 
             "isSettleable": false
         }, 
         {
@@ -2160,7 +2167,7 @@
                 37
             ], 
             "num": 25, 
-            "owner": 1, 
+            "owner": -1, 
             "isSettleable": false
         }, 
         {
@@ -2295,7 +2302,7 @@
             ], 
             "num": 34, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2311,7 +2318,7 @@
             ], 
             "num": 35, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2326,8 +2333,8 @@
                 52
             ], 
             "num": 36, 
-            "owner": -1, 
-            "isSettleable": true
+            "owner": 0, 
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2370,8 +2377,8 @@
                 56
             ], 
             "num": 39, 
-            "owner": -1, 
-            "isSettleable": true
+            "owner": 1, 
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2386,8 +2393,8 @@
                 58
             ], 
             "num": 40, 
-            "owner": -1, 
-            "isSettleable": true
+            "owner": 0, 
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2403,7 +2410,7 @@
             ], 
             "num": 41, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2431,7 +2438,7 @@
             ], 
             "num": 43, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2447,7 +2454,7 @@
             ], 
             "num": 44, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2463,7 +2470,7 @@
             ], 
             "num": 45, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2576,22 +2583,36 @@
             "isSettleable": true
         }
     ], 
-    "currentPlayer": 2, 
+    "currentPlayer": 3, 
     "numCPUs": 3, 
     "history": [
         {
+            "pid": 0, 
             "command": [
                 "settle", 
-                "a12"
-            ], 
-            "pid": 0
+                "o28"
+            ]
         }, 
         {
+            "pid": 0, 
             "command": [
                 "pave", 
-                "b10"
-            ], 
-            "pid": 0
+                "n30"
+            ]
+        }, 
+        {
+            "pid": 0, 
+            "command": [
+                "settle", 
+                "q20"
+            ]
+        }, 
+        {
+            "pid": 0, 
+            "command": [
+                "pave", 
+                "r18"
+            ]
         }
     ]
 }
