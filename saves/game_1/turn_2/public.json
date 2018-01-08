@@ -27,12 +27,12 @@
             "color": "&p1t", 
             "hasLongestRoad": false, 
             "settlements": [
-                12
+                40
             ], 
             "num": 1, 
             "bcolor": "&p1b", 
             "roads": [
-                11
+                57
             ], 
             "devCardsP": {
                 "vp": 0, 
@@ -50,12 +50,12 @@
             "color": "&p2t", 
             "hasLongestRoad": false, 
             "settlements": [
-                29
+                31
             ], 
             "num": 2, 
             "bcolor": "&p2b", 
             "roads": [
-                35
+                46
             ], 
             "devCardsP": {
                 "vp": 0, 
@@ -71,9 +71,9 @@
     "hasLongestRoad": -1, 
     "hexes": [
         {
-            "resource": "brick", 
+            "resource": "ore", 
             "isOcean": false, 
-            "diceValue": 8, 
+            "diceValue": 9, 
             "num": 0, 
             "isBlocked": false, 
             "conns": [
@@ -86,9 +86,9 @@
             ]
         }, 
         {
-            "resource": "sheep", 
+            "resource": "wheat", 
             "isOcean": false, 
-            "diceValue": 4, 
+            "diceValue": 10, 
             "num": 1, 
             "isBlocked": false, 
             "conns": [
@@ -101,9 +101,9 @@
             ]
         }, 
         {
-            "resource": "wheat", 
+            "resource": "sheep", 
             "isOcean": false, 
-            "diceValue": 3, 
+            "diceValue": 12, 
             "num": 2, 
             "isBlocked": false, 
             "conns": [
@@ -116,9 +116,9 @@
             ]
         }, 
         {
-            "resource": "wheat", 
+            "resource": "wood", 
             "isOcean": false, 
-            "diceValue": 6, 
+            "diceValue": 3, 
             "num": 3, 
             "isBlocked": false, 
             "conns": [
@@ -131,9 +131,9 @@
             ]
         }, 
         {
-            "resource": "ore", 
+            "resource": "brick", 
             "isOcean": false, 
-            "diceValue": 4, 
+            "diceValue": 5, 
             "num": 4, 
             "isBlocked": false, 
             "conns": [
@@ -146,9 +146,9 @@
             ]
         }, 
         {
-            "resource": "sheep", 
+            "resource": "wheat", 
             "isOcean": false, 
-            "diceValue": 12, 
+            "diceValue": 4, 
             "num": 5, 
             "isBlocked": false, 
             "conns": [
@@ -161,9 +161,9 @@
             ]
         }, 
         {
-            "resource": "wood", 
+            "resource": "sheep", 
             "isOcean": false, 
-            "diceValue": 8, 
+            "diceValue": 11, 
             "num": 6, 
             "isBlocked": false, 
             "conns": [
@@ -176,11 +176,11 @@
             ]
         }, 
         {
-            "resource": "sheep", 
+            "resource": "desert", 
             "isOcean": false, 
-            "diceValue": 11, 
+            "diceValue": 0, 
             "num": 7, 
-            "isBlocked": false, 
+            "isBlocked": true, 
             "conns": [
                 42, 
                 43, 
@@ -193,7 +193,7 @@
         {
             "resource": "brick", 
             "isOcean": false, 
-            "diceValue": 10, 
+            "diceValue": 4, 
             "num": 8, 
             "isBlocked": false, 
             "conns": [
@@ -206,9 +206,9 @@
             ]
         }, 
         {
-            "resource": "ore", 
+            "resource": "wood", 
             "isOcean": false, 
-            "diceValue": 6, 
+            "diceValue": 11, 
             "num": 9, 
             "isBlocked": false, 
             "conns": [
@@ -221,9 +221,9 @@
             ]
         }, 
         {
-            "resource": "wheat", 
+            "resource": "wood", 
             "isOcean": false, 
-            "diceValue": 2, 
+            "diceValue": 6, 
             "num": 10, 
             "isBlocked": false, 
             "conns": [
@@ -236,9 +236,9 @@
             ]
         }, 
         {
-            "resource": "ore", 
+            "resource": "wheat", 
             "isOcean": false, 
-            "diceValue": 10, 
+            "diceValue": 8, 
             "num": 11, 
             "isBlocked": false, 
             "conns": [
@@ -251,9 +251,9 @@
             ]
         }, 
         {
-            "resource": "wood", 
+            "resource": "wheat", 
             "isOcean": false, 
-            "diceValue": 5, 
+            "diceValue": 10, 
             "num": 12, 
             "isBlocked": false, 
             "conns": [
@@ -266,9 +266,9 @@
             ]
         }, 
         {
-            "resource": "wood", 
+            "resource": "sheep", 
             "isOcean": false, 
-            "diceValue": 5, 
+            "diceValue": 8, 
             "num": 13, 
             "isBlocked": false, 
             "conns": [
@@ -281,9 +281,9 @@
             ]
         }, 
         {
-            "resource": "brick", 
+            "resource": "sheep", 
             "isOcean": false, 
-            "diceValue": 3, 
+            "diceValue": 5, 
             "num": 14, 
             "isBlocked": false, 
             "conns": [
@@ -296,9 +296,9 @@
             ]
         }, 
         {
-            "resource": "sheep", 
+            "resource": "ore", 
             "isOcean": false, 
-            "diceValue": 9, 
+            "diceValue": 6, 
             "num": 15, 
             "isBlocked": false, 
             "conns": [
@@ -311,9 +311,9 @@
             ]
         }, 
         {
-            "resource": "wood", 
+            "resource": "ore", 
             "isOcean": false, 
-            "diceValue": 9, 
+            "diceValue": 2, 
             "num": 16, 
             "isBlocked": false, 
             "conns": [
@@ -326,11 +326,11 @@
             ]
         }, 
         {
-            "resource": "desert", 
+            "resource": "brick", 
             "isOcean": false, 
-            "diceValue": 0, 
+            "diceValue": 9, 
             "num": 17, 
-            "isBlocked": true, 
+            "isBlocked": false, 
             "conns": [
                 102, 
                 103, 
@@ -341,9 +341,9 @@
             ]
         }, 
         {
-            "resource": "wheat", 
+            "resource": "wood", 
             "isOcean": false, 
-            "diceValue": 11, 
+            "diceValue": 3, 
             "num": 18, 
             "isBlocked": false, 
             "conns": [
@@ -1165,8 +1165,8 @@
     "numHumans": 1, 
     "isFirstTurn": true, 
     "playerOrder": [
-        1, 
         2, 
+        1, 
         0
     ], 
     "roads": [
@@ -1259,7 +1259,7 @@
             ]
         }, 
         {
-            "owner": 1, 
+            "owner": -1, 
             "num": 11, 
             "vertices": [
                 7, 
@@ -1451,7 +1451,7 @@
             ]
         }, 
         {
-            "owner": 2, 
+            "owner": -1, 
             "num": 35, 
             "vertices": [
                 23, 
@@ -1539,7 +1539,7 @@
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 2, 
             "num": 46, 
             "vertices": [
                 36, 
@@ -1627,7 +1627,7 @@
             ]
         }, 
         {
-            "owner": -1, 
+            "owner": 1, 
             "num": 57, 
             "vertices": [
                 44, 
@@ -1856,7 +1856,7 @@
             ], 
             "num": 7, 
             "owner": -1, 
-            "isSettleable": false
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -1872,7 +1872,7 @@
             ], 
             "num": 8, 
             "owner": -1, 
-            "isSettleable": false
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -1931,8 +1931,8 @@
                 19
             ], 
             "num": 12, 
-            "owner": 1, 
-            "isSettleable": false
+            "owner": -1, 
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -2008,7 +2008,7 @@
             ], 
             "num": 17, 
             "owner": -1, 
-            "isSettleable": false
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -2100,7 +2100,7 @@
             ], 
             "num": 23, 
             "owner": -1, 
-            "isSettleable": false
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -2132,7 +2132,7 @@
             ], 
             "num": 25, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2189,8 +2189,8 @@
                 43
             ], 
             "num": 29, 
-            "owner": 2, 
-            "isSettleable": false
+            "owner": -1, 
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -2221,8 +2221,8 @@
                 47
             ], 
             "num": 31, 
-            "owner": -1, 
-            "isSettleable": true
+            "owner": 2, 
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2266,7 +2266,7 @@
             ], 
             "num": 34, 
             "owner": -1, 
-            "isSettleable": false
+            "isSettleable": true
         }, 
         {
             "isCity": false, 
@@ -2298,7 +2298,7 @@
             ], 
             "num": 36, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2313,7 +2313,7 @@
             ], 
             "num": 37, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2357,8 +2357,8 @@
                 58
             ], 
             "num": 40, 
-            "owner": -1, 
-            "isSettleable": true
+            "owner": 1, 
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2418,7 +2418,7 @@
             ], 
             "num": 44, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2434,7 +2434,7 @@
             ], 
             "num": 45, 
             "owner": -1, 
-            "isSettleable": true
+            "isSettleable": false
         }, 
         {
             "isCity": false, 
@@ -2547,7 +2547,7 @@
             "isSettleable": true
         }
     ], 
-    "currentPlayer": 2, 
+    "currentPlayer": 1, 
     "numCPUs": 2, 
     "history": []
 }

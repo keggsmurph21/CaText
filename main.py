@@ -32,6 +32,9 @@ class Settings(object):
     def get(self, key):
         return self.data[key]
 
+    def set(self, key, value):
+        self.data[key] = value
+
 class Cmd(object):
     def __init__(self, name, func, d):
         self.name = name
@@ -142,7 +145,6 @@ class Options(object):
     def __init__(self, catan):
         self.data = { 'admin':{}, 'all':{}, 'available':{}, 'persistent':{} }
         self.catan = catan
-
         funcs = {
             'quit':         self.c_quit,
             'load':         self.c_load,
@@ -160,7 +162,8 @@ class Options(object):
             'setcpuname':   self.c_setcpuname,
             'build':        self.c_build,
             'flip':         self.c_flip,
-            'end':          self.c_end}
+            'pass':         self.c_pass}
+
         commands = catan.settings.get('commands')
         for key in commands.keys():
             command = Cmd( key, funcs[key], commands[key]  )
@@ -225,6 +228,27 @@ class Options(object):
             else:
                 self.catan.gui.set_msg( ret )
                 return False
+
+        elif len(args) == 3 and self.catan.isAuthenticated( args[0] ) and args[1] == 'h':
+            try:
+                path = 'hardsaves/game_%d/' % int(args[2])
+                for f in os.listdir( 'tmp' ):
+                    os.remove(f)
+            except ValueError:
+                self.catan.gui.set_msg( "load: Unable to load game `%s`.  For a list of available options, try load opts." % args[2])
+
+            ret = self.catan.loadGame( path )
+            if ret == True:
+                if self.catan.turn == 1:
+                    self.catan()
+                self.catan.gui.set_msg( "load: Successfully loaded %s." % args[1] )
+                self.catan.settings.set( 'savepath', 'tmp' )
+                print self.catan.settings.get( 'savepath' )
+                return True
+            else:
+                self.catan.gui.set_msg( ret )
+                return False
+
         else:
             self.catan.gui.set_msg( "load: Invalid number of arguments.  Expected 0 or 1, got %d." % (len(args)-1) )
 
@@ -241,7 +265,7 @@ class Options(object):
             if obj == False:
                 self.catan.gui.set_msg( 'info: Coordinate "%s" not found.' % args[1] )
             else:
-                self.catan.gui.set_msg( obj.show_info(args[1]) )
+                self.catan.gui.set_msg( obj.show_info(self.catan, args[1]) )
                 return True
         else:
             self.catan.gui.set_msg( "info: Invalid number of arguments.  Expected 1, got %d." % (len(args)-1) )
@@ -270,12 +294,17 @@ class Options(object):
             return "help: Invalid number of arguments.  Expected 0 or 1, got %d." % (len(args)-1)
 
     def c_roll(self, args):
-        self.catan.gui.set_msg( self.catan.roll() )
+        self.catan.gui.set_msg()
+        self.catan.gui.remove_pMsg()
+        self.catan.roll()
+        self.catan.hasRolled = True
         return True
 
     def c_reset(self, args):
+        self.catan.gui.remove_pMsg( 'all' )
         self.catan.gui.set_msg( "reset: Successfully reset board." )
         self.catan.reseed()
+        self.catan.loop( 0 )
         return True
 
     def c_neighbors(self, args):
@@ -285,7 +314,7 @@ class Options(object):
             if obj == False:
                 self.catan.gui.set_msg( 'Coordinate "%s" not found.' % args[1] )
             else:
-                s = obj.show_info( args[1] )
+                s = obj.show_info( self.catan, args[1] )
                 if isinstance( obj, Hex ):
                     s += "\n - connections:\t{"
                     for c in obj.conns:
@@ -389,13 +418,17 @@ class Options(object):
             self.catan.gui.set_msg( "setcpuname: Invalid number of arguments.  Expected 2 got %d." % (len(args)-1) )
 
     def c_build(self, args):
-        pass
+        self.catan.gui.set_msg( 'build' )
+        return True
 
     def c_flip(self, args):
-        pass
+        self.catan.gui.set_msg( 'flip' )
+        return True
 
-    def c_end(self, args):
-        pass
+    def c_pass(self, args):
+        self.catan.hasPassed = True
+        self.catan.gui.set_msg( 'pass' )
+        return True
 
 class Catan(object):
     def __init__(self, numHumans, numCPUs):
@@ -464,7 +497,9 @@ class Catan(object):
             for p in self.players:
                 p.load( 'private', privateData[str(p.num)], self )
 
-            self.loop( self.turn, self.currentPlayer )
+            # enter the game at the last checkpoint
+            self.loop( self.turn-1 )
+
             return True
 
         else:
@@ -478,6 +513,7 @@ class Catan(object):
         path = '%sturn_%d/' % ( path, self.turn )
         if os.path.exists( path ) == False:
             os.mkdir( path )
+        print path
 
         # save hidden game
         kw = 'hidden'
@@ -549,7 +585,7 @@ class Catan(object):
                 random.shuffle( self.dcDeck )
 
         # make the Hexes and Resources
-        diceValues = self.settings.get('diceValues')
+        diceValues = self.settings.get('diceValues')[:]
         random.shuffle( diceValues )
         resources = []
         for key in self.settings.get('resources').keys():
@@ -601,10 +637,7 @@ class Catan(object):
         self.players += [ CPU(self.settings.get('numHumans') + i, self) for i in range(self.settings.get('numCPUs'))]
         random.shuffle(self.players)
 
-    def take_turn(self, current=None):
-        if DEBUG == True: # if debugging we want to see all the CPU steps
-            self.gui.render()
-
+    def take_turn(self):
         if self.turn < 2 * len(self.players):
             if self.turn == 0:
                 self.firstTwoTurnsQueue = [ p for p in self.players ] + [ p for p in self.players[::-1] ]
@@ -632,28 +665,30 @@ class Catan(object):
 
             self.currentPlayer.take_turn()
 
-    def loop(self, turn=0, current=None):
+    def loop(self, turn=0):
         self.turn = turn
         while self.is_game_over() == False:
-            self.take_turn(current)
+            self.take_turn()
             self.saveGame()
         print "%s wins!" % player.name
 
     def roll(self):
         diceValue = self.dice.roll()
+        if diceValue in {8,11}:
+            self.gui.add_pMsg( "%s - %s rolled an %d" % (self.currentPlayer.color, self.currentPlayer.name, diceValue) )
+        else:
+            self.gui.add_pMsg( "%s - %s rolled a %d" % (self.currentPlayer.color, self.currentPlayer.name, diceValue) )
 
         if diceValue == 7:
-            return "Robber!!"
+            for p in self.players:
+                if p.total('res') > 7:
+                    p.discard()
+            self.currentPlayer.move_robber()
         else:
             for h in self.hexes:
                 if h.diceValue == diceValue and h.isBlocked == False:
                     for n in h.get_adj_nodes():
-                        if n.owner != None:
-                            n.owner.resCards[h.resource] += 1
-
-            if diceValue in {8,11}:
-                return "You rolled an %d." % diceValue
-            return "You rolled a %d." % diceValue
+                        n.owner.harvest( h.resource.resource )
 
     def isAuthenticated(self, opt):
         return DEBUG or opt not in self.options.dump( 'admin' ) or not( self.currentPlayer.isAdmin )
@@ -663,7 +698,7 @@ class Catan(object):
 
         args = self.gui.prompt().split(' ')
         cmd = args[0]
-        self.history.append( { 'pid':self.currentPlayer.num, 'command':args } )
+        self.history.append( { 'pid':self.currentPlayer.num, 'turn':self.turn, 'command':args } ) # add history to CPUs
 
         if cmd in self.options.dump():
             if cmd in self.options.dump( 'available' ) or cmd in self.options.dump( 'persistent' ):
@@ -675,10 +710,11 @@ class Catan(object):
                 else:
                     self.gui.set_msg( "%s: Could not execute because developer commands are disabled for this session." % cmd )
             else:
-                msg = u'%s: Could not execute.  &gCurrently available commands:&& ' % cmd
+                msg = u'%s: Could not execute.\n  &gCurrently available commands:&&\n' % cmd
                 for opt in self.options.dump( 'available' ):
                     if self.isAuthenticated( opt ):
                         msg += opt + ", "
+                msg += u'\n  &gAlways available commands:&&\n'
                 for opt in self.options.dump( 'persistent' ):
                     if self.isAuthenticated( opt ):
                         msg += opt + ", "
@@ -693,7 +729,7 @@ class Catan(object):
         for player in self.players:
             return player.privateScore >= self.settings.get('victoryPointsGoal')
 
-    def checkLongestRoad(self):
+    def check_longest_road(self):
         if self.hasLongestRoad != None:
             currentHolder = self.hasLongestRoad
             currentLongestRoad = currentHolder.longestRoad
@@ -830,7 +866,7 @@ class Player(object):
                     self.privateScore += 1
 
     def harvest(self, resource):
-        if resource in self.resCards:
+        if resource in self.resCards and self.isNonePlayer == False:
             self.resCards[resource] += 1
         else:
             return False
@@ -839,12 +875,13 @@ class Player(object):
         score = self.publicScore
         if self == self.catan.currentPlayer:
             score = self.privateScore
-        return "%s %-8s %2d  %2d  %2d   %2d  &&" % (self.color, self.name, score, self.total(self.resCards), self.total(self.devCardsU), self.numKnights)
+        return "%s %-8s %2d  %2d  %2d   %2d  &&" % (self.color, self.name, score, self.total('res'), self.total('dcu'), self.numKnights)
 
-    def total(self, dic):
+    def total(self, datatype):
         acc = 0
-        for key in dic.keys():
-            acc += dic[key]
+        data = { 'res':self.resCards, 'dcu':self.devCardsU }[datatype]
+        for key in data.keys():
+            acc += data[key]
         return acc
 
     def count(self, res, within='resources'):
@@ -859,7 +896,7 @@ class Player(object):
     def calc_longest_road(self):
         longestRoad = 0
         self.longestRoad = longestRoad
-        self.catan.checkLongestRoad()
+        self.catan.check_longest_road()
 
     def add_settlement(self, node):
         self.publicScore += 1
@@ -878,25 +915,37 @@ class Human(Player):
 
     def settle(self):
 
-        self.catan.gui.add_pMsg( u"%s%s please choose a settlement (settle opts).&&" % (self.color, self.name) )
+        self.catan.gui.add_pMsg( u"%schoose a settlement (settle opts)&&" % self.color)
         self.catan.options.set( {'settle'} )
         self.catan.handle_input()
         self.catan.gui.remove_pMsg()
 
         if self.catan.isFirstTurn:
 
-            self.catan.gui.add_pMsg( u"%s%s please choose a road (pave opts).&&" % (self.color, self.name) )
+            self.catan.gui.add_pMsg( u"%schoose a road (pave opts)&&" % self.color )
             self.catan.options.set( {'pave'} )
             self.catan.handle_input()
             self.catan.gui.remove_pMsg()
 
+    def discard(self):
+        pass
+
+    def move_robber(self):
+        pass
+
     def take_turn(self):
-        self.catan.gui.add_pMsg( u"%s%s please roll or flip a development card (roll, flip)" % (self.color, self.name) )
-        self.catan.options.set( {'build','flip'} )
+        self.catan.gui.add_pMsg( u"%sroll or flip a development card (roll, flip opts)" % self.color )
         while self.catan.hasPassed == False:
+            self.catan.options.set( {'flip'} ) # always able to play VP but not necessarily other cards
+            if self.catan.hasRolled:
+                self.catan.gui.add_pMsg( u"%sbuild, flip a development card, or pass (build, flip opts, pass)" % self.color)
+                self.catan.options.add( 'build' )
+                self.catan.options.add( 'pass' )
+            else:
+                self.catan.options.add( 'roll' )
             self.catan.handle_input()
 
-        self.catan.gui.remove_pMsg()
+        self.catan.gui.remove_pMsg( 'all' )
 
 class CPU(Player):
     def __init__(self, num, catan):
@@ -919,13 +968,27 @@ class CPU(Player):
         if self.catan.isFirstTurn:
             self.pave(bestNode)
 
+    def discard(self):
+        old = self.total('res')
+        new = self.total('res')
+        while old - new < int(old/2):
+            key = random.choice( self.resCards.keys() )
+            if self.resCards[key] > 0:
+                self.resCards[key] -= 1
+            new = self.total('res')
+
+        self.catan.gui.add_pMsg( '   %s%s discarded %d cards' % (self.color, self.name, old-new) )
+
+    def move_robber(self):
+        pass
+
     def pave(self, restrict=None):
         if self.catan.isFirstTurn:
             r = random.choice(self.settlements[-1].roads)
             r.pave(self)
 
     def take_turn(self):
-        pass
+        self.catan.roll()
 
 class Vertex(object):
     def __init__(self, num):
@@ -982,8 +1045,8 @@ class Hex(Vertex):
             s += "&& %s   && " % self.color
         return s
 
-    def show_info(self, coord):
-        s = u"%s = { type: HEX, resource: %s%s&&" % ( coord, self.resource.text, self.resource.name )
+    def show_info(self, catan, coord=''):
+        s = u"%s = { type: HEX, coord: %s, resource: %s%s&&" % ( coord, catan.lookup(self.num, 'hexes'), self.resource.text, self.resource.name )
         s += ", diceroll: %s%d&&, is-blocked: &hb&bt" % ( self.resource.text, self.diceValue)
         if self.isBlocked:
             s += "YES"
@@ -1033,8 +1096,8 @@ class Node(Vertex):
             s += u' s '
         return s
 
-    def show_info(self, coord):
-        s = u"%s = { type: NODE, owner: %s%s&&, is-city: &hb&bt" % ( coord, self.owner.color, self.owner.name )
+    def show_info(self, catan, coord=''):
+        s = u"%s = { type: NODE, coord: %s, owner: %s%s&&, is-city: &hb&bt" % ( coord, catan.lookup(self.num, 'nodes'), self.owner.color, self.owner.name )
         if self.isCity:
             s += "YES"
         else:
@@ -1133,13 +1196,16 @@ class Road(Edge):
             s += u' | '
         return s
 
-    def show_info(self, coord):
-        s = u"%s = { type: ROAD, owner: %s%s&& }" % ( coord, self.owner.color, self.owner.name )
+    def show_info(self, catan, coord=''):
+        s = u"%s = { type: ROAD, coord: %s, owner: %s%s&& }" % ( coord, catan.lookup(self.num, 'roads'), self.owner.color, self.owner.name )
         return s
 
 class Connection(Edge):
     def __init__(self, num):
         Edge.__init__(self, num)
+
+    def __repr__(self):
+        return "<n:%d, h:%d>" % (self.vertices[0].num, self.vertices[1].num)
 
     def save(self, keyword):
         if keyword == 'public':
@@ -1149,10 +1215,7 @@ class Connection(Edge):
         return d
 
     def load(self, keyword, data, catan):
-        self.set_vertices( catan.nodes[ data['vertices'][1] ], catan.hexes[ data['vertices'][1] ] )
-
-    def __repr__(self):
-        return "Connection(%s)" % ("<-->".join(str(e) for e in self.vertices))
+        self.set_vertices( catan.nodes[ data['vertices'][0] ], catan.hexes[ data['vertices'][1] ] )
 
 def main():
     catan = Catan(1,2)

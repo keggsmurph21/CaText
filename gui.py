@@ -17,14 +17,16 @@ class GUI(object):
         self.infoText = None
         self.infoEscs = None
 
-    def set_msg(self, msg):
+    def set_msg(self, msg=None):
         self.msg = msg
 
     def add_pMsg(self, pMsg):
-        self.pMsgs.append(pMsg)
+        self.pMsgs.append( pMsg )
 
     def remove_pMsg(self, pMsg=None):
-        if pMsg == None:
+        if pMsg == 'all':
+            self.pMsgs = []
+        elif pMsg == None:
             self.pMsgs.pop()
         elif pMsg in self.pMsgs:
             self.pMsgs.remove( pMsg )
@@ -32,6 +34,8 @@ class GUI(object):
             return False
 
     def escape(self, s):
+        for extraPlayerCode in range(4,10): # color all players greater with player X coloring
+            s = s.replace('&p%d' % extraPlayerCode, '&pX')
         for code in self.colors.keys():
             s = s.replace(code, self.colors[code])
         return s
