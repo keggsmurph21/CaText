@@ -257,7 +257,7 @@ class GUI(object):
                         argLine.append( self.catan.dice.view( item[1] ))
                     elif item[0] == 'P':
                         if item[1] == 'c':
-                            argLine.append( self.catan.currentPlayer.color )
+                            argLine.append( self.catan.currentHuman.color )
                         else:
                             argLine.append( self.catan.players[ item[1] ].print_line() )
                     elif item[0] == 'R':
@@ -267,7 +267,7 @@ class GUI(object):
                         if item[2] == 'n':
                             argLine.append( resource.name )
                         elif item[2] == 'c':
-                            argLine.append( self.catan.currentPlayer.count( resource.resource ))
+                            argLine.append( self.catan.currentHuman.count( resource.resource ))
                     elif item[0] == 'V':
                         devCard = self.catan.devCards[ item[1] ]
                         if item[2] == 'color':
@@ -275,9 +275,9 @@ class GUI(object):
                         if item[2] == 'n':
                             argLine.append( devCard.plural )
                         elif item[2] == 'u':
-                            argLine.append( self.catan.currentPlayer.count( devCard.name, 'up' ))
+                            argLine.append( self.catan.currentHuman.count( devCard.name, 'up' ))
                         elif item[2] == 'd':
-                            argLine.append( self.catan.currentPlayer.count( devCard.name, 'down' ))
+                            argLine.append( self.catan.currentHuman.count( devCard.name, 'down' ))
                     else:
                         argLine.append( item )
 

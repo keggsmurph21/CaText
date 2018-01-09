@@ -1,0 +1,2 @@
+bad graphics:
+  - card on middle of screen, flips over to reveal what the player stole

@@ -262,9 +262,9 @@ class Options(object):
                 try:
                     pair = [ int(args[i]), args[i+1] ]
                     if pair[0] > 0:
-                        if pair[1] in self.catan.currentPlayer.resCards:
-                            if self.catan.currentPlayer.resCards[pair[1]] >= pair[0]:
-                                self.catan.currentPlayer.resCards[pair[1]] -= pair[0]
+                        if pair[1] in self.catan.currentHuman.resCards:
+                            if self.catan.currentHuman.resCards[pair[1]] >= pair[0]:
+                                self.catan.currentHuman.resCards[pair[1]] -= pair[0]
                             else:
                                 self.catan.gui.set_msg( "toss: There are not %d %s%s&& to toss." % (pair[0], self.catan.resources[pair[1]].text, pair[1]))
                         else:
@@ -283,10 +283,69 @@ class Options(object):
             self.catan.gui.set_msg( "toss: Invalid number of arguments.  Expected a positive even number, got %d." % (len(args)-1) )
 
     def c_rob(self, args):
-        pass
+        if len(args) == 2:
+            for h in self.catan.hexes:
+                if h.isBlocked:
+                    old = h
+            new = self.catan.lookup( args[1] )
+            if new != False and isinstance( new, Hex ):
+                if new != old:
+                    old.isBlocked = False
+                    new.isBlocked = True
+                    self.catan.gui.set_msg( 'Successfully robbed hex %s.' % args[1] )
+                    return True
+                else:
+                    self.catan.gui.set_msg( 'rob: Error cannot rob the same hex twice.' )
+            else:
+                self.catan.gui.set_msg( 'rob: Error location %s is not a hex.' % args[1] )
+        else:
+            self.catan.gui.set_msg( 'rob: Invalid number of arguments.  Expected 1, got %d.' % (len(args)-1) )
 
     def c_steal(self, args):
-        pass
+        num = -1
+        if len(args) > 1:
+            try:
+                num = int(args[1]) - 1
+            except ValueError:
+                pNames = []
+                for p in self.catan.players:
+                    pNames.append( (' '.join(p.name.split(' ')).lower(), p.num) )
+                for p in pNames:
+                    if ' '.join(args[1:]).lower() == p[0]:
+                        num = p[1]
+
+            for h in self.catan.hexes:
+                if h.isBlocked:
+                    robbed = h
+            adjs = []
+            for n in robbed.get_adj_nodes():
+                if n.owner.isNonePlayer == False and n.owner != self:
+                    adjs.append( n.owner )
+
+            steal = self.catan.get_player_by_id( num )
+            if steal:
+                print adjs
+                if steal in adjs:
+
+                    if steal.total( 'res' ) > 0:
+                        resources = []
+                        for r in steal.resCards.keys():
+                            for i in range( steal.resCards[r] ):
+                                resources.append(r)
+                        resource = random.choice( resources )
+                        steal.resCards[resource] -= 1
+                        self.catan.currentPlayer.resCards[resource] += 1
+                        self.catan.gui.set_msg( 'Stole %s%s&& from %s%s&&.' % (self.catan.resources[resource].text, resource, steal.color, steal.name) )
+                    else:
+                        self.catan.gui.set_msg( 'steal: `%s%s%s` has no cards.' % (steal.color, steal.name, self.catan.currentPlayer.color) )
+                    return True
+
+                else:
+                    self.catan.gui.set_msg( 'steal: `%s%s%s` unable to be stolen from.' % (steal.color, steal.name, self.catan.currentPlayer.color) )
+            else:
+                self.catan.gui.set_msg( 'steal: Unable to find player `%s`.' % ' '.join(args[1:]) )
+        else:
+            self.catan.gui.set_msg( 'steal: Invalid number of arguments.  Expected 1, got %d.' % (len(args)-1) )
 
     def c_force(self, args):
         if len(args) > 1:
@@ -524,6 +583,7 @@ class Catan(object):
             self.isFirstTurn = publicData['isFirstTurn']
             self.players = [ self.get_player_by_id(p) for p in publicData['playerOrder'] ]
             self.currentPlayer = self.get_player_by_id( publicData['currentPlayer'] )
+            self.currentHuman = self.get_player_by_id( publicData['currentHuman'] )
             self.hasRolled = publicData['hasRolled']
             self.hasPassed = publicData['hasPassed']
             self.hasPlayedDC = publicData['hasPlayedDC']
@@ -583,6 +643,7 @@ class Catan(object):
         data['hasPlayedDC'] = self.hasPlayedDC
         data['playerOrder'] = [ p.num for p in self.players ]
         data['currentPlayer'] = self.currentPlayer.num
+        data['currentHuman'] = self.currentHuman.num
         data['hasLargestArmy'] = self.hasLargestArmy.num
         data['hasLongestRoad'] = self.hasLongestRoad.num
         data['dice'] = self.dice.save( kw )
@@ -680,6 +741,7 @@ class Catan(object):
     def generate_players(self):
         self.players = []
         self.currentPlayer = self.nonePlayer
+        self.currentHuman = self.nonePlayer
         self.hasLargestArmy = self.nonePlayer
         self.hasLongestRoad = self.nonePlayer
 
@@ -693,7 +755,6 @@ class Catan(object):
         self.hasPassed = False
 
     def take_turn(self):
-
         if self.turn < 2 * len(self.players):
             if self.turn == 0:
                 self.firstTwoTurnsQueue = [ p for p in self.players ] + [ p for p in self.players[::-1] ]
@@ -755,7 +816,11 @@ class Catan(object):
     def is_authenticated(self, opt):
         return DEBUG or opt not in self.options.dump( 'admin' ) or not( self.currentPlayer.isAdmin )
 
-    def handle_input(self):
+    def handle_input(self, ch=None):
+        self.currentHuman = self.currentPlayer
+        if ch != None:
+            self.currentHuman = ch
+
         self.gui.render()
 
         args = self.gui.prompt().split(' ')
@@ -999,8 +1064,9 @@ class Human(Player):
         b4Remove = self.total('res')
         toRemove = int( b4Remove/2 )
         while self.total('res') > b4Remove - toRemove:
+            print 'b4:%d, to:%d, num:%d' % (b4Remove, toRemove, self.total('res'))
             self.catan.gui.add_pMsg( '%sdiscard %d cards (toss)' % (self.color, toRemove - (b4Remove - self.total('res'))) )
-            self.catan.handle_input()
+            self.catan.handle_input( self )
 
         self.catan.gui.remove_pMsg( 'all' )
         self.catan.options.set( oldOptions )
@@ -1013,6 +1079,7 @@ class Human(Player):
 
         self.catan.options.set( {'rob'} )
         self.catan.gui.remove_pMsg( 'all' )
+        self.catan.gui.add_pMsg( '%smove the Robber to an available hex' % self.color )
 
         self.catan.handle_input()
 
@@ -1028,6 +1095,12 @@ class Human(Player):
         if len(adjs) > 0:
             self.catan.options.set( {'steal'} )
             self.catan.gui.remove_pMsg( 'all' )
+
+            pMsg = '%ssteal from ' % self.color
+            for adj in adjs:
+                pMsg += '%s%s%s or ' % (adj.color, adj.name, self.color)
+            pMsg = pMsg[:-3]
+            self.catan.gui.add_pMsg( pMsg )
 
             self.catan.handle_input()
 
@@ -1347,7 +1420,7 @@ class Connection(Edge):
         self.set_vertices( catan.nodes[ data['vertices'][0] ], catan.hexes[ data['vertices'][1] ] )
 
 def main():
-    catan = Catan(1,0)
+    catan = Catan(1,3)
     return 0
 
 if __name__ == "__main__":
