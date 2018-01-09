@@ -12,6 +12,5 @@
 # temporary stuff
 tmp
 
-# saved game states
-saves
-backups
+# old files
+*.info

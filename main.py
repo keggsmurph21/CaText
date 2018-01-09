@@ -35,13 +35,14 @@ class Settings(object):
         self.data[key] = value
 
 class Cmd(object):
-    def __init__(self, name, func, d):
+    def __init__(self, name, func, d, catan):
         self.name = name
         self.argv = d['args']
         self.argc = len(self.argv)
         self.func = func
         self.isAdminCommand = d['isAdminCommand']
         self.isPersistentCommand = d['isPersistentCommand']
+        self.catan = catan
 
     def help_text(self):
         msg = u"Usage: " + self.name + " "
@@ -60,7 +61,9 @@ class Cmd(object):
         return u'Command "%s" requires %s arguments.  For help, type "help".' % (self.name, str(self.argc))
 
     def do(self, args):
-        return self.func(args)
+        ret = self.func(args)
+        self.catan.save_game()
+        return ret
 
 class Die(object):
     def __init__(self, initialValue=0):
@@ -148,6 +151,9 @@ class Options(object):
             'quit':         self.c_quit,
             'save':         self.c_save,
             'load':         self.c_load,
+            'toss':         self.c_toss,
+            'rob':          self.c_rob,
+            'steal':        self.c_steal,
             'force':        self.c_force,
             'info':         self.c_info,
             'clear':        self.c_clear,
@@ -166,7 +172,7 @@ class Options(object):
 
         commands = catan.settings.get('commands')
         for key in commands.keys():
-            command = Cmd( key, funcs[key], commands[key]  )
+            command = Cmd( key, funcs[key], commands[key], catan )
             if command.isAdminCommand:
                 self.data['admin'][key] = command
                 self.data['persistent'][key] = command
@@ -202,12 +208,8 @@ class Options(object):
         if len(args) == 2:
             dest = './saves/game_%s' % args[1]
             if os.path.exists(dest):
-                confirm = raw_input('Warning: file %s already exists.  To overwrite, type `y`.')
-                if confirm.lower() == 'y':
-                    self.catan.set_msg( 'save: Overwriting file %s' )
-                else:
-                    self.catan.set_msg( 'save: Error file already exists')
-                    return False
+                self.catan.gui.set_msg( 'save: Error file already exists')
+                return False
 
         else:
             num = 0
@@ -239,16 +241,52 @@ class Options(object):
             else:
                 path = 'saves/%s/' % sorted(os.listdir('saves')).pop()
 
-            path = '%s%s/' % ( path, sorted(os.listdir(path)).pop() )
-            ret = self.catan.loadGame( path )
-            if ret == True:
-                return True
+            if os.path.exists( path ):
+                path = '%s%s/' % ( path, sorted(os.listdir(path)).pop() )
+                ret = self.catan.load_game( path )
+                if ret == True:
+                    return True
+                else:
+                    self.catan.gui.set_msg( ret )
+                    return False
+
             else:
-                self.catan.gui.set_msg( ret )
-                return False
+                self.catan.gui.set_msg( "load: Error retrieving save files.  File `%s` missing or corrupted." % path )
 
         else:
             self.catan.gui.set_msg( "load: Invalid number of arguments.  Expected 0 or 1, got %d." % (len(args)-1) )
+
+    def c_toss(self, args):
+        if len(args) > 1 and len(args) % 2 == 1:
+            for i in range(1,len(args),2):
+                try:
+                    pair = [ int(args[i]), args[i+1] ]
+                    if pair[0] > 0:
+                        if pair[1] in self.catan.currentPlayer.resCards:
+                            if self.catan.currentPlayer.resCards[pair[1]] >= pair[0]:
+                                self.catan.currentPlayer.resCards[pair[1]] -= pair[0]
+                            else:
+                                self.catan.gui.set_msg( "toss: There are not %d %s%s&& to toss." % (pair[0], self.catan.resources[pair[1]].text, pair[1]))
+                        else:
+                            self.catan.gui.set_msg( "toss: Invalid resource type `%s`." % pair[1] )
+                            return False
+                    else:
+                        self.catan.gui.set_msg( "toss: Expected a positive integer, got `%d`." % pair[0] )
+                        return False
+                except ValueError:
+                    self.catan.gui.set_msg( "toss: Expected an integer, got `%s`." % args[i])
+                    return False
+            self.catan.gui.set_msg( "Successfully discarded some cards." )
+            self.catan.gui.remove_pMsg()
+            return True
+        else:
+            self.catan.gui.set_msg( "toss: Invalid number of arguments.  Expected a positive even number, got %d." % (len(args)-1) )
+
+    def c_rob(self, args):
+        pass
+
+    def c_steal(self, args):
+        pass
 
     def c_force(self, args):
         if len(args) > 1:
@@ -269,6 +307,8 @@ class Options(object):
             self.catan.gui.set_msg( "info: Invalid number of arguments.  Expected 1, got %d." % (len(args)-1) )
 
     def c_clear(self, args):
+        for pm in self.catan.gui.get_pMsgs()[:-1]:
+            self.catan.gui.remove_pMsg( pm )
         self.catan.gui.set_msg( None )
         return True
 
@@ -278,7 +318,7 @@ class Options(object):
         if len(args) == 1:
             msg = u'For help with a specific command, type "help {command}".\n&gCommands:&& '
             for key in keys:
-                if self.catan.isAuthenticated( key ):
+                if self.catan.is_authenticated( key ):
                     msg += self.get(key).name + ", "
             self.catan.gui.set_msg( msg )
             return True
@@ -294,7 +334,15 @@ class Options(object):
     def c_roll(self, args):
         self.catan.gui.set_msg()
         self.catan.gui.remove_pMsg()
-        self.catan.roll()
+
+        if len(args) == 2:
+            try:
+                self.catan.roll( int(args[1]) )
+            except ValueError:
+                self.catan.roll()
+        else:
+            self.catan.roll()
+
         self.catan.hasRolled = True
         return True
 
@@ -425,7 +473,6 @@ class Options(object):
 
     def c_pass(self, args):
         self.catan.hasPassed = True
-        self.catan.gui.set_msg( 'pass' )
         return True
 
 class Catan(object):
@@ -438,7 +485,7 @@ class Catan(object):
 
         self.loop()
 
-    def loadGame(self, path):
+    def load_game(self, path):
         if os.path.isdir( path ):
             # retrieve hidden game data
             if os.path.exists( path+'hidden.json' ):
@@ -477,6 +524,9 @@ class Catan(object):
             self.isFirstTurn = publicData['isFirstTurn']
             self.players = [ self.get_player_by_id(p) for p in publicData['playerOrder'] ]
             self.currentPlayer = self.get_player_by_id( publicData['currentPlayer'] )
+            self.hasRolled = publicData['hasRolled']
+            self.hasPassed = publicData['hasPassed']
+            self.hasPlayedDC = publicData['hasPlayedDC']
             self.hasLargestArmy = self.get_player_by_id( publicData['hasLargestArmy'] )
             self.hasLongestRoad = self.get_player_by_id( publicData['hasLongestRoad'] )
             self.dice.load( publicData['dice'] )
@@ -503,10 +553,9 @@ class Catan(object):
         else:
             return '%s: Error retrieving save files.  Files missing or corrupted.' % path
 
-    def saveGame(self):
+    def save_game(self):
         # get filepath
         path = self.settings.get('savepath')
-        print path
         with open( '%sdata.txt' % path, 'w' ) as f:
             f.write( 'humans:%d, CPUs:%d, turn:%d, modified:%s' % (self.settings.get('numHumans'), self.settings.get('numCPUs'), self.turn, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") ) )
         path = '%sturn_%s/' % ( path, str(self.turn).zfill(3) )
@@ -529,6 +578,9 @@ class Catan(object):
         data['history'] = self.history
         data['turn'] = self.turn
         data['isFirstTurn'] = self.isFirstTurn
+        data['hasRolled'] = self.hasRolled
+        data['hasPassed'] = self.hasPassed
+        data['hasPlayedDC'] = self.hasPlayedDC
         data['playerOrder'] = [ p.num for p in self.players ]
         data['currentPlayer'] = self.currentPlayer.num
         data['hasLargestArmy'] = self.hasLargestArmy.num
@@ -635,7 +687,13 @@ class Catan(object):
         self.players += [ CPU(self.settings.get('numHumans') + i, self) for i in range(self.settings.get('numCPUs'))]
         random.shuffle(self.players)
 
+        # set some stuff up
+        self.hasRolled = False
+        self.hasPlayedDC = False
+        self.hasPassed = False
+
     def take_turn(self):
+
         if self.turn < 2 * len(self.players):
             if self.turn == 0:
                 self.firstTwoTurnsQueue = [ p for p in self.players ] + [ p for p in self.players[::-1] ]
@@ -657,21 +715,27 @@ class Catan(object):
         else:
             self.currentPlayer = self.players[ self.turn % len(self.players) ]
             self.turn += 1
-            self.hasRolled = False
-            self.hasPlayedDC = False
-            self.hasPassed = False
 
             self.currentPlayer.take_turn()
+
+        # set the stuff for the next guy
+        self.hasRolled = False
+        self.hasPlayedDC = False
+        self.hasPassed = False
 
     def loop(self, turn=0):
         self.turn = turn
         while self.is_game_over() == False:
             self.take_turn()
-            self.saveGame()
-        print "%s wins!" % player.name
+            self.save_game()
+        exit()
 
-    def roll(self):
-        diceValue = self.dice.roll()
+    def roll(self, override=None):
+        if override == None or DEBUG == False:# or self.currentPlayer.isAdmin == False:
+            diceValue = self.dice.roll()
+        else:
+            diceValue = override # used for debugging 7s
+
         if diceValue in {8,11}:
             self.gui.add_pMsg( "%s - %s rolled an %d" % (self.currentPlayer.color, self.currentPlayer.name, diceValue) )
         else:
@@ -688,7 +752,7 @@ class Catan(object):
                     for n in h.get_adj_nodes():
                         n.owner.harvest( h.resource.resource )
 
-    def isAuthenticated(self, opt):
+    def is_authenticated(self, opt):
         return DEBUG or opt not in self.options.dump( 'admin' ) or not( self.currentPlayer.isAdmin )
 
     def handle_input(self):
@@ -700,7 +764,7 @@ class Catan(object):
 
         if cmd in self.options.dump():
             if cmd in self.options.dump( 'available' ) or cmd in self.options.dump( 'persistent' ):
-                if self.isAuthenticated( cmd ):
+                if self.is_authenticated( cmd ):
                     command = self.options.get( cmd )
                     ret = command.do( args )
                     if ret == True and cmd in self.options.dump( 'available' ):
@@ -710,11 +774,11 @@ class Catan(object):
             else:
                 msg = u'%s: Could not execute.\n  &gCurrently available commands:&&\n' % cmd
                 for opt in self.options.dump( 'available' ):
-                    if self.isAuthenticated( opt ):
+                    if self.is_authenticated( opt ):
                         msg += opt + ", "
                 msg += u'\n  &gAlways available commands:&&\n'
                 for opt in self.options.dump( 'persistent' ):
-                    if self.isAuthenticated( opt ):
+                    if self.is_authenticated( opt ):
                         msg += opt + ", "
                 msg += "&&"
                 self.gui.set_msg( msg )
@@ -926,13 +990,53 @@ class Human(Player):
             self.catan.gui.remove_pMsg()
 
     def discard(self):
-        pass
+        oldOptions = self.catan.options.dump( 'available' )
+        oldPMsgs = self.catan.gui.get_pMsgs()
+
+        self.catan.options.set( {'toss'} )
+        self.catan.gui.remove_pMsg( 'all' )
+
+        b4Remove = self.total('res')
+        toRemove = int( b4Remove/2 )
+        while self.total('res') > b4Remove - toRemove:
+            self.catan.gui.add_pMsg( '%sdiscard %d cards (toss)' % (self.color, toRemove - (b4Remove - self.total('res'))) )
+            self.catan.handle_input()
+
+        self.catan.gui.remove_pMsg( 'all' )
+        self.catan.options.set( oldOptions )
+        for pm in oldPMsgs:
+            self.catan.gui.add_pMsg( pm )
 
     def move_robber(self):
-        pass
+        oldOptions = self.catan.options.dump( 'available' )
+        oldPMsgs = self.catan.gui.get_pMsgs()
+
+        self.catan.options.set( {'rob'} )
+        self.catan.gui.remove_pMsg( 'all' )
+
+        self.catan.handle_input()
+
+        for h in self.catan.hexes:
+            if h.isBlocked:
+                robbed = h
+
+        adjs = []
+        for n in robbed.get_adj_nodes():
+            if n.owner.isNonePlayer == False and n.owner != self:
+                adjs.append( n.owner )
+
+        if len(adjs) > 0:
+            self.catan.options.set( {'steal'} )
+            self.catan.gui.remove_pMsg( 'all' )
+
+            self.catan.handle_input()
+
+        self.catan.gui.remove_pMsg( 'all' )
+        self.catan.options.set( oldOptions )
+        for pm in oldPMsgs:
+            self.catan.gui.add_pMsg( pm )
 
     def take_turn(self):
-        self.catan.gui.add_pMsg( u"%sroll or flip a development card (roll, flip opts)" % self.color )
         while self.catan.hasPassed == False:
             self.catan.options.set( {'flip'} ) # always able to play VP but not necessarily other cards
             if self.catan.hasRolled:
@@ -940,6 +1044,7 @@ class Human(Player):
                 self.catan.options.add( 'build' )
                 self.catan.options.add( 'pass' )
             else:
+                self.catan.gui.add_pMsg( u"%sroll or flip a development card (roll, flip opts)" % self.color )
                 self.catan.options.add( 'roll' )
             self.catan.handle_input()
 
@@ -978,7 +1083,32 @@ class CPU(Player):
         self.catan.gui.add_pMsg( '   %s%s discarded %d cards' % (self.color, self.name, old-new) )
 
     def move_robber(self):
-        pass
+        for h in self.catan.hexes:
+            if h.isBlocked:
+                old = h
+        old.isBlocked = False
+
+        new = random.choice( self.catan.hexes )
+        new.isBlocked = True
+
+        adjs = []
+        for n in new.get_adj_nodes():
+            if n.owner.isNonePlayer == False and n.owner != self:
+                adjs.append( n.owner )
+
+        if len(adjs) > 0:
+            steal = random.choice( adjs )
+            resources = []
+            for r in steal.resCards.keys():
+                for i in range( steal.resCards[r] ):
+                    resources.append(r)
+
+            if len(resources) > 0:
+                resource = random.choice( resources )
+                self.catan.gui.add_pMsg( '   %s%s stole a card from %s%s%s!' % (self.color, self.name, steal.color, steal.name, self.color) )
+                steal.resCards[resource] -= 1
+                self.resCards[resource] += 1
+
 
     def pave(self, restrict=None):
         if self.catan.isFirstTurn:
@@ -987,6 +1117,7 @@ class CPU(Player):
 
     def take_turn(self):
         self.catan.roll()
+        self.catan.save_game()
 
 class Vertex(object):
     def __init__(self, num):
@@ -1216,7 +1347,7 @@ class Connection(Edge):
         self.set_vertices( catan.nodes[ data['vertices'][0] ], catan.hexes[ data['vertices'][1] ] )
 
 def main():
-    catan = Catan(1,3)
+    catan = Catan(1,0)
     return 0
 
 if __name__ == "__main__":

@@ -33,6 +33,9 @@ class GUI(object):
         else:
             return False
 
+    def get_pMsgs(self):
+        return self.pMsgs
+
     def escape(self, s):
         for extraPlayerCode in range(4,10): # color all players greater with player X coloring
             s = s.replace('&p%d' % extraPlayerCode, '&pX')

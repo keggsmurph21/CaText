@@ -186,6 +186,27 @@
         "isAdminCommand": false,
         "isPersistentCommand": true
       },
+      "toss": {
+        "args": [
+          "num1 card1 [...] (e.g. toss 4 sheep 3 ore)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "rob": {
+        "args": [
+          "hex coordinate (e.g. rob L20))"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "steal": {
+        "args": [
+          "player id or player name (e.g. steal 3 or steal CPU 3)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
       "force": {
         "args": [],
         "isAdminCommand": true,
@@ -212,7 +233,7 @@
       },
       "info": {
         "args": [
-          "coordinate (e.g. E24)"
+          "hex/node/road coordinate (e.g. E24)"
         ],
         "isAdminCommand": false,
         "isPersistentCommand": true
@@ -236,7 +257,7 @@
       },
       "neighbors": {
         "args": [
-          "coordinate (e.g. E24)"
+          "hex/node/road coordinate (e.g. E24)"
         ],
         "isAdminCommand": true,
         "isPersistentCommand": false
@@ -253,14 +274,14 @@
       },
       "settle": {
         "args": [
-          "coordinate (e.g. E24) or opts"
+          "node coordinate (e.g. E24) or opts"
         ],
         "isAdminCommand": false,
         "isPersistentCommand": false
       },
       "pave": {
         "args": [
-          "coordinate (e.g. F26) or opts"
+          "road coordinate (e.g. F26) or opts"
         ],
         "isAdminCommand": false,
         "isPersistentCommand": false
