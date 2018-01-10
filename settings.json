@@ -6,7 +6,7 @@
       "tbanner": "&g/================================= [ CaTEXT ] =================================\\&&",
       "lpad": 1,
       "mpad": 3,
-      "ienc": "s7Tas8\ns7Tbs8\nIt\nI s=|__NAME____VPs_Res_DCs_Army_|\nIm\nIb\ns7Das8\ns7Dbs8\nRt\nRss=|__RESOURCES_________Num____|\nRm\nRb\nVss=|__DEV CARDS_____Up__Down___|\nVm\nVb",
+      "ienc": "s7Tas8\ns7Tbs8\nIt\nI s=|__NAME____VP_DC_Res_Ar_LR__|\nIm\nIb\ns7Das8\ns7Dbs8\nRt\nRss=|__RESOURCES__________Num___|\nRm\nRb\nVss=|__DEV CARDS_____Up__Down___|\nVm\nVb",
       "border": true,
       "order": [
         [
@@ -37,6 +37,32 @@
       "genc": "  ObNdO5NdO5NdOb  \n  O9RsHtRbO1RsHtRbO1RsHtRbO9  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O5RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO5  \n  O3NdHfNdHfNdHfNdHfNdO3  \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O1RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO1  \nNdHfNdHfNdHfNdHfNdHfNd\nRvHxRvHxRvHxRvHxRvHxRv\nNdHgNdHgNdHgNdHgNdHgNd\n  O1RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO1  \n  O3NdHfNdHfNdHfNdHfNdO3 \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O5RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO5  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O9RbHbRsO1RbHbRsO1RbHbRsO9  \n  ObNdO5NdO5NdOb  "
     },
     "prompt": " >",
+    "buildingCosts": {
+      "road": {
+        "brick": 1,
+        "wood": 1
+      },
+      "settlement": {
+        "wheat": 1,
+        "sheep": 1,
+        "brick": 1,
+        "wood": 1
+      },
+      "city": {
+        "wheat": 2,
+        "ore": 3
+      },
+      "dc": {
+        "wheat": 1,
+        "sheep": 1,
+        "ore": 1
+      }
+    },
+    "maxEachBuilding": {
+      "road": 15,
+      "settlement": 5,
+      "city": 4
+    },
     "devCards": {
       "vp": {
         "nameShort": "VP",
@@ -207,7 +233,7 @@
         "isAdminCommand": false,
         "isPersistentCommand": false
       },
-      "force": {
+      "sudo": {
         "args": [],
         "isAdminCommand": true,
         "isPersistentCommand": true
@@ -282,6 +308,13 @@
       "pave": {
         "args": [
           "road coordinate (e.g. F26) or opts"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "trade": {
+        "args": [
+          "player_name (or bank), num and type of outgoing resources, num and type of incoming resources (e.g. `trade bank 4 ore 1 sheep`)"
         ],
         "isAdminCommand": false,
         "isPersistentCommand": false

@@ -219,7 +219,7 @@ class GUI(object):
                                     tline += '.___________________________.'
                                 elif line[i+1] == 'm':
                                     for r in [ 'wheat', 'sheep', 'brick', 'wood', 'ore' ]:
-                                        infoText.append( '%s| %s%-5s               %s    %s|' )
+                                        infoText.append( '%s| %s%-5s               %2s    %s|' )
                                         infoEscs.append( [('P','c'),('R',r,'color'),('R',r,'n'),('R',r,'c'),('P','c')] )
                                     useThis = False
                                 elif line[i+1] == 'b':
@@ -230,7 +230,7 @@ class GUI(object):
                                 eline += [('P','c')]
                                 if line[i+1] == 'm':
                                     for v in [ 'vp', 'knight', 'yop', 'monopoly', 'rb' ]:
-                                        infoText.append( '%s| %s%-13s  %s   %s    %s|' )
+                                        infoText.append( '%s| %s%-13s  %2s   %2s    %s|' )
                                         infoEscs.append( [('P','c'),('V',v,'color'),('V',v,'n'),('V',v,'u'),('V',v,'d'),('P','c')] )
                                     useThis = False
                                 elif line[i+1] == 'b':

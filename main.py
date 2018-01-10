@@ -154,7 +154,7 @@ class Options(object):
             'toss':         self.c_toss,
             'rob':          self.c_rob,
             'steal':        self.c_steal,
-            'force':        self.c_force,
+            'sudo':         self.c_sudo,
             'info':         self.c_info,
             'clear':        self.c_clear,
             'help':         self.c_help,
@@ -168,6 +168,7 @@ class Options(object):
             'setcpuname':   self.c_setcpuname,
             'build':        self.c_build,
             'flip':         self.c_flip,
+            'trade':        self.c_trade,
             'pass':         self.c_pass}
 
         commands = catan.settings.get('commands')
@@ -263,7 +264,7 @@ class Options(object):
                     pair = [ int(args[i]), args[i+1] ]
                     if pair[0] > 0:
                         if pair[1] in self.catan.currentHuman.resCards:
-                            if self.catan.currentHuman.resCards[pair[1]] >= pair[0]:
+                            if self.catan.currentHuman.count(pair[1]) >= pair[0]:
                                 self.catan.currentHuman.resCards[pair[1]] -= pair[0]
                             else:
                                 self.catan.gui.set_msg( "toss: There are not %d %s%s&& to toss." % (pair[0], self.catan.resources[pair[1]].text, pair[1]))
@@ -324,7 +325,6 @@ class Options(object):
 
             steal = self.catan.get_player_by_id( num )
             if steal:
-                print adjs
                 if steal in adjs:
 
                     if steal.total( 'res' ) > 0:
@@ -347,11 +347,11 @@ class Options(object):
         else:
             self.catan.gui.set_msg( 'steal: Invalid number of arguments.  Expected 1, got %d.' % (len(args)-1) )
 
-    def c_force(self, args):
+    def c_sudo(self, args):
         if len(args) > 1:
             return self.get( args[1] ).do( args[1:] )
         else:
-            self.catan.gui.set_msg( "force: Invalid number of arguments.  Expected at least argument, got 0." )
+            self.catan.gui.set_msg( "sudo: Invalid number of arguments.  Expected at least argument, got 0." )
 
     def c_info(self, args):
         if len(args) == 2:
@@ -455,6 +455,8 @@ class Options(object):
                     if node.settle(self.catan.currentPlayer, False) == True:
                         msg += '%s, ' % self.catan.lookup(node.num, 'nodes')
                 self.catan.gui.set_msg( msg )
+            elif args[1] == 'cancel':
+                return True
             else:
                 node = self.catan.lookup( args[1] )
                 if node == False or not( isinstance(node, Node) ):
@@ -478,6 +480,8 @@ class Options(object):
                     if road.pave(self.catan.currentPlayer, False) == True:
                         msg += '%s, ' % self.catan.lookup(road.num, 'roads')
                 self.catan.gui.set_msg( msg )
+            elif args[1] == 'cancel':
+                return True
             else:
                 road = self.catan.lookup( args[1] )
                 if road == False or not( isinstance(road, Road) ):
@@ -498,9 +502,15 @@ class Options(object):
             old = self.catan.currentPlayer.name
             new = args[1][:8]
             color = self.catan.currentPlayer.color
-            self.catan.currentPlayer.name = new
-            self.catan.gui.set_msg( "setname: Changed name %s%s&& to %s%s&&." % (color, old, color, new) )
-            return True
+            if new in [ p.name for p in self.catan.players ]:
+                self.catan.gui.set_msg( "setname: Error unable to change name to `%s`.  Name already taken." % new )
+            else:
+                if '  ' in new:
+                    self.catan.gui.set_msg( "setname: Error unable to change name to `%s`.  Make sure it does not contain consecutive spaces." % new )
+                else:
+                    self.catan.currentPlayer.name = new
+                    self.catan.gui.set_msg( "setname: Changed name %s%s&& to %s%s&&." % (color, old, color, new) )
+                    return True
         else:
             self.catan.gui.set_msg( "setname: Invalid number of arguments.  Expected 1 got %d." % (len(args)-1) )
 
@@ -523,12 +533,55 @@ class Options(object):
             self.catan.gui.set_msg( "setcpuname: Invalid number of arguments.  Expected 2 got %d." % (len(args)-1) )
 
     def c_build(self, args):
-        self.catan.gui.set_msg( 'build' )
-        return True
+        args = [a.lower() for a in args]
+        if len(args) > 1:
+
+            if 'road' in args:
+                if self.catan.currentPlayer.can_build( 'road' ):
+                    oldOptions = self.catan.options.dump( 'available' )
+                    self.catan.options.set( {'pave'} )
+                    pMsg = self.catan.gui.get_pMsgs().pop()
+                    self.catan.gui.remove_pMsg( 'all' )
+                    self.catan.gui.add_pMsg( u"%schoose a road (pave opts)&&" % self.catan.currentPlayer.color )
+
+                    before = len(self.catan.currentPlayer.roads)
+                    if len(args) == 3:
+                        self.catan.handle_input( None, ['pave'] + args[2:] )
+                    else:
+                        self.catan.handle_input()
+                    after = len(self.catan.currentPlayer.roads)
+
+                    if before != after:
+                        self.catan.currentPlayer.resCards['brick'] -= 1
+                        self.catan.currentPlayer.resCards['wood'] -= 1
+
+                    self.catan.options.set( oldOptions )
+                    self.catan.gui.remove_pMsg( 'all' )
+                    self.catan.gui.add_pMsg( pMsg )
+
+            elif 'city' in args:
+                if self.catan.currentPlayer.can_build( 'city' ):
+                    pass
+
+            elif 'settlement' in args:
+                if self.catan.currentPlayer.can_build( 'settlement' ):
+                    pass
+
+            elif 'dc' in args or 'dev' in args or 'development' in args or 'card' in args:
+                if self.catan.currentPlayer.can_build( 'dc' ):
+                    pass
+
+            else:
+                self.catan.gui.set_msg( 'build: Invalid option `%s`.  Make sure to only build one thing at a time.' % arg )
+        else:
+            self.catan.gui.set_msg( 'build: Invalid number of arguments.  Expected at least one, got %d.' % (len(args)-1) )
 
     def c_flip(self, args):
         self.catan.gui.set_msg( 'flip' )
         return True
+
+    def c_trade(self, args):
+        pass
 
     def c_pass(self, args):
         self.catan.hasPassed = True
@@ -816,14 +869,15 @@ class Catan(object):
     def is_authenticated(self, opt):
         return DEBUG or opt not in self.options.dump( 'admin' ) or not( self.currentPlayer.isAdmin )
 
-    def handle_input(self, ch=None):
+    def handle_input(self, ch=None, args=None):
         self.currentHuman = self.currentPlayer
         if ch != None:
             self.currentHuman = ch
 
         self.gui.render()
 
-        args = self.gui.prompt().split(' ')
+        if args == None:
+            args = self.gui.prompt().split(' ')
         cmd = args[0]
         self.history.append( { 'pid':self.currentPlayer.num, 'turn':self.turn, 'command':args } ) # add history to CPUs
 
@@ -948,6 +1002,7 @@ class Player(object):
                 'isHuman': self.isHuman,
                 'settlements': [ s.num for s in self.settlements ],
                 'roads': [ r.num for r in self.roads ],
+                'longestRoad': self.longestRoad,
                 'hasLongestRoad': self.hasLongestRoad,
                 'color': self.color,
                 'bcolor': self.bcolor }
@@ -969,6 +1024,7 @@ class Player(object):
             self.isHuman = data['isHuman']
             self.settlements = [ catan.nodes[num] for num in data['settlements'] ]
             self.roads = [ catan.roads[num] for num in data['roads'] ]
+            self.longestRoad = self.longestRoad
             self.hasLongestRoad = data['hasLongestRoad']
             self.color = data['color']
             self.bcolor = data['bcolor']
@@ -992,6 +1048,63 @@ class Player(object):
                 if dc == 'vp':
                     self.privateScore += 1
 
+    def can_build(self, keyword):
+        costs = self.catan.settings.get( 'buildingCosts' )
+        maxes = self.catan.settings.get( 'maxEachBuilding' )
+
+        if keyword == 'road':
+            if len(self.roads) < maxes[ keyword ]:
+                for req in costs[ keyword ]:
+                    if self.count( req ) >= costs[ keyword ][ req ]:
+                        return True
+                    else:
+                        msg = 'build: Error insufficient resources.  Need '
+                        for req in costs[ keyword ]:
+                            msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[keyword][req], req)
+                        msg = '%s to build a %s.' % (msg[:-2],keyword)
+            else:
+                msg = 'build: Error no more roads available to be built.'
+
+        elif keyword == 'settlement':
+            if len(self.settlements) < maxes[ keyword ]:
+                for req in costs[ keyword ]:
+                    if self.count( req ) >= costs[ keyword ][ req ]:
+                        return True
+                    else:
+                        msg = 'build: Error insufficient resources.  Need '
+                        for req in costs[ keyword ]:
+                            msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[keyword][req], req)
+                        msg = '%s to build a %s.' % (msg[:-2],keyword)
+            else:
+                msg = 'build: Error no more settlements available to be built.'
+
+        elif keyword == 'city':
+            cities = [ s.isCity for s in self.settlements ]
+            if sum(cities) < maxes[ keyword ]:
+                for req in costs[ keyword ]:
+                    if self.count( req ) >= costs[ keyword ][ req ]:
+                        return True
+                    else:
+                        msg = 'build: Error insufficient resources.  Need '
+                        for req in costs[ keyword ]:
+                            msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[keyword][req], req)
+                        msg = '%s to build a %s.' % (msg[:-2],keyword)
+            else:
+                msg = 'build: Error no more cities available to be built.'
+
+        elif keyword == 'dc':
+            for req in costs[ keyword ]:
+                if self.count( req ) >= costs[ keyword ][ req ]:
+                    return True
+                else:
+                    msg = 'build: Error insufficient resources.  Need '
+                    for req in costs[ keyword ]:
+                        msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[keyword][req], req)
+                    msg = '%s to build a %s.' % (msg[:-2],keyword)
+
+        self.catan.gui.set_msg( msg )
+        return False
+
     def harvest(self, resource):
         if resource in self.resCards and self.isNonePlayer == False:
             self.resCards[resource] += 1
@@ -999,10 +1112,15 @@ class Player(object):
             return False
 
     def print_line(self):
-        score = self.publicScore
-        if self == self.catan.currentPlayer:
-            score = self.privateScore
-        return "%s %-8s %2d  %2d  %2d   %2d  &&" % (self.color, self.name, score, self.total('res'), self.total('dcu'), self.numKnights)
+        line = "%s %-8s " % (self.color, self.name)
+        line += "%2d " % (self.privateScore if self == self.catan.currentPlayer else self.publicScore)
+        line += "%2d %2d  " % (self.total('dcu'), self.total('res'))
+
+        LA = ('*' if self.hasLargestArmy else ' ')
+        LR = ('*' if self.hasLongestRoad else ' ')
+        line += "%2d%s%2d%s &&" % ( self.numKnights, LA, self.longestRoad, LR )
+
+        return line
 
     def total(self, datatype):
         acc = 0
@@ -1018,12 +1136,86 @@ class Player(object):
             dic = self.devCardsP
         else:
             dic = self.resCards
-        return str(dic[res]).rjust(2)
+        return dic[res]
 
     def calc_longest_road(self):
-        longestRoad = 0
-        self.longestRoad = longestRoad
+
+        # construct connected components
+        components = []
+        visited = set()
+
+        while len(visited) < len(self.roads):
+            for r in self.roads:
+                if r.num not in visited:
+                    component = { r, }
+                    visited.add( r.num )
+                    for s in self.roads:
+                        if self.calc_distance(r,s) < float('inf'):
+                            component.add( s )
+                            visited.add( s.num )
+                    components.append( component )
+
+        # scan each component
+        for component in components:
+            for road in component:
+                self.longestRoad = max( self.longestRoad, self.component_longest_road(road) )
+
         self.catan.check_longest_road()
+
+    def component_longest_road(self, src):
+
+        visited = { src.num, }
+        distance = { r.num : 1 for r in self.catan.roads }
+        stack = [ src.num ]
+
+        while len(stack):
+            cur = self.catan.roads[ stack.pop() ]
+            d = distance[ cur.num ]
+
+            neighbors = cur.get_adj_roads( self )
+            for r in neighbors:
+                if r.num not in visited:
+                    visited.add( r.num )
+                    distance[ r.num ] = max( distance[r.num], d+1 )
+                    stack = stack + [ r.num ]
+
+        return max( distance.values() )
+
+    def find_shortest_path(self, src, tar):
+
+        visited = { src.num, }
+        previous = { r.num : None for r in self.catan.roads }
+        queue = [ src.num ]
+
+        while len(queue):
+            cur = self.catan.roads[ queue.pop() ]
+
+            neighbors = cur.get_adj_roads( self )
+            for r in neighbors:
+                if r.num not in visited:
+                    visited.add( r.num )
+                    previous[ r.num ] = cur.num
+                    queue = [ r.num ] + queue
+
+                if r == tar:
+
+                    # reconstruct path
+                    cur = r.num
+                    path = [ cur ]
+                    while previous[ cur ] != None:
+                        cur = previous[ cur ]
+                        path = [ cur ] + path
+                    return path
+
+        return False
+
+    def calc_distance(self, src, tar):
+        path = self.find_shortest_path( src, tar )
+
+        if path:
+            return len(path)
+        else:
+            return float('inf')
 
     def add_settlement(self, node):
         self.publicScore += 1
@@ -1064,7 +1256,6 @@ class Human(Player):
         b4Remove = self.total('res')
         toRemove = int( b4Remove/2 )
         while self.total('res') > b4Remove - toRemove:
-            print 'b4:%d, to:%d, num:%d' % (b4Remove, toRemove, self.total('res'))
             self.catan.gui.add_pMsg( '%sdiscard %d cards (toss)' % (self.color, toRemove - (b4Remove - self.total('res'))) )
             self.catan.handle_input( self )
 
@@ -1111,10 +1302,11 @@ class Human(Player):
 
     def take_turn(self):
         while self.catan.hasPassed == False:
-            self.catan.options.set( {'flip'} ) # always able to play VP but not necessarily other cards
+            self.catan.options.set( {'flip'} ) # always able to play VP
             if self.catan.hasRolled:
-                self.catan.gui.add_pMsg( u"%sbuild, flip a development card, or pass (build, flip opts, pass)" % self.color)
+                self.catan.gui.add_pMsg( u"%sbuild, trade, flip a development card, or pass (build, flip opts, pass)" % self.color)
                 self.catan.options.add( 'build' )
+                self.catan.options.add( 'trade' )
                 self.catan.options.add( 'pass' )
             else:
                 self.catan.gui.add_pMsg( u"%sroll or flip a development card (roll, flip opts)" % self.color )
@@ -1173,7 +1365,7 @@ class CPU(Player):
             steal = random.choice( adjs )
             resources = []
             for r in steal.resCards.keys():
-                for i in range( steal.resCards[r] ):
+                for i in range( steal.count(r) ):
                     resources.append(r)
 
             if len(resources) > 0:
@@ -1181,7 +1373,6 @@ class CPU(Player):
                 self.catan.gui.add_pMsg( '   %s%s stole a card from %s%s%s!' % (self.color, self.name, steal.color, steal.name, self.color) )
                 steal.resCards[resource] -= 1
                 self.resCards[resource] += 1
-
 
     def pave(self, restrict=None):
         if self.catan.isFirstTurn:
@@ -1365,7 +1556,7 @@ class Road(Edge):
 
     def load(self, keyword, data, catan):
         self.owner = catan.get_player_by_id( data['owner'] )
-        self.set_vertices( catan.nodes[ data['vertices'][1] ], catan.nodes[ data['vertices'][1] ] )
+        self.set_vertices( catan.nodes[ data['vertices'][0] ], catan.nodes[ data['vertices'][1] ] )
 
     def pave(self, player, save=True):
         if self.owner.isNonePlayer:
@@ -1379,14 +1570,24 @@ class Road(Edge):
                     return "pave: Error need to pave a road adjacent to most recent settlement."
             else:
                 for r in player.roads:
-                    if self.calc_distance(r) <= 1: # check if adjacent to any other built roads
+                    if player.calc_distance( self, r ) <= 2:
                         if save:
                             self.owner = player
                             player.add_road(self)
                         return True
-                    return "pave: Error road needs to be adjacent to existing road or settlement."
+                return "pave: Error road needs to be adjacent to existing road or settlement."
         else:
             return "pave: Error road already paved by %s%s&&." % ( self.owner.color, self.owner.name )
+
+    def get_adj_roads(self, owner):
+        neighbors = set()
+        for node in self.vertices:
+            if node.owner.isNonePlayer or node.owner == owner:
+                for r in node.roads:
+                    if r.owner == owner:
+                        neighbors.add( r )
+
+        return neighbors
 
     def escape(self, shape):
         s = self.owner.bcolor
