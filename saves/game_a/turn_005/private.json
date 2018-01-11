@@ -40,10 +40,10 @@
             "yop": 0
         }, 
         "resCards": {
-            "sheep": 1, 
+            "sheep": 0, 
             "brick": 0, 
             "wood": 0, 
-            "wheat": 1, 
+            "wheat": 2, 
             "ore": 1
         }
     }, 

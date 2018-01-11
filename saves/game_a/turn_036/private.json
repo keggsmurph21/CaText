@@ -1,0 +1,66 @@
+{
+    "0": {
+        "devCardsU": {
+            "vp": 0, 
+            "knight": 0, 
+            "monopoly": 0, 
+            "rb": 0, 
+            "yop": 0
+        }, 
+        "resCards": {
+            "sheep": 8, 
+            "brick": 2, 
+            "wood": 0, 
+            "wheat": 4, 
+            "ore": 3
+        }
+    }, 
+    "1": {
+        "devCardsU": {
+            "vp": 0, 
+            "knight": 0, 
+            "monopoly": 0, 
+            "rb": 0, 
+            "yop": 0
+        }, 
+        "resCards": {
+            "sheep": 14, 
+            "brick": 0, 
+            "wood": 1, 
+            "wheat": 2, 
+            "ore": 1
+        }
+    }, 
+    "2": {
+        "devCardsU": {
+            "vp": 0, 
+            "knight": 0, 
+            "monopoly": 0, 
+            "rb": 0, 
+            "yop": 0
+        }, 
+        "resCards": {
+            "sheep": 0, 
+            "brick": 0, 
+            "wood": 1, 
+            "wheat": 7, 
+            "ore": 3
+        }
+    }, 
+    "3": {
+        "devCardsU": {
+            "vp": 0, 
+            "knight": 0, 
+            "monopoly": 0, 
+            "rb": 0, 
+            "yop": 0
+        }, 
+        "resCards": {
+            "sheep": 6, 
+            "brick": 6, 
+            "wood": 0, 
+            "wheat": 3, 
+            "ore": 4
+        }
+    }
+}

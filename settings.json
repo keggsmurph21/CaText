@@ -52,7 +52,7 @@
         "wheat": 2,
         "ore": 3
       },
-      "dc": {
+      "development card": {
         "wheat": 1,
         "sheep": 1,
         "ore": 1
@@ -61,7 +61,8 @@
     "maxEachBuilding": {
       "road": 15,
       "settlement": 5,
-      "city": 4
+      "city": 4,
+      "development card": 25
     },
     "devCards": {
       "vp": {
@@ -308,6 +309,13 @@
       "pave": {
         "args": [
           "road coordinate (e.g. F26) or opts"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "fortify": {
+        "args": [
+          "settlement coordinate or opts"
         ],
         "isAdminCommand": false,
         "isPersistentCommand": false

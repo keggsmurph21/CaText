@@ -8,8 +8,8 @@
             "yop": 0
         }, 
         "resCards": {
-            "sheep": 0, 
-            "brick": 0, 
+            "sheep": 1, 
+            "brick": 2, 
             "wood": 0, 
             "wheat": 0, 
             "ore": 0
@@ -40,10 +40,10 @@
             "yop": 0
         }, 
         "resCards": {
-            "sheep": 1, 
+            "sheep": 0, 
             "brick": 0, 
             "wood": 0, 
-            "wheat": 1, 
+            "wheat": 2, 
             "ore": 1
         }
     }, 
@@ -56,8 +56,8 @@
             "yop": 0
         }, 
         "resCards": {
-            "sheep": 2, 
-            "brick": 1, 
+            "sheep": 0, 
+            "brick": 0, 
             "wood": 0, 
             "wheat": 0, 
             "ore": 0

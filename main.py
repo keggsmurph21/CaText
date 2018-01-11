@@ -164,6 +164,7 @@ class Options(object):
             'reset':        self.c_reset,
             'settle':       self.c_settle,
             'pave':         self.c_pave,
+            'fortify':      self.c_fortify,
             'setname':      self.c_setname,
             'setcpuname':   self.c_setcpuname,
             'build':        self.c_build,
@@ -201,6 +202,21 @@ class Options(object):
     def remove(self, options={}):
         for opt in options:
             self.data['available'].pop( opt, None )
+
+    def tom_suspend(self, opts={}, tmp_pMsg=''):
+        oldOptions = self.catan.options.dump( 'available' )
+        self.catan.options.set( opts )
+        pMsg = self.catan.gui.get_pMsgs().pop()
+        self.catan.gui.remove_pMsg( 'all' )
+        self.catan.gui.add_pMsg( tmp_pMsg )
+
+        obj = { 'opts':oldOptions, 'pMsg':pMsg }
+        return obj
+
+    def tom_resume(self, obj={ 'opts':{}, 'pMsg':'' }):
+        self.catan.options.set( obj['opts'] )
+        self.catan.gui.remove_pMsg( 'all' )
+        self.catan.gui.add_pMsg( obj['pMsg'] )
 
     def c_quit(self, args):
         exit()
@@ -497,6 +513,31 @@ class Options(object):
         else:
             self.catan.gui.set_msg( "pave: Invalid number of arguments.  Expected 1, got %d." % (len(args)-1) )
 
+    def c_fortify(self, args):
+        if len(args) == 2:
+            if args[1] == 'opts':
+                msg = '&gAvailable locations to build a city:&& '
+                for node in self.catan.currentPlayer.settlements:
+                    if node.fortify(self.catan.currentPlayer, False) == True:
+                        msg += '%s, ' % self.catan.lookup(node.num, 'nodes')
+                self.catan.gui.set_msg( msg )
+            elif args[1] == 'cancel':
+                return True
+            else:
+                node = self.catan.lookup( args[1] )
+                if node == False or not( isinstance(node, Node) ):
+                    self.catan.gui.set_msg( "fortify: Error square %s is not a node." % args[1] )
+                    return False
+                ret = node.fortify( self.catan.currentPlayer )
+                if ret == True:
+                    self.catan.gui.set_msg( "fortify: Fortified square %s into a city." % args[1] )
+                    return True
+                else:
+                    self.catan.gui.set_msg( ret )
+                    return False
+        else:
+            self.catan.gui.set_msg( "fortify: Invalid number of arguments.  Expected 1, got %d." % (len(args)-1) )
+
     def c_setname(self, args):
         if len(args) == 2:
             old = self.catan.currentPlayer.name
@@ -538,11 +579,7 @@ class Options(object):
 
             if 'road' in args:
                 if self.catan.currentPlayer.can_build( 'road' ):
-                    oldOptions = self.catan.options.dump( 'available' )
-                    self.catan.options.set( {'pave'} )
-                    pMsg = self.catan.gui.get_pMsgs().pop()
-                    self.catan.gui.remove_pMsg( 'all' )
-                    self.catan.gui.add_pMsg( u"%schoose a road (pave opts)&&" % self.catan.currentPlayer.color )
+                    tomObj = self.tom_suspend( {'pave'}, u"%schoose a road (pave opts)&&" % self.catan.currentPlayer.color )
 
                     before = len(self.catan.currentPlayer.roads)
                     if len(args) == 3:
@@ -552,23 +589,50 @@ class Options(object):
                     after = len(self.catan.currentPlayer.roads)
 
                     if before != after:
-                        self.catan.currentPlayer.resCards['brick'] -= 1
-                        self.catan.currentPlayer.resCards['wood'] -= 1
+                        costs = self.catan.settings.get( 'buildingCosts' )
+                        for req in costs[ 'road' ]:
+                            self.catan.currentPlayer.resCards[ req ] -= costs[ 'road' ][ req ]
 
-                    self.catan.options.set( oldOptions )
-                    self.catan.gui.remove_pMsg( 'all' )
-                    self.catan.gui.add_pMsg( pMsg )
-
-            elif 'city' in args:
-                if self.catan.currentPlayer.can_build( 'city' ):
-                    pass
+                    self.tom_resume( tomObj )
 
             elif 'settlement' in args:
                 if self.catan.currentPlayer.can_build( 'settlement' ):
-                    pass
+                    tomObj = self.tom_suspend( {'settle'}, u"%schoose a settlement (settle opts)&&" % self.catan.currentPlayer.color )
+
+                    before = len(self.catan.currentPlayer.settlements)
+                    if len(args) == 3:
+                        self.catan.handle_input( None, ['settle'] + args[2:] )
+                    else:
+                        self.catan.handle_input()
+                    after = len(self.catan.currentPlayer.settlements)
+
+                    if before != after:
+                        costs = self.catan.settings.get( 'buildingCosts' )
+                        for req in costs[ 'settlement' ]:
+                            self.catan.currentPlayer.resCards[ req ] -= costs[ 'settlement' ][ req ]
+
+                    self.tom_resume( tomObj )
+
+            elif 'city' in args:
+                if self.catan.currentPlayer.can_build( 'city' ):
+                    tomObj = self.tom_suspend( {'fortify'}, u"%schoose a settlement to upgrade (fortify opts)&&" % self.catan.currentPlayer.color )
+
+                    before = sum([ s.isCity for s in self.catan.currentPlayer.settlements ])
+                    if len(args) == 3:
+                        self.catan.handle_input( None, ['fortify'] + args[2:] )
+                    else:
+                        self.catan.handle_input()
+                    after = sum([ s.isCity for s in self.catan.currentPlayer.settlements ])
+
+                    if before != after:
+                        costs = self.catan.settings.get( 'buildingCosts' )
+                        for req in costs[ 'city' ]:
+                            self.catan.currentPlayer.resCards[ req ] -= costs[ 'city' ][ req ]
+
+                    self.tom_resume( tomObj )
 
             elif 'dc' in args or 'dev' in args or 'development' in args or 'card' in args:
-                if self.catan.currentPlayer.can_build( 'dc' ):
+                if self.catan.currentPlayer.can_build( 'development card' ):
                     pass
 
             else:
@@ -865,6 +929,8 @@ class Catan(object):
                 if h.diceValue == diceValue and h.isBlocked == False:
                     for n in h.get_adj_nodes():
                         n.owner.harvest( h.resource.resource )
+                        if n.isCity:
+                            n.owner.harvest( h.resource.resource )
 
     def is_authenticated(self, opt):
         return DEBUG or opt not in self.options.dump( 'admin' ) or not( self.currentPlayer.isAdmin )
@@ -1024,16 +1090,14 @@ class Player(object):
             self.isHuman = data['isHuman']
             self.settlements = [ catan.nodes[num] for num in data['settlements'] ]
             self.roads = [ catan.roads[num] for num in data['roads'] ]
-            self.longestRoad = self.longestRoad
+            self.longestRoad = data['longestRoad']
             self.hasLongestRoad = data['hasLongestRoad']
             self.color = data['color']
             self.bcolor = data['bcolor']
 
             self.publicScore = 0
             for s in self.settlements:
-                self.publicScore += 1
-                if s.isCity:
-                    self.publicScore += 1
+                self.publicScore += 1 # add the extra VP for being a city in Node.load()
             if self.hasLargestArmy:
                 self.publicScore += 2
             if self.hasLongestRoad:
@@ -1043,67 +1107,34 @@ class Player(object):
         elif keyword == 'private':
             self.resCards = data['resCards']
             self.devCardsU = data['devCardsU']
+            self.privateScore += self.devCardsU['vp']
 
-            for dc in self.devCardsU:
-                if dc == 'vp':
-                    self.privateScore += 1
+        print 'load ', self.num, self.privateScore, self.publicScore
 
     def can_build(self, keyword):
-        costs = self.catan.settings.get( 'buildingCosts' )
-        maxes = self.catan.settings.get( 'maxEachBuilding' )
+        costs = self.catan.settings.get( 'buildingCosts' )[ keyword ]
+        maxes = self.catan.settings.get( 'maxEachBuilding' )[ keyword ]
+        current = {
+            'road':len(self.roads),
+            'settlement':len(self.settlements),
+            'city':sum([ s.isCity for s in self.settlements ]),
+            'development card':0 }[ keyword ] # no limit on dev cards
 
-        if keyword == 'road':
-            if len(self.roads) < maxes[ keyword ]:
-                for req in costs[ keyword ]:
-                    if self.count( req ) >= costs[ keyword ][ req ]:
-                        return True
-                    else:
-                        msg = 'build: Error insufficient resources.  Need '
-                        for req in costs[ keyword ]:
-                            msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[keyword][req], req)
-                        msg = '%s to build a %s.' % (msg[:-2],keyword)
-            else:
-                msg = 'build: Error no more roads available to be built.'
-
-        elif keyword == 'settlement':
-            if len(self.settlements) < maxes[ keyword ]:
-                for req in costs[ keyword ]:
-                    if self.count( req ) >= costs[ keyword ][ req ]:
-                        return True
-                    else:
-                        msg = 'build: Error insufficient resources.  Need '
-                        for req in costs[ keyword ]:
-                            msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[keyword][req], req)
-                        msg = '%s to build a %s.' % (msg[:-2],keyword)
-            else:
-                msg = 'build: Error no more settlements available to be built.'
-
-        elif keyword == 'city':
-            cities = [ s.isCity for s in self.settlements ]
-            if sum(cities) < maxes[ keyword ]:
-                for req in costs[ keyword ]:
-                    if self.count( req ) >= costs[ keyword ][ req ]:
-                        return True
-                    else:
-                        msg = 'build: Error insufficient resources.  Need '
-                        for req in costs[ keyword ]:
-                            msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[keyword][req], req)
-                        msg = '%s to build a %s.' % (msg[:-2],keyword)
-            else:
-                msg = 'build: Error no more cities available to be built.'
-
-        elif keyword == 'dc':
-            for req in costs[ keyword ]:
-                if self.count( req ) >= costs[ keyword ][ req ]:
-                    return True
-                else:
+        if current < maxes:
+            for req in costs:
+                if self.count( req ) < costs[ req ]:
                     msg = 'build: Error insufficient resources.  Need '
-                    for req in costs[ keyword ]:
-                        msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[keyword][req], req)
-                    msg = '%s to build a %s.' % (msg[:-2],keyword)
-
-        self.catan.gui.set_msg( msg )
-        return False
+                    for req in costs:
+                        msg += '%s%d %s&&, ' % (self.catan.resources[req].text, costs[req], req)
+                    msg = '%s to build a %s.' % (msg[:-2], keyword )
+                    if self.isHuman:  # don't want the CPUs spamming the messages here
+                        self.catan.gui.set_msg( msg )
+                    return False
+            return True
+        else:
+            if self.isHuman:
+                self.catan.gui.set_msg( 'build: Error no more %ss available to be built.' % (keyword if keyword != 'city' else 'citie') )# irr pl )
+            return False
 
     def harvest(self, resource):
         if resource in self.resCards and self.isNonePlayer == False:
@@ -1112,6 +1143,7 @@ class Player(object):
             return False
 
     def print_line(self):
+        print 'print_line ', self.num, self.privateScore, self.publicScore
         line = "%s %-8s " % (self.color, self.name)
         line += "%2d " % (self.privateScore if self == self.catan.currentPlayer else self.publicScore)
         line += "%2d %2d  " % (self.total('dcu'), self.total('res'))
@@ -1225,6 +1257,10 @@ class Player(object):
     def add_road(self, road):
         self.roads.append(road)
         self.calc_longest_road()
+
+    def add_city(self, node):
+        self.publicScore += 1
+        self.privateScore += 1
 
 class Human(Player):
     def __init__(self, num, catan):
@@ -1479,6 +1515,10 @@ class Node(Vertex):
         self.roads = [ catan.roads[num] for num in data['roads'] ]
         self.conns = [ catan.conns[num] for num in data['conns'] ]
 
+        if self.isCity:
+            self.owner.publicScore += 1
+            self.owner.privateScore += 1
+
     def escape(self, shape=''):
         s = self.owner.bcolor
         if self.owner.isNonePlayer:
@@ -1515,8 +1555,17 @@ class Node(Vertex):
 
         return "settle: Error not settleable."
 
-    def make_city(self):
-        self.isCity = True
+    def fortify(self, player, save=True):
+        if self.owner == player:
+            if self.isCity == False:
+                if save:
+                    self.isCity = True
+                    player.add_city(self)
+                return True
+            else:
+                return "fortify: Error this node is already a city."
+
+        return "fortify: Error you do not own this node."
 
     def get_adj_nodes(self):
         nodes = []
