@@ -831,9 +831,23 @@ class Catan(object):
             self.hexes.append( Hex(i,False,diceValue,resource) )
             self.resources[resource.resource] = resource
 
-        # makes the Nodes
+        # make the Nodes
         for i in range(54):
             self.nodes.append( Node(i, self.nonePlayer) )
+
+        # make the ports
+        portStyle = self.settings.get( 'portStyle' )
+        portLocations = self.settings.get( 'ports' )[ 'locations']
+        portTypes = self.settings.get( 'ports' )[ 'types' ][::-1] # reverse the direction b/c using pop()
+        if portStyle == 'random':
+            portTypes = random.shuffle( portTypes )
+        for portLoc in portLocations:
+            portType = portTypes.pop()
+            portOrientation = portLoc[ 'orientation' ]
+            for n in portLoc['nodes']:
+                self.nodes[ n ].port = portType
+                self.nodes[ n ].portColor = '&ht' if portType == 'mystery' else self.resources[ portType ].text
+                self.nodes[ n ].portOrientation = portOrientation
 
         # make the Roads
         road_vertices = [(3,0),(0,4),(4,1),(1,5),(5,2),(2,6),(3,7),(4,8),(5,9),(6,10),(11,7),(7,12),(12,8),(8,13),(13,9),(9,14),(14,10),(10,15),(11,16),(12,17),(13,18),(14,19),(15,20),(21,16),(16,22),(22,17),(17,23),(23,18),(18,24),(24,19),(19,25),(25,20),(20,26),(21,27),(22,28),(23,29),(24,30),(25,31),(26,32),(27,33),(33,28),(28,34),(34,29),(29,35),(35,30),(30,36),(36,31),(31,37),(37,32),(33,38),(34,39),(35,40),(36,41),(37,42),(38,43),(43,39),(39,44),(44,40),(40,45),(45,41),(41,46),(46,42),(43,47),(44,48),(45,49),(46,50),(47,51),(51,48),(48,52),(52,49),(49,53),(53,50)]
@@ -1048,6 +1062,7 @@ class Player(object):
         self.roads = []
         self.longestRoad = 0
         self.hasLongestRoad = False
+        self.ports = set()
         if num < 0:
             self.isNonePlayer = True
             self.color = u'&&'
@@ -1070,6 +1085,7 @@ class Player(object):
                 'roads': [ r.num for r in self.roads ],
                 'longestRoad': self.longestRoad,
                 'hasLongestRoad': self.hasLongestRoad,
+                'ports': list(self.ports),
                 'color': self.color,
                 'bcolor': self.bcolor }
         elif keyword == 'private':
@@ -1092,6 +1108,7 @@ class Player(object):
             self.roads = [ catan.roads[num] for num in data['roads'] ]
             self.longestRoad = data['longestRoad']
             self.hasLongestRoad = data['hasLongestRoad']
+            self.ports = set(data['ports'])
             self.color = data['color']
             self.bcolor = data['bcolor']
 
@@ -1108,8 +1125,6 @@ class Player(object):
             self.resCards = data['resCards']
             self.devCardsU = data['devCardsU']
             self.privateScore += self.devCardsU['vp']
-
-        print 'load ', self.num, self.privateScore, self.publicScore
 
     def can_build(self, keyword):
         costs = self.catan.settings.get( 'buildingCosts' )[ keyword ]
@@ -1143,7 +1158,7 @@ class Player(object):
             return False
 
     def print_line(self):
-        print 'print_line ', self.num, self.privateScore, self.publicScore
+
         line = "%s %-8s " % (self.color, self.name)
         line += "%2d " % (self.privateScore if self == self.catan.currentPlayer else self.publicScore)
         line += "%2d %2d  " % (self.total('dcu'), self.total('res'))
@@ -1252,7 +1267,9 @@ class Player(object):
     def add_settlement(self, node):
         self.publicScore += 1
         self.privateScore += 1
-        self.settlements.append(node)
+        self.settlements.append( node )
+        if node.port != None:
+            self.ports.add( node.port )
 
     def add_road(self, road):
         self.roads.append(road)
@@ -1496,6 +1513,9 @@ class Node(Vertex):
         self.owner = owner
         self.isCity = False
         self.isSettleable = True
+        self.port = None
+        self.portColor = None
+        self.portOrientation = None
 
     def save(self, keyword):
         if keyword == 'public':
@@ -1504,6 +1524,9 @@ class Node(Vertex):
                 'owner': self.owner.num,
                 'isCity': self.isCity,
                 'isSettleable': self.isSettleable,
+                'port': self.port,
+                'port': self.portColor,
+                'portOrientation': self.portOrientation,
                 'roads': [ r.num for r in self.roads ],
                 'conns': [ c.num for c in self.conns ]}
         return d
@@ -1512,21 +1535,39 @@ class Node(Vertex):
         self.owner = catan.get_player_by_id( data['owner'] )
         self.isCity = data['isCity']
         self.isSettleable = data['isSettleable']
+        self.port = data['port']
+        self.portColor = data['portColor']
+        self.portOrientation = data['portOrientation']
         self.roads = [ catan.roads[num] for num in data['roads'] ]
         self.conns = [ catan.conns[num] for num in data['conns'] ]
 
+        # need this here b/c Players are loaded b/f Nodes
         if self.isCity:
             self.owner.publicScore += 1
             self.owner.privateScore += 1
 
     def escape(self, shape=''):
+
         s = self.owner.bcolor
+        s += ( u'%s\u001b[4mP&ht' % self.portColor) if self.portOrientation == 'left' else ' '
+
+        if self.port != None:
+            s += u'%s\u001b[4m' % self.portColor
+
         if self.owner.isNonePlayer:
-            s += u' . '
-        elif self.isCity:
-            s += u' C '
+            if self.port == None:
+                s += u'.&&'
+            else:
+                s += u'P&&'
         else:
-            s += u' s '
+            if self.isCity:
+                s += u'C&&'
+            else:
+                s += u's&&'
+
+        s += self.owner.bcolor
+        s += ( u'%s\u001b[4mP&ht&&' % self.portColor) if self.portOrientation == 'right' else ' &&'
+
         return s
 
     def show_info(self, catan, coord=''):
@@ -1535,11 +1576,21 @@ class Node(Vertex):
             s += "YES"
         else:
             s += "NO"
+
         s += "&&, is-settleable: &hb&bt"
         if self.isSettleable:
             s += "YES"
         else:
             s += "NO"
+
+        s += "&&, port: "
+        if self.port == None:
+            s += "&hb&btNONE"
+        elif self.port == 'mystery':
+            s += "Mystery"
+        else:
+            s += catan.resources[ self.port ].text + self.port
+
         s += "&& }"
         return s
 

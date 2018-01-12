@@ -219,7 +219,7 @@ class GUI(object):
                                     tline += '.___________________________.'
                                 elif line[i+1] == 'm':
                                     for r in [ 'wheat', 'sheep', 'brick', 'wood', 'ore' ]:
-                                        infoText.append( '%s| %s%-5s               %2s    %s|' )
+                                        infoText.append( '%s| %s%-9s           %2s    %s|' )
                                         infoEscs.append( [('P','c'),('R',r,'color'),('R',r,'n'),('R',r,'c'),('P','c')] )
                                     useThis = False
                                 elif line[i+1] == 'b':
@@ -264,15 +264,18 @@ class GUI(object):
                         resource = self.catan.resources[ item[1] ]
                         if item[2] == 'color':
                             argLine.append( resource.text )
-                        if item[2] == 'n':
-                            argLine.append( resource.name )
+                        elif item[2] == 'n':
+                            if resource.name in self.catan.currentHuman.ports:
+                                argLine.append( '%s (P)' % resource.name )
+                            else:
+                                argLine.append( '%s    ' % resource.name )
                         elif item[2] == 'c':
                             argLine.append( self.catan.currentHuman.count( resource.resource ))
                     elif item[0] == 'V':
                         devCard = self.catan.devCards[ item[1] ]
                         if item[2] == 'color':
                             argLine.append( devCard.text )
-                        if item[2] == 'n':
+                        elif item[2] == 'n':
                             argLine.append( devCard.plural )
                         elif item[2] == 'u':
                             argLine.append( self.catan.currentHuman.count( devCard.name, 'up' ))
@@ -284,6 +287,7 @@ class GUI(object):
                 args.append(argLine)
 
             for l in range(len(self.infoText)):
+                print self.infoText[l], args[l]
                 chunk.append( self.infoText[l] % tuple(args[l]) )
 
             return chunk

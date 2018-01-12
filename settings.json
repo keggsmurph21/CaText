@@ -37,6 +37,58 @@
       "genc": "  ObNdO5NdO5NdOb  \n  O9RsHtRbO1RsHtRbO1RsHtRbO9  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O5RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO5  \n  O3NdHfNdHfNdHfNdHfNdO3  \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O1RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO1  \nNdHfNdHfNdHfNdHfNdHfNd\nRvHxRvHxRvHxRvHxRvHxRv\nNdHgNdHgNdHgNdHgNdHgNd\n  O1RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO1  \n  O3NdHfNdHfNdHfNdHfNdO3 \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O5RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO5  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O9RbHbRsO1RbHbRsO1RbHbRsO9  \n  ObNdO5NdO5NdOb  "
     },
     "prompt": " >",
+    "portStyle": "fixed",
+    "ports": {
+      "types": [
+        "mystery",
+        "wheat",
+        "ore",
+        "wood",
+        "mystery",
+        "brick",
+        "sheep",
+        "mystery",
+        "mystery"
+      ],
+      "locations" : [
+        {
+          "orientation": "left",
+          "nodes": [0,3]
+        },
+        {
+          "orientation": "right",
+          "nodes": [1,5]
+        },
+        {
+          "orientation": "right",
+          "nodes": [10,15]
+        },
+        {
+          "orientation": "left",
+          "nodes": [11,16]
+        },
+        {
+          "orientation": "right",
+          "nodes": [26,32]
+        },
+        {
+          "orientation": "left",
+          "nodes": [33,38]
+        },
+        {
+          "orientation": "right",
+          "nodes": [42,46]
+        },
+        {
+          "orientation": "left",
+          "nodes": [47,51]
+        },
+        {
+          "orientation": "right",
+          "nodes": [49,52]
+        }
+      ]
+    },
     "buildingCosts": {
       "road": {
         "brick": 1,
@@ -107,6 +159,7 @@
       "&at": "\u001b[38;5;226m",
       "&bt": "\u001b[30m",
       "&hb": "\u001b[107m",
+      "&ht": "\u001b[97m",
       "&g": "\u001b[38;5;244m",
       "&ab": "\u001b[48;5;226m\u001b[30m",
       "&sb": "\u001b[48;5;155m\u001b[30m",
