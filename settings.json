@@ -116,6 +116,7 @@
       "city": 4,
       "development card": 25
     },
+    "illegalChars": [ " ", "&" ],
     "devCards": {
       "vp": {
         "nameShort": "VP",

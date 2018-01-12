@@ -114,34 +114,10 @@ class DevCard(object):
         self.plural = argv['namePlural']
         self.text = argv['textColor']
 
-        if self.name == 'vp':
-            self.func = self.dc_vp
-        elif self.name == 'knight':
-            self.func = self.dc_knight
-        elif self.name == 'yop':
-            self.func = self.dc_yop
-        elif self.name == 'monopoly':
-            self.func = self.dc_monopoly
-        elif self.name == 'rb':
-            self.func = self.dc_rb
-
-    def do(player,action='draw'):
-        return self.func(player,action)
-
-    def dc_vp(self, player, action):
-        raise NotImplementedError
-
-    def dc_knight(self, player, action):
-        raise NotImplementedError
-
-    def dc_yop(self, player, action):
-        raise NotImplementedError
-
-    def dc_monopoly(self, player, action):
-        raise NotImplementedError
-
-    def dc_rb(self, player, action):
-        raise NotImplementedError
+    def do(self, player):
+        player.play_dc( self.name )
+        player.catan.gui.add_pMsg( ' - %s%s&& played a %s%s&&!.' % (player.color, player.name, self.text, self.name) )
+        return True
 
 class Options(object):
     def __init__(self, catan):
@@ -321,15 +297,8 @@ class Options(object):
     def c_steal(self, args):
         num = -1
         if len(args) > 1:
-            try:
-                num = int(args[1]) - 1
-            except ValueError:
-                pNames = []
-                for p in self.catan.players:
-                    pNames.append( (' '.join(p.name.split(' ')).lower(), p.num) )
-                for p in pNames:
-                    if ' '.join(args[1:]).lower() == p[0]:
-                        num = p[1]
+
+            steal = self.catan.get_player_by_str( args[1] )
 
             for h in self.catan.hexes:
                 if h.isBlocked:
@@ -339,7 +308,6 @@ class Options(object):
                 if n.owner.isNonePlayer == False and n.owner != self:
                     adjs.append( n.owner )
 
-            steal = self.catan.get_player_by_id( num )
             if steal:
                 if steal in adjs:
 
@@ -540,6 +508,10 @@ class Options(object):
 
     def c_setname(self, args):
         if len(args) == 2:
+            for char in self.catan.settings.get( 'illegalChars' ):
+                if char in args[1]:
+                    self.catan.gui.set_msg( "setname: Invalid character `%s`." % char)
+                    return False
             old = self.catan.currentPlayer.name
             new = args[1][:8]
             color = self.catan.currentPlayer.color
@@ -560,6 +532,10 @@ class Options(object):
             p = self.catan.get_player_by_id( int(args[1])-1 )
             if p != False:
                 if isinstance( p, CPU ):
+                    for char in self.catan.settings.get( 'illegalChars' ):
+                        if char in args[1]:
+                            self.catan.gui.set_msg( "setname: Invalid character `%s`." % char)
+                            return False
                     old = p.name
                     new = args[2][:8]
                     color = p.color
@@ -574,7 +550,7 @@ class Options(object):
             self.catan.gui.set_msg( "setcpuname: Invalid number of arguments.  Expected 2 got %d." % (len(args)-1) )
 
     def c_build(self, args):
-        args = [a.lower() for a in args]
+        args = [ a.lower() for a in args ]
         if len(args) > 1:
 
             if 'road' in args:
@@ -633,7 +609,21 @@ class Options(object):
 
             elif 'dc' in args or 'dev' in args or 'development' in args or 'card' in args:
                 if self.catan.currentPlayer.can_build( 'development card' ):
-                    pass
+
+                    dc = self.catan.dcDeck.pop()
+                    self.catan.gui.set_msg( "You bought a %s%s&&." % (dc.text, dc.long) )
+                    self.catan.currentPlayer.devCardsU[ dc.name ] += 1
+                    self.catan.devCardThisTurn = dc.name
+
+                    costs = self.catan.settings.get( 'buildingCosts' )
+                    for req in costs[ 'development card' ]:
+                        self.catan.currentPlayer.resCards[ req ] -= costs[ 'development card' ][ req ]
+
+                    if dc == 'vp':
+                        self.catan.currentPlayer.privateScore += 1
+                        self.catan.is_game_over()
+
+                    return True
 
             else:
                 self.catan.gui.set_msg( 'build: Invalid option `%s`.  Make sure to only build one thing at a time.' % arg )
@@ -641,11 +631,102 @@ class Options(object):
             self.catan.gui.set_msg( 'build: Invalid number of arguments.  Expected at least one, got %d.' % (len(args)-1) )
 
     def c_flip(self, args):
-        self.catan.gui.set_msg( 'flip' )
-        return True
+        if len(args) == 2:
+
+            dc = args[1].lower()
+
+            if dc == 'opts':
+                pass
+
+            else:
+                if dc in { 'vp', 'knight', 'yop', 'monopoly', 'rb' }:
+
+                    available = self.catan.currentPlayer.devCardsU[ dc ] - int( self.catan.devCardThisTurn==dc )
+                    if available > 0:
+
+                        self.catan.devCards[ dc ].do( self.catan.currentPlayer )
+                        self.catan.currentPlayer.devCardsU[ dc ] -= 1
+                        self.catan.currentPlayer.devCardsP[ dc ] += 1
+
+                        return True
+
+                    else:
+                        self.catan.gui.set_msg( "flip: You don't have a %s%s&& to play!" % (self.catan.devCards[dc].text, self.catan.devCards[dc].long) )
+
+                else:
+                    self.catan.gui.set_msg( 'flip: Unrecognized development card `%s`.' % dc )
+        else:
+            self.catan.gui.set_msg( 'flip: Invalid number of arguments.  Expected 1, got %d.' % (len(args)-1) )
 
     def c_trade(self, args):
-        pass
+        if len(args) == 6:
+            try:
+                o_num = int(args[2]) # trading away
+                o_res = args[3]
+                if o_res in self.catan.resources:
+                    o_color = self.catan.resources[o_res].text
+                else:
+                    self.catan.gui.set_msg( "trade: Invalid resource `%s`." % o_res )
+                    return False
+
+                i_num = int(args[4]) # trading for
+                i_res = args[5]
+                if i_res in self.catan.resources:
+                    i_color = self.catan.resources[i_res].text
+                else:
+                    self.catan.gui.set_msg( "trade: Invalid resource `%s`." % i_res )
+                    return False
+
+                if args[1] == 'bank':
+
+                    rate = 4
+                    if 'mystery' in self.catan.currentPlayer.ports:
+                        rate = 3
+                    if i_res in self.catan.currentPlayer.ports:
+                        rate = 2
+
+                    cost = rate * i_num
+                    if self.catan.currentPlayer.count( o_res ) < cost:
+                        self.catan.gui.set_msg( "trade: Insufficient resources.  %s%d %s&& costs %s%d %s&&; you have %s%d&&." % (i_color, i_num, i_res, o_color, cost, o_res, o_color, self.catan.currentPlayer.count( o_res )) )
+                    else:
+                        if o_num < cost:
+                            self.catan.gui.set_msg( "trade: Note %d %s%s&& costs %d %s%s." % (i_num, i_color, in_res, cost, o_color, o_res) )
+                        else:
+                            self.catan.currentPlayer.resCards[ o_res ] -= cost
+                            self.catan.currentPlayer.resCards[ i_res ] += i_num
+                            self.catan.gui.set_msg( 'trade: Exchanged %s%d %s&& for %s%d %s&& with the bank.' % (o_color, cost, o_res, i_color, i_num, i_res) )
+                            return True
+
+                else:
+
+                    target = self.catan.get_player_by_str( args[1] )
+                    if target:
+
+                        if self.catan.currentPlayer.count( o_res ) < o_num:
+                            self.catan.gui.set_msg( "trade: Insufficient resources.  Cannot offer %s%d %s&& when you only have %s%d&&." % (o_color, o_num, o_res, o_color, self.catan.currentPlayer.count( o_res )) )
+
+                        else:
+                            offer = {
+                                'o': {'res':o_res, 'num':o_num},
+                                'i': {'res':i_res, 'num':i_num} }
+                            if target.receive_trade_offer( offer ):
+
+                                self.catan.currentPlayer.resCards[ o_res ] -= o_num
+                                self.catan.currentPlayer.resCards[ i_res ] += i_num
+                                target.resCards[ o_res ] += o_num
+                                target.resCards[ i_res ] -= i_num
+
+                                return True
+
+                            else:
+                                self.catan.gui.set_msg( 'trade: %s%s&& has declined your offer.' % (target.color, target.name) )
+                    else:
+                        self.catan.gui.set_msg( 'trade: Unable to find player `%s`.' % ' '.join(args[1:]) )
+
+            except ValueError:
+                self.catan.gui.set_msg( "trade: Expected arguments 2 and 4 to be integers." )
+        else:
+            self.catan.gui.set_msg( "trade: Invalid number of arguments.  Expected five, got %d.\n &gsyntax:&& > trade {player_name|bank} {# out} {resource} {# in} {resource}" % (len(args)-1) )
 
     def c_pass(self, args):
         self.catan.hasPassed = True
@@ -704,6 +785,7 @@ class Catan(object):
             self.hasRolled = publicData['hasRolled']
             self.hasPassed = publicData['hasPassed']
             self.hasPlayedDC = publicData['hasPlayedDC']
+            self.devCardThisTurn = publicData['devCardThisTurn']
             self.hasLargestArmy = self.get_player_by_id( publicData['hasLargestArmy'] )
             self.hasLongestRoad = self.get_player_by_id( publicData['hasLongestRoad'] )
             self.dice.load( publicData['dice'] )
@@ -758,6 +840,7 @@ class Catan(object):
         data['hasRolled'] = self.hasRolled
         data['hasPassed'] = self.hasPassed
         data['hasPlayedDC'] = self.hasPlayedDC
+        data['devCardThisTurn'] = self.devCardThisTurn
         data['playerOrder'] = [ p.num for p in self.players ]
         data['currentPlayer'] = self.currentPlayer.num
         data['currentHuman'] = self.currentHuman.num
@@ -884,6 +967,7 @@ class Catan(object):
         self.hasRolled = False
         self.hasPlayedDC = False
         self.hasPassed = False
+        self.devCardThisTurn = None
 
     def take_turn(self):
         if self.turn < 2 * len(self.players):
@@ -914,6 +998,7 @@ class Catan(object):
         self.hasRolled = False
         self.hasPlayedDC = False
         self.hasPassed = False
+        self.devCardThisTurn = None
 
     def loop(self, turn=0):
         self.turn = turn
@@ -1010,6 +1095,30 @@ class Catan(object):
                     self.hasLongestRoad.publicScore -= 2
                     self.hasLongestRoad.privateScore -= 2
                 self.hasLongestRoad = currentHolder
+                self.gui.add_pMsg( '%s%s&& has taken Longest Road!' % (currentHolder.color, currentHolder.name) )
+        self.is_game_over()
+
+    def check_largest_army(self):
+        if self.hasLargestArmy != None:
+            currentHolder = self.hasLargestArmy
+            currentLargestArmy = currentHolder.numKnights
+        else:
+            currentLargestArmy = 0
+        for player in self.players:
+            if player.numKnights > currentLargestArmy:
+                currentHolder = player
+                currentLargestArmy = currentHolder.numKnights
+        if currentLargestArmy > 2:
+            if currentHolder != self.hasLargestArmy:
+                currentHolder.hasLargestArmy = True
+                currentHolder.publicScore += 2
+                currentHolder.privateScore += 2
+                if self.hasLargestArmy != None:
+                    self.hasLargestArmy.hasLargestArmy = False
+                    self.hasLargestArmy.publicScore -= 2
+                    self.hasLargestArmy.privateScore -= 2
+                self.hasLargestArmy = currentHolder
+                self.gui.add_pMsg( '%s%s&& has taken Largest Army!' % (currentHolder.color, currentHolder.name) )
         self.is_game_over()
 
     def get_player_by_id(self, i):
@@ -1017,6 +1126,25 @@ class Catan(object):
             if p.num == i:
                 return p
         return self.nonePlayer
+
+    def get_player_by_str(self, s):
+        for char in self.settings.get( 'illegalChars' ):
+            if char in s:
+                return False
+
+        num = -1
+
+        try:
+            num = int(s) - 1
+        except ValueError:
+            pNames = []
+            for p in self.players:
+                pNames.append( (' '.join(p.name.split(' ')).lower(), p.num) )
+            for p in pNames:
+                if ' '.join(s).lower() == p[0]:
+                    num = p[1]
+
+        return self.get_player_by_id( num )
 
     def lookup(self, coord, look=None):
         h_index = self.settings.get("h_index")
@@ -1053,6 +1181,7 @@ class Player(object):
         self.resCards = { 'wheat':0, 'sheep':0, 'brick':0, 'wood':0, 'ore':0 } # resource cards
         self.devCardsU = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # played
         self.devCardsP = { 'vp':0, 'knight':0, 'yop':0, 'monopoly':0, 'rb':0 } # unplayed
+        self.devCardThisTurn = None
         self.numKnights = 0
         self.hasLargestArmy = False
         self.name = ''
@@ -1156,6 +1285,9 @@ class Player(object):
             self.resCards[resource] += 1
         else:
             return False
+
+    def can_play_dc(self, dc):
+        return True
 
     def print_line(self):
 
@@ -1279,11 +1411,14 @@ class Player(object):
         self.publicScore += 1
         self.privateScore += 1
 
+    def receive_trade_offer(self, offer):
+        return False # inherited classes overwrite this
+
 class Human(Player):
     def __init__(self, num, catan):
         Player.__init__(self, num, catan)
         self.isHuman = True
-        self.name = "Player " + str(self.num + 1)
+        self.name = "Player-" + str(self.num + 1)
 
     def settle(self):
 
@@ -1293,11 +1428,13 @@ class Human(Player):
         self.catan.gui.remove_pMsg()
 
         if self.catan.isFirstTurn:
+            self.pave()
 
-            self.catan.gui.add_pMsg( u"%schoose a road (pave opts)&&" % self.color )
-            self.catan.options.set( {'pave'} )
-            self.catan.handle_input()
-            self.catan.gui.remove_pMsg()
+    def pave(self):
+        self.catan.gui.add_pMsg( u"%schoose a road (pave opts)&&" % self.color )
+        self.catan.options.set( {'pave'} )
+        self.catan.handle_input()
+        self.catan.gui.remove_pMsg()
 
     def discard(self):
         oldOptions = self.catan.options.dump( 'available' )
@@ -1353,6 +1490,26 @@ class Human(Player):
         for pm in oldPMsgs:
             self.catan.gui.add_pMsg( pm )
 
+    def play_dc(self, dc):
+        if dc == 'vp':
+            self.publicScore += 1
+
+        else:
+            if self.catan.hasPlayedDC == False:
+                if dc == 'knight':
+                    self.numKnights += 1
+                    self.move_robber()
+                    self.catan.check_largest_army()
+                elif dc == 'yop':
+                    pass
+                elif dc == 'monopoly':
+                    pass
+                elif dc == 'rb':
+                    self.pave()
+                    self.pave()
+            else:
+                pass
+
     def take_turn(self):
         while self.catan.hasPassed == False:
             self.catan.options.set( {'flip'} ) # always able to play VP
@@ -1368,10 +1525,14 @@ class Human(Player):
 
         self.catan.gui.remove_pMsg( 'all' )
 
+    def receive_trade_offer(self, offer):
+        # don't expect Humans to receive any trade offers in the immediate future, so return True every time until then
+        return True
+
 class CPU(Player):
     def __init__(self, num, catan):
         Player.__init__(self, num, catan)
-        self.name = "CPU " + str(self.num + 1)
+        self.name = "CPU-" + str(self.num + 1)
 
     def settle(self):
         bestNode = None
@@ -1427,6 +1588,9 @@ class CPU(Player):
                 steal.resCards[resource] -= 1
                 self.resCards[resource] += 1
 
+    def play_knight(self):
+        raise NotImplementedError
+
     def pave(self, restrict=None):
         if self.catan.isFirstTurn:
             r = random.choice(self.settlements[-1].roads)
@@ -1435,6 +1599,11 @@ class CPU(Player):
     def take_turn(self):
         self.catan.roll()
         self.catan.save_game()
+
+    def receive_trade_offer(self, offer):
+        # check if it's possible ... until AI is built just accept any time it's possible
+        if self.count( offer['i']['res'] ) >= offer['i']['num']:
+            return True
 
 class Vertex(object):
     def __init__(self, num):
@@ -1525,7 +1694,7 @@ class Node(Vertex):
                 'isCity': self.isCity,
                 'isSettleable': self.isSettleable,
                 'port': self.port,
-                'port': self.portColor,
+                'portColor': self.portColor,
                 'portOrientation': self.portOrientation,
                 'roads': [ r.num for r in self.roads ],
                 'conns': [ c.num for c in self.conns ]}
