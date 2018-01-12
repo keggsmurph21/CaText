@@ -1,0 +1,626 @@
+{
+  "standard": {
+    "victoryPointsGoal": 10,
+    "wide": {
+      "rpad": 1,
+      "tbanner": "&g/================================= [ CaTEXT ] =================================\\&&",
+      "lpad": 1,
+      "mpad": 3,
+      "ienc": "s7Tas8\ns7Tbs8\nIt\nI s=|__NAME____VP_DC_Res_Ar_LR__|\nIm\nIb\ns7Das8\ns7Dbs8\nRt\nRss=|__RESOURCES__________Num___|\nRm\nRb\nVss=|__DEV CARDS_____Up__Down___|\nVm\nVb",
+      "border": true,
+      "order": [
+        [
+          "tbanner"
+        ],
+        [
+          "game",
+          [
+            "info",
+            45,
+            0
+          ]
+        ],
+        [
+          "lbanner"
+        ],
+        [
+          "pMsgs"
+        ],
+        [
+          "msg"
+        ],
+        [
+          "prompt"
+        ]
+      ],
+      "lbanner": "&g\\==============================================================================/&&",
+      "genc": "  ObNdO5NdO5NdOb  \n  O9RsHtRbO1RsHtRbO1RsHtRbO9  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O5RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO5  \n  O3NdHfNdHfNdHfNdHfNdO3  \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O1RsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbO1  \nNdHfNdHfNdHfNdHfNdHfNd\nRvHxRvHxRvHxRvHxRvHxRv\nNdHgNdHgNdHgNdHgNdHgNd\n  O1RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO1  \n  O3NdHfNdHfNdHfNdHfNdO3 \n  O3RvHxRvHxRvHxRvHxRvO3  \n  O3NdHgNdHgNdHgNdHgNdO3  \n  O5RbHbRsHtRbHbRsHtRbHbRsHtRbHbRsO5  \n  O7NdHfNdHfNdHfNdO7  \n  O7RvHxRvHxRvHxRvO7  \n  O7NdHgNdHgNdHgNdO7  \n  O9RbHbRsO1RbHbRsO1RbHbRsO9  \n  ObNdO5NdO5NdOb  "
+    },
+    "prompt": " >",
+    "portStyle": "fixed",
+    "ports": {
+      "types": [
+        "mystery",
+        "wheat",
+        "ore",
+        "wood",
+        "mystery",
+        "brick",
+        "sheep",
+        "mystery",
+        "mystery"
+      ],
+      "locations" : [
+        {
+          "orientation": "left",
+          "nodes": [0,3]
+        },
+        {
+          "orientation": "right",
+          "nodes": [1,5]
+        },
+        {
+          "orientation": "right",
+          "nodes": [10,15]
+        },
+        {
+          "orientation": "left",
+          "nodes": [11,16]
+        },
+        {
+          "orientation": "right",
+          "nodes": [26,32]
+        },
+        {
+          "orientation": "left",
+          "nodes": [33,38]
+        },
+        {
+          "orientation": "right",
+          "nodes": [42,46]
+        },
+        {
+          "orientation": "left",
+          "nodes": [47,51]
+        },
+        {
+          "orientation": "right",
+          "nodes": [49,52]
+        }
+      ]
+    },
+    "buildingCosts": {
+      "road": {
+        "brick": 1,
+        "wood": 1
+      },
+      "settlement": {
+        "wheat": 1,
+        "sheep": 1,
+        "brick": 1,
+        "wood": 1
+      },
+      "city": {
+        "wheat": 2,
+        "ore": 3
+      },
+      "development card": {
+        "wheat": 1,
+        "sheep": 1,
+        "ore": 1
+      }
+    },
+    "maxEachBuilding": {
+      "road": 15,
+      "settlement": 5,
+      "city": 4,
+      "development card": 25
+    },
+    "illegalChars": [ " ", "&" ],
+    "devCards": {
+      "vp": {
+        "nameShort": "VP",
+        "namePlural": "VPs",
+        "num": 5,
+        "textColor": "&at",
+        "nameLong": "Victory Point"
+      },
+      "knight": {
+        "nameShort": "Knight",
+        "namePlural": "Knights",
+        "num": 14,
+        "textColor": "&p0t",
+        "nameLong": "Knight"
+      },
+      "monopoly": {
+        "nameShort": "Monopoly",
+        "namePlural": "Monopolies",
+        "num": 2,
+        "textColor": "&wt",
+        "nameLong": "Monopoly"
+      },
+      "rb": {
+        "nameShort": "RB",
+        "namePlural": "Road Builders",
+        "num": 2,
+        "textColor": "&wt",
+        "nameLong": "Road Building"
+      },
+      "yop": {
+        "nameShort": "YoP",
+        "namePlural": "YoPs",
+        "num": 2,
+        "textColor": "&wt",
+        "nameLong": "Year of Plenty"
+      }
+    },
+    "colors": {
+      "&p2b": "\u001b[48;5;14m",
+      "&x": "\u001b[40m",
+      "&at": "\u001b[38;5;226m",
+      "&bt": "\u001b[30m",
+      "&hb": "\u001b[107m",
+      "&ht": "\u001b[97m",
+      "&g": "\u001b[38;5;244m",
+      "&ab": "\u001b[48;5;226m\u001b[30m",
+      "&sb": "\u001b[48;5;155m\u001b[30m",
+      "&db": "\u001b[48;5;223m\u001b[30m",
+      "&wb": "\u001b[48;5;22m",
+      "&_": "\u001b[47m",
+      "&st": "\u001b[38;5;155m",
+      "&dt": "\u001b[38;5;223m",
+      "&p2t": "\u001b[38;5;14m",
+      "&rt": "\u001b[38;5;202m",
+      "&wt": "\u001b[38;5;22m",
+      "&p1t": "\u001b[38;5;26m",
+      "&p0t": "\u001b[38;5;1m",
+      "&p1b": "\u001b[48;5;26m",
+      "&~": "\u001b[38;5;234m\u001b[40m",
+      "&&": "\u001b[0m",
+      "&rb": "\u001b[48;5;202m\u001b[30m",
+      "&ot": "\u001b[38;5;240m",
+      "&p3b": "\u001b[48;5;208m",
+      "&ob": "\u001b[48;5;240m",
+      "&p3t": "\u001b[38;5;208m",
+      "&p0b": "\u001b[48;5;1m",
+      "&pXt": "\u001b[37m",
+      "&pXb": "\u001b[47m\u001b[30m"
+    },
+    "diceValues": [
+      2,
+      3,
+      3,
+      4,
+      4,
+      5,
+      5,
+      6,
+      6,
+      8,
+      8,
+      9,
+      9,
+      10,
+      10,
+      11,
+      11,
+      12
+    ],
+    "narrow": {},
+    "resources": {
+      "sheep": {
+        "isZero": false,
+        "bColor": "&sb",
+        "num": 4,
+        "name": "Sheep",
+        "tColor": "&st"
+      },
+      "wheat": {
+        "isZero": false,
+        "bColor": "&ab",
+        "num": 4,
+        "name": "Wheat",
+        "tColor": "&at"
+      },
+      "wood": {
+        "isZero": false,
+        "bColor": "&wb",
+        "num": 4,
+        "name": "Wood",
+        "tColor": "&wt"
+      },
+      "brick": {
+        "isZero": false,
+        "bColor": "&rb",
+        "num": 3,
+        "name": "Brick",
+        "tColor": "&rt"
+      },
+      "ore": {
+        "isZero": false,
+        "bColor": "&ob",
+        "num": 3,
+        "name": "Ore",
+        "tColor": "&ot"
+      },
+      "desert": {
+        "isZero": true,
+        "bColor": "&db",
+        "num": 1,
+        "name": "Desert",
+        "tColor": "&dt"
+      }
+    },
+    "commands": {
+      "quit": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "save": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "load": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "toss": {
+        "args": [
+          "num1 card1 [...] (e.g. toss 4 sheep 3 ore)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "rob": {
+        "args": [
+          "hex coordinate (e.g. rob L20))"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "steal": {
+        "args": [
+          "player id or player name (e.g. steal 3 or steal CPU 3)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "sudo": {
+        "args": [],
+        "isAdminCommand": true,
+        "isPersistentCommand": true
+      },
+      "build": {
+        "args": [
+          "thing (e.g. road)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "flip": {
+        "args": [
+          "dev_card (e.g. knight)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "pass": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "info": {
+        "args": [
+          "hex/node/road coordinate (e.g. E24)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "clear": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "help": {
+        "args": [
+          "command (e.g. info)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "abbrev": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "neighbors": {
+        "args": [
+          "hex/node/road coordinate (e.g. E24)"
+        ],
+        "isAdminCommand": true,
+        "isPersistentCommand": false
+      },
+      "roll": {
+        "args": [],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "reset": {
+        "args": [],
+        "isAdminCommand": true,
+        "isPersistentCommand": false
+      },
+      "settle": {
+        "args": [
+          "node coordinate (e.g. E24) or opts"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "pave": {
+        "args": [
+          "road coordinate (e.g. F26) or opts"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "fortify": {
+        "args": [
+          "settlement coordinate or opts"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "monopoly": {
+        "args": [
+          "resource type to monopolize"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "yop": {
+        "args": [
+          "resource_1",
+          "resource_2"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "trade": {
+        "args": [
+          "player_name (or bank), num and type of outgoing resources, num and type of incoming resources (e.g. `trade bank 4 ore 1 sheep`)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "setname": {
+        "args": [
+          "name (8 chars or less)"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": true
+      },
+      "setcpuname": {
+        "args": [
+          "id (e.g. '4' for 'CPU 4')",
+          "name (8 chars or less)"
+        ],
+        "isAdminCommand": true,
+        "isPersistentCommand": true
+      }
+    },
+    "h_index": {
+        "d11":  0,
+        "d12":  0,
+        "d19":  1,
+        "d20":  1,
+        "d27":  2,
+        "d28":  2,
+        "h7":   3,
+        "h07":  3,
+        "h8":   3,
+        "h08":  3,
+        "h15":  4,
+        "h16":  4,
+        "h23":  5,
+        "h24":  5,
+        "h31":  6,
+        "h32":  6,
+        "l4":   7,
+        "l04":  7,
+        "l5":   7,
+        "l6":   7,
+        "l11":  8,
+        "l12":  8,
+        "l19":  9,
+        "l20":  9,
+        "l27":  10,
+        "l28":  10,
+        "l35":  11,
+        "l36":  11,
+        "p7":   12,
+        "p07":  12,
+        "p8":   12,
+        "p08":  12,
+        "p15":  13,
+        "p16":  13,
+        "p23":  14,
+        "p24":  14,
+        "p31":  15,
+        "p32":  15,
+        "t11":  16,
+        "t12":  16,
+        "t19":  17,
+        "t20":  17,
+        "t27":  18,
+        "t28":  18},
+    "n_index": {
+        "a12":  0,
+        "a20":  1,
+        "a28":  2,
+        "c8":   3,
+        "c08":  3,
+        "c16":  4,
+        "c24":  5,
+        "c32":  6,
+        "e8":   7,
+        "e08":  7,
+        "e16":  8,
+        "e24":  9,
+        "e32":  10,
+        "g4":   11,
+        "g04":  11,
+        "g12":  12,
+        "g20":  13,
+        "g28":  14,
+        "g36":  15,
+        "i4":   16,
+        "i04":  16,
+        "i12":  17,
+        "i20":  18,
+        "i28":  19,
+        "i36":  20,
+        "k0":   21,
+        "k00":  21,
+        "k8":   22,
+        "k08":  22,
+        "k16":  23,
+        "k24":  24,
+        "k32":  25,
+        "k40":  26,
+        "m0":   27,
+        "m00":  27,
+        "m8":   28,
+        "m08":  28,
+        "m16":  29,
+        "m24":  30,
+        "m32":  31,
+        "m40":  32,
+        "o4":   33,
+        "o04":  33,
+        "o12":  34,
+        "o20":  35,
+        "o28":  36,
+        "o36":  37,
+        "q4":   38,
+        "q04":  38,
+        "q12":  39,
+        "q20":  40,
+        "q28":  41,
+        "q36":  42,
+        "s8":   43,
+        "s08":  43,
+        "s16":  44,
+        "s24":  45,
+        "s32":  46,
+        "u8":   47,
+        "u08":  47,
+        "u16":  48,
+        "u24":  49,
+        "u32":  50,
+        "w12":  51,
+        "w20":  52,
+        "w28":  53},
+    "r_index": {
+        "b10":  0,
+        "b14":  1,
+        "b18":  2,
+        "b22":  3,
+        "b26":  4,
+        "b30":  5,
+        "d8":   6,
+        "d08":  6,
+        "d16":  7,
+        "d24":  8,
+        "d32":  9,
+        "f6":   10,
+        "f06":  10,
+        "f10":  11,
+        "f14":  12,
+        "f18":  13,
+        "f22":  14,
+        "f26":  15,
+        "f30":  16,
+        "f34":  17,
+        "h4":   18,
+        "h04":  18,
+        "h12":  19,
+        "h20":  20,
+        "h28":  21,
+        "h36":  22,
+        "j2":   23,
+        "j02":  23,
+        "j6":   24,
+        "j06":  24,
+        "j10":  25,
+        "j14":  26,
+        "j18":  27,
+        "j22":  28,
+        "j26":  29,
+        "j30":  30,
+        "j34":  31,
+        "j38":  32,
+        "l0":   33,
+        "l00":  33,
+        "l8":   34,
+        "l08":  34,
+        "l16":  35,
+        "l24":  36,
+        "l32":  37,
+        "l40":  38,
+        "n2":   39,
+        "n02":  39,
+        "n6":   40,
+        "n06":  40,
+        "n10":  41,
+        "n14":  42,
+        "n18":  43,
+        "n22":  44,
+        "n26":  45,
+        "n30":  46,
+        "n34":  47,
+        "n38":  48,
+        "p4":   49,
+        "p04":  49,
+        "p12":  50,
+        "p20":  51,
+        "p28":  52,
+        "p36":  53,
+        "r6":   54,
+        "r06":  54,
+        "r10":  55,
+        "r14":  56,
+        "r18":  57,
+        "r22":  58,
+        "r26":  59,
+        "r30":  60,
+        "r34":  61,
+        "t8":   62,
+        "t08":  62,
+        "t16":  63,
+        "t24":  64,
+        "t32":  65,
+        "v10":  66,
+        "v14":  67,
+        "v18":  68,
+        "v22":  69,
+        "v26":  70,
+        "v30":  71},
+    "hex_dots": {
+      "0":0,
+      "2":1,
+      "3":2,
+      "4":3,
+      "5":4,
+      "6":5,
+      "8":5,
+      "9":4,
+      "10":3,
+      "11":2,
+      "12":1
+    }
+  }
+}

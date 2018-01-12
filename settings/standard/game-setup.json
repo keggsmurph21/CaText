@@ -1,0 +1,286 @@
+{
+  "rules": "standard",
+  "victoryPointsGoal": 10,
+  "counts": {
+    "humans": 1,
+    "CPUs": 3,
+    "dice": 2
+  },
+  "portStyles": {
+    "default": "fixed",
+    "available": [ "fixed", "random" ]
+  },
+  "resourceSetupStyles": {
+    "default": "fixed",
+    "available": [ "fixed", "random" ]
+  },
+  "buildingCosts": {
+    "road": {
+      "brick": 1,
+      "wood": 1
+    },
+    "settlement": {
+      "wheat": 1,
+      "sheep": 1,
+      "brick": 1,
+      "wood": 1
+    },
+    "city": {
+      "wheat": 2,
+      "ore": 3
+    },
+    "development card": {
+      "wheat": 1,
+      "sheep": 1,
+      "ore": 1
+    }
+  },
+  "maxEachBuilding": {
+    "road": 15,
+    "settlement": 5,
+    "city": 4,
+    "development card": 25
+  },
+  "devCards": {
+    "vp": {
+      "nameShort": "VP",
+      "namePlural": "VPs",
+      "count": 5,
+      "textColor": "&at",
+      "nameLong": "Victory Point"
+    },
+    "knight": {
+      "nameShort": "Knight",
+      "namePlural": "Knights",
+      "count": 14,
+      "textColor": "&p0t",
+      "nameLong": "Knight"
+    },
+    "monopoly": {
+      "nameShort": "Monopoly",
+      "namePlural": "Monopolies",
+      "count": 2,
+      "textColor": "&wt",
+      "nameLong": "Monopoly"
+    },
+    "rb": {
+      "nameShort": "RB",
+      "namePlural": "Road Builders",
+      "count": 2,
+      "textColor": "&wt",
+      "nameLong": "Road Building"
+    },
+    "yop": {
+      "nameShort": "YoP",
+      "namePlural": "YoPs",
+      "count": 2,
+      "textColor": "&wt",
+      "nameLong": "Year of Plenty"
+    }
+  },
+  "resources": {
+    "sheep": {
+      "isZero": false,
+      "bkgColor": "&sb",
+      "count": 4,
+      "name": "Sheep",
+      "textColor": "&st"
+    },
+    "wheat": {
+      "isZero": false,
+      "bkgColor": "&ab",
+      "count": 4,
+      "name": "Wheat",
+      "textColor": "&at"
+    },
+    "wood": {
+      "isZero": false,
+      "bkgColor": "&wb",
+      "count": 4,
+      "name": "Wood",
+      "textColor": "&wt"
+    },
+    "brick": {
+      "isZero": false,
+      "bkgColor": "&rb",
+      "count": 3,
+      "name": "Brick",
+      "textColor": "&rt"
+    },
+    "ore": {
+      "isZero": false,
+      "bkgColor": "&ob",
+      "count": 3,
+      "name": "Ore",
+      "textColor": "&ot"
+    },
+    "desert": {
+      "isZero": true,
+      "bkgColor": "&db",
+      "count": 1,
+      "name": "Desert",
+      "textColor": "&dt"
+    }
+  },
+  "actions": {
+    "quit": {
+      "args": [],
+      "isAdminAction": false,
+      "isPersistentAction": true
+    },
+    "save": {
+      "args": [],
+      "isAdminAction": false,
+      "isPersistentAction": true
+    },
+    "load": {
+      "args": [],
+      "isAdminAction": false,
+      "isPersistentAction": true
+    },
+    "toss": {
+      "args": [
+        "num1 card1 [...] (e.g. toss 4 sheep 3 ore)"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "rob": {
+      "args": [
+        "hex coordinate (e.g. rob L20))"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "steal": {
+      "args": [
+        "player id or player name (e.g. steal 3 or steal CPU 3)"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "sudo": {
+      "args": [],
+      "isAdminAction": true,
+      "isPersistentAction": true
+    },
+    "build": {
+      "args": [
+        "thing (e.g. road)"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "flip": {
+      "args": [
+        "dev_card (e.g. knight)"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "pass": {
+      "args": [],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "info": {
+      "args": [
+        "hex/node/road coordinate (e.g. E24)"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": true
+    },
+    "clear": {
+      "args": [],
+      "isAdminAction": false,
+      "isPersistentAction": true
+    },
+    "help": {
+      "args": [
+        "Action (e.g. info)"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": true
+    },
+    "abbrev": {
+      "args": [],
+      "isAdminAction": false,
+      "isPersistentAction": true
+    },
+    "neighbors": {
+      "args": [
+        "hex/node/road coordinate (e.g. E24)"
+      ],
+      "isAdminAction": true,
+      "isPersistentAction": false
+    },
+    "roll": {
+      "args": [],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "reset": {
+      "args": [],
+      "isAdminAction": true,
+      "isPersistentAction": false
+    },
+    "settle": {
+      "args": [
+        "node coordinate (e.g. E24) or opts"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "pave": {
+      "args": [
+        "road coordinate (e.g. F26) or opts"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "fortify": {
+      "args": [
+        "settlement coordinate or opts"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "monopoly": {
+      "args": [
+        "resource type to monopolize"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "yop": {
+      "args": [
+        "resource_1",
+        "resource_2"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "trade": {
+      "args": [
+        "player_name (or bank), num and type of outgoing resources, num and type of incoming resources (e.g. `trade bank 4 ore 1 sheep`)"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": false
+    },
+    "setname": {
+      "args": [
+        "name (8 chars or less)"
+      ],
+      "isAdminAction": false,
+      "isPersistentAction": true
+    },
+    "setcpuname": {
+      "args": [
+        "id (e.g. '4' for 'CPU 4')",
+        "name (8 chars or less)"
+      ],
+      "isAdminAction": true,
+      "isPersistentAction": true
+    }
+  },
+}

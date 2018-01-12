@@ -1,129 +1,7 @@
 import datetime, gui, json, os, random, shutil
 
-DEFAULT_RULES = 'standard'
-
-DEFAULT_ROOT_PATH = '.'
-DEFAULT_BACKUPS_PATH = 'backups'
-DEFAULT_LOGS_PATH = 'logs'
-DEFAULT_SETTINGS_PATH = 'settings'
-DEFAULT_SAVES_PATH = 'saves'
-DEFAULT_TMP_PATH = 'tmp'
-
-class GameManager(object):
-    def __init__(self):
-
-        # set up paths
-        self.root = DEFAULT_ROOT_PATH
-        self.paths = {
-            'backups': os.path.join( self.root, DEFAULT_BACKUPS_PATH ),
-            'logs': os.path.join( self.root, DEFAULT_LOGS_PATH ),
-            'settings': os.path.join( self.root, DEFAULT_SETTINGS_PATH ),
-            'saves': os.path.join( self.root, DEFAULT_SAVES_PATH ),
-            'tmp': os.path.join( self.root, DEFAULT_TMP_PATH ) }
-        for p in self.paths:
-            self.path_get_contents( p ) # and make sure they exist
-
-        # set up logs
-        self.log = Log( self.paths['logs'], 'debug.log' )
-        self.log.write( 'init GameManager' )
-        self.log.writes([ ' - %s: %s' % (p, self.paths[p]) for p in self.paths ])
-
-        # let the games begin!
-        self.game = self.load_or_init_game()
-
-        # close out log file
-        self.log.write( 'closing file\n\n' )
-
-    def load_or_init_game(self):
-        """
-        either load a game or set up a new game
-        """
-
-        # get the current saved games
-        saves = []
-        availableSaveFiles = os.listdir( self.paths['saves'] )
-        for i in range(len(availableSaveFiles)):
-            sfdata = self.get_metadata_from_save_file( availableSaveFiles[i], i+1 )
-            saves.append( sfdata )
-
-        # add a start-new-game option
-        saves = [[ '  0 ->\t<START A NEW GAME>' ]] + saves
-
-        # get input from user to select which one
-        valid = False
-        while not(valid):
-
-            self.clear_screen()
-            print '... enter a number between 1 and %d to load a file or 0 to start a new game ...' % len(availableSaveFiles)
-            for lines in saves:
-                for line in lines:
-                    print line
-
-            choice = raw_input('')
-            try:
-                choice = int(choice)
-                if choice < 0:
-                    continue
-                elif choice == 0:
-                    return True
-                    
-                try:
-                    savepath = os.path.join( self.paths['saves'], availableSaveFiles[choice-1] )
-                    return savepath
-                except IndexError:
-                    pass
-            except ValueError:
-                pass
-
-
-    def get_metadata_from_save_file(self, savefile, i):
-        """
-        returns a string with some metadata about the savefile
-        """
-
-        metadata = os.path.join( self.paths['saves'], savefile, 'metadata.json' )
-        if os.path.exists( metadata ):
-            with open( metadata, 'r' ) as f:
-                data = json.load( f )
-
-            try:
-                lines = [
-                    '  %d ->\tname:     %s,    turn:%3d,    modified: %s' % (i, data['name'][:16], data['turn'], data['modified']),
-                    '\tplayers:  %s' % ', '.join([ str(p) for p in data['players']]) ]
-                return lines
-            except KeyError as e:
-                self.log.write( 'error loading `%s`: missing key %s' % (metadata, e) )
-
-        else:
-            self.log.write( 'error file does not exist: `%s`' % metadata )
-        return [ '  %d ->\tError loading `%s`: missing or corrupted file `%s`.' % (i, savefile, metadata) ]
-
-    def path_get_contents(self, path):
-        if os.path.exists( path ):
-            return os.listdir( path )
-        else:
-            os.mkdir( path )
-            return []
-
-    def clear_screen(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
-
-class Log(object):
-    def __init__(self, path, filename):
-        self.path = path
-        self.filename = filename
-        self.filepath = os.path.join( path, filename )
-
-    def write(self, line, timestamp=True):
-        if timestamp:
-            line = '[%s] %s' % (str(datetime.datetime.now()), line)
-        line += '\n'
-        with open( self.filepath, 'a' ) as f:
-            f.write( line )
-
-    def writes(self, array):
-        for line in array:
-            self.write( line, True )
+DEBUG = True
+STYLE = 'standard'
 
 class Settings(object):
     def __init__(self, style, numHumans, numCPUs, savepath=None):
@@ -2077,9 +1955,7 @@ class Connection(Edge):
         self.set_vertices( catan.nodes[ data['vertices'][0] ], catan.hexes[ data['vertices'][1] ] )
 
 def main():
-
-    gm = GameManager()
-    #catan = Catan(1,3)
+    catan = Catan(1,3)
     return 0
 
 if __name__ == "__main__":

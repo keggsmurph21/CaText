@@ -1,0 +1,1944 @@
+{
+  "ports": {
+    "types": [
+      "mystery",
+      "wheat",
+      "ore",
+      "wood",
+      "mystery",
+      "brick",
+      "sheep",
+      "mystery",
+      "mystery"
+    ],
+    "locations" : [
+      {
+        "orientation": 11,
+        "nodes": [0,3]
+      },
+      {
+        "orientation": 1,
+        "nodes": [1,5]
+      },
+      {
+        "orientation": 1,
+        "nodes": [10,15]
+      },
+      {
+        "orientation": 9,
+        "nodes": [11,16]
+      },
+      {
+        "orientation": 3,
+        "nodes": [26,32]
+      },
+      {
+        "orientation": 9,
+        "nodes": [33,38]
+      },
+      {
+        "orientation": 5,
+        "nodes": [42,46]
+      },
+      {
+        "orientation": 7,
+        "nodes": [47,51]
+      },
+      {
+        "orientation": 5,
+        "nodes": [49,52]
+      }
+    ]
+  },
+  "diceData": [
+    { "roll":5, "dots":4 },
+    { "roll":2, "dots":1 },
+    { "roll":6, "dots":5 },
+    { "roll":3, "dots":2 },
+    { "roll":8, "dots":5 },
+    { "roll":10, "dots":3 },
+    { "roll":12, "dots":1 },
+    { "roll":11, "dots":2 },
+    { "roll":4, "dots":3 },
+    { "roll":8, "dots":5 },
+    { "roll":10, "dots":3 },
+    { "roll":9, "dots":4 },
+    { "roll":4, "dots":3 },
+    { "roll":5, "dots":4 },
+    { "roll":6, "dots":5 },
+    { "roll":3, "dots":2 },
+    { "roll":11, "dots":2 },
+  ],
+  "counts": {
+    "hexes": 19,
+    "nodes": 54,
+    "roads": 72,
+    "conns": 113
+  },
+  "edgeData": {
+    "roads": {
+      "0": {
+        "u": {
+          "type": "node",
+          "id": 3
+        },
+        "v": {
+          "type": "node",
+          "id": 0
+        }
+      },
+      "1": {
+        "u": {
+          "type": "node",
+          "id": 0
+        },
+        "v": {
+          "type": "node",
+          "id": 4
+        }
+      },
+      "2": {
+        "u": {
+          "type": "node",
+          "id": 4
+        },
+        "v": {
+          "type": "node",
+          "id": 1
+        }
+      },
+      "3": {
+        "u": {
+          "type": "node",
+          "id": 1
+        },
+        "v": {
+          "type": "node",
+          "id": 5
+        }
+      },
+      "4": {
+        "u": {
+          "type": "node",
+          "id": 5
+        },
+        "v": {
+          "type": "node",
+          "id": 2
+        }
+      },
+      "5": {
+        "u": {
+          "type": "node",
+          "id": 2
+        },
+        "v": {
+          "type": "node",
+          "id": 6
+        }
+      },
+      "6": {
+        "u": {
+          "type": "node",
+          "id": 3
+        },
+        "v": {
+          "type": "node",
+          "id": 7
+        }
+      },
+      "7": {
+        "u": {
+          "type": "node",
+          "id": 4
+        },
+        "v": {
+          "type": "node",
+          "id": 8
+        }
+      },
+      "8": {
+        "u": {
+          "type": "node",
+          "id": 5
+        },
+        "v": {
+          "type": "node",
+          "id": 9
+        }
+      },
+      "9": {
+        "u": {
+          "type": "node",
+          "id": 6
+        },
+        "v": {
+          "type": "node",
+          "id": 10
+        }
+      },
+      "10": {
+        "u": {
+          "type": "node",
+          "id": 11
+        },
+        "v": {
+          "type": "node",
+          "id": 7
+        }
+      },
+      "11": {
+        "u": {
+          "type": "node",
+          "id": 7
+        },
+        "v": {
+          "type": "node",
+          "id": 12
+        }
+      },
+      "12": {
+        "u": {
+          "type": "node",
+          "id": 12
+        },
+        "v": {
+          "type": "node",
+          "id": 8
+        }
+      },
+      "13": {
+        "u": {
+          "type": "node",
+          "id": 8
+        },
+        "v": {
+          "type": "node",
+          "id": 13
+        }
+      },
+      "14": {
+        "u": {
+          "type": "node",
+          "id": 13
+        },
+        "v": {
+          "type": "node",
+          "id": 9
+        }
+      },
+      "15": {
+        "u": {
+          "type": "node",
+          "id": 9
+        },
+        "v": {
+          "type": "node",
+          "id": 14
+        }
+      },
+      "16": {
+        "u": {
+          "type": "node",
+          "id": 14
+        },
+        "v": {
+          "type": "node",
+          "id": 10
+        }
+      },
+      "17": {
+        "u": {
+          "type": "node",
+          "id": 10
+        },
+        "v": {
+          "type": "node",
+          "id": 15
+        }
+      },
+      "18": {
+        "u": {
+          "type": "node",
+          "id": 11
+        },
+        "v": {
+          "type": "node",
+          "id": 16
+        }
+      },
+      "19": {
+        "u": {
+          "type": "node",
+          "id": 12
+        },
+        "v": {
+          "type": "node",
+          "id": 17
+        }
+      },
+      "20": {
+        "u": {
+          "type": "node",
+          "id": 13
+        },
+        "v": {
+          "type": "node",
+          "id": 18
+        }
+      },
+      "21": {
+        "u": {
+          "type": "node",
+          "id": 14
+        },
+        "v": {
+          "type": "node",
+          "id": 19
+        }
+      },
+      "22": {
+        "u": {
+          "type": "node",
+          "id": 15
+        },
+        "v": {
+          "type": "node",
+          "id": 20
+        }
+      },
+      "23": {
+        "u": {
+          "type": "node",
+          "id": 21
+        },
+        "v": {
+          "type": "node",
+          "id": 16
+        }
+      },
+      "24": {
+        "u": {
+          "type": "node",
+          "id": 16
+        },
+        "v": {
+          "type": "node",
+          "id": 22
+        }
+      },
+      "25": {
+        "u": {
+          "type": "node",
+          "id": 22
+        },
+        "v": {
+          "type": "node",
+          "id": 17
+        }
+      },
+      "26": {
+        "u": {
+          "type": "node",
+          "id": 17
+        },
+        "v": {
+          "type": "node",
+          "id": 23
+        }
+      },
+      "27": {
+        "u": {
+          "type": "node",
+          "id": 23
+        },
+        "v": {
+          "type": "node",
+          "id": 18
+        }
+      },
+      "28": {
+        "u": {
+          "type": "node",
+          "id": 18
+        },
+        "v": {
+          "type": "node",
+          "id": 24
+        }
+      },
+      "29": {
+        "u": {
+          "type": "node",
+          "id": 24
+        },
+        "v": {
+          "type": "node",
+          "id": 19
+        }
+      },
+      "30": {
+        "u": {
+          "type": "node",
+          "id": 19
+        },
+        "v": {
+          "type": "node",
+          "id": 25
+        }
+      },
+      "31": {
+        "u": {
+          "type": "node",
+          "id": 25
+        },
+        "v": {
+          "type": "node",
+          "id": 20
+        }
+      },
+      "32": {
+        "u": {
+          "type": "node",
+          "id": 20
+        },
+        "v": {
+          "type": "node",
+          "id": 26
+        }
+      },
+      "33": {
+        "u": {
+          "type": "node",
+          "id": 21
+        },
+        "v": {
+          "type": "node",
+          "id": 27
+        }
+      },
+      "34": {
+        "u": {
+          "type": "node",
+          "id": 22
+        },
+        "v": {
+          "type": "node",
+          "id": 28
+        }
+      },
+      "35": {
+        "u": {
+          "type": "node",
+          "id": 23
+        },
+        "v": {
+          "type": "node",
+          "id": 29
+        }
+      },
+      "36": {
+        "u": {
+          "type": "node",
+          "id": 24
+        },
+        "v": {
+          "type": "node",
+          "id": 30
+        }
+      },
+      "37": {
+        "u": {
+          "type": "node",
+          "id": 25
+        },
+        "v": {
+          "type": "node",
+          "id": 31
+        }
+      },
+      "38": {
+        "u": {
+          "type": "node",
+          "id": 26
+        },
+        "v": {
+          "type": "node",
+          "id": 32
+        }
+      },
+      "39": {
+        "u": {
+          "type": "node",
+          "id": 27
+        },
+        "v": {
+          "type": "node",
+          "id": 33
+        }
+      },
+      "40": {
+        "u": {
+          "type": "node",
+          "id": 33
+        },
+        "v": {
+          "type": "node",
+          "id": 28
+        }
+      },
+      "41": {
+        "u": {
+          "type": "node",
+          "id": 28
+        },
+        "v": {
+          "type": "node",
+          "id": 34
+        }
+      },
+      "42": {
+        "u": {
+          "type": "node",
+          "id": 34
+        },
+        "v": {
+          "type": "node",
+          "id": 29
+        }
+      },
+      "43": {
+        "u": {
+          "type": "node",
+          "id": 29
+        },
+        "v": {
+          "type": "node",
+          "id": 35
+        }
+      },
+      "44": {
+        "u": {
+          "type": "node",
+          "id": 35
+        },
+        "v": {
+          "type": "node",
+          "id": 30
+        }
+      },
+      "45": {
+        "u": {
+          "type": "node",
+          "id": 30
+        },
+        "v": {
+          "type": "node",
+          "id": 36
+        }
+      },
+      "46": {
+        "u": {
+          "type": "node",
+          "id": 36
+        },
+        "v": {
+          "type": "node",
+          "id": 31
+        }
+      },
+      "47": {
+        "u": {
+          "type": "node",
+          "id": 31
+        },
+        "v": {
+          "type": "node",
+          "id": 37
+        }
+      },
+      "48": {
+        "u": {
+          "type": "node",
+          "id": 37
+        },
+        "v": {
+          "type": "node",
+          "id": 32
+        }
+      },
+      "49": {
+        "u": {
+          "type": "node",
+          "id": 33
+        },
+        "v": {
+          "type": "node",
+          "id": 38
+        }
+      },
+      "50": {
+        "u": {
+          "type": "node",
+          "id": 34
+        },
+        "v": {
+          "type": "node",
+          "id": 39
+        }
+      },
+      "51": {
+        "u": {
+          "type": "node",
+          "id": 35
+        },
+        "v": {
+          "type": "node",
+          "id": 40
+        }
+      },
+      "52": {
+        "u": {
+          "type": "node",
+          "id": 36
+        },
+        "v": {
+          "type": "node",
+          "id": 41
+        }
+      },
+      "53": {
+        "u": {
+          "type": "node",
+          "id": 37
+        },
+        "v": {
+          "type": "node",
+          "id": 42
+        }
+      },
+      "54": {
+        "u": {
+          "type": "node",
+          "id": 38
+        },
+        "v": {
+          "type": "node",
+          "id": 43
+        }
+      },
+      "55": {
+        "u": {
+          "type": "node",
+          "id": 43
+        },
+        "v": {
+          "type": "node",
+          "id": 39
+        }
+      },
+      "56": {
+        "u": {
+          "type": "node",
+          "id": 39
+        },
+        "v": {
+          "type": "node",
+          "id": 44
+        }
+      },
+      "57": {
+        "u": {
+          "type": "node",
+          "id": 44
+        },
+        "v": {
+          "type": "node",
+          "id": 40
+        }
+      },
+      "58": {
+        "u": {
+          "type": "node",
+          "id": 40
+        },
+        "v": {
+          "type": "node",
+          "id": 45
+        }
+      },
+      "59": {
+        "u": {
+          "type": "node",
+          "id": 45
+        },
+        "v": {
+          "type": "node",
+          "id": 41
+        }
+      },
+      "60": {
+        "u": {
+          "type": "node",
+          "id": 41
+        },
+        "v": {
+          "type": "node",
+          "id": 46
+        }
+      },
+      "61": {
+        "u": {
+          "type": "node",
+          "id": 46
+        },
+        "v": {
+          "type": "node",
+          "id": 42
+        }
+      },
+      "62": {
+        "u": {
+          "type": "node",
+          "id": 43
+        },
+        "v": {
+          "type": "node",
+          "id": 47
+        }
+      },
+      "63": {
+        "u": {
+          "type": "node",
+          "id": 44
+        },
+        "v": {
+          "type": "node",
+          "id": 48
+        }
+      },
+      "64": {
+        "u": {
+          "type": "node",
+          "id": 45
+        },
+        "v": {
+          "type": "node",
+          "id": 49
+        }
+      },
+      "65": {
+        "u": {
+          "type": "node",
+          "id": 46
+        },
+        "v": {
+          "type": "node",
+          "id": 50
+        }
+      },
+      "66": {
+        "u": {
+          "type": "node",
+          "id": 47
+        },
+        "v": {
+          "type": "node",
+          "id": 51
+        }
+      },
+      "67": {
+        "u": {
+          "type": "node",
+          "id": 51
+        },
+        "v": {
+          "type": "node",
+          "id": 48
+        }
+      },
+      "68": {
+        "u": {
+          "type": "node",
+          "id": 48
+        },
+        "v": {
+          "type": "node",
+          "id": 52
+        }
+      },
+      "69": {
+        "u": {
+          "type": "node",
+          "id": 52
+        },
+        "v": {
+          "type": "node",
+          "id": 49
+        }
+      },
+      "70": {
+        "u": {
+          "type": "node",
+          "id": 49
+        },
+        "v": {
+          "type": "node",
+          "id": 53
+        }
+      },
+      "71": {
+        "u": {
+          "type": "node",
+          "id": 53
+        },
+        "v": {
+          "type": "node",
+          "id": 50
+        }
+      }
+    },
+    "conns": {
+      "0": {
+        "u": {
+          "type": "node",
+          "id": 0
+        },
+        "v": {
+          "type": "hex",
+          "id": 0
+        }
+      },
+      "1": {
+        "u": {
+          "type": "node",
+          "id": 4
+        },
+        "v": {
+          "type": "hex",
+          "id": 0
+        }
+      },
+      "2": {
+        "u": {
+          "type": "node",
+          "id": 8
+        },
+        "v": {
+          "type": "hex",
+          "id": 0
+        }
+      },
+      "3": {
+        "u": {
+          "type": "node",
+          "id": 12
+        },
+        "v": {
+          "type": "hex",
+          "id": 0
+        }
+      },
+      "4": {
+        "u": {
+          "type": "node",
+          "id": 7
+        },
+        "v": {
+          "type": "hex",
+          "id": 0
+        }
+      },
+      "5": {
+        "u": {
+          "type": "node",
+          "id": 3
+        },
+        "v": {
+          "type": "hex",
+          "id": 0
+        }
+      },
+      "6": {
+        "u": {
+          "type": "node",
+          "id": 1
+        },
+        "v": {
+          "type": "hex",
+          "id": 1
+        }
+      },
+      "7": {
+        "u": {
+          "type": "node",
+          "id": 5
+        },
+        "v": {
+          "type": "hex",
+          "id": 1
+        }
+      },
+      "8": {
+        "u": {
+          "type": "node",
+          "id": 9
+        },
+        "v": {
+          "type": "hex",
+          "id": 1
+        }
+      },
+      "9": {
+        "u": {
+          "type": "node",
+          "id": 13
+        },
+        "v": {
+          "type": "hex",
+          "id": 1
+        }
+      },
+      "10": {
+        "u": {
+          "type": "node",
+          "id": 8
+        },
+        "v": {
+          "type": "hex",
+          "id": 1
+        }
+      },
+      "11": {
+        "u": {
+          "type": "node",
+          "id": 4
+        },
+        "v": {
+          "type": "hex",
+          "id": 1
+        }
+      },
+      "12": {
+        "u": {
+          "type": "node",
+          "id": 2
+        },
+        "v": {
+          "type": "hex",
+          "id": 2
+        }
+      },
+      "13": {
+        "u": {
+          "type": "node",
+          "id": 6
+        },
+        "v": {
+          "type": "hex",
+          "id": 2
+        }
+      },
+      "14": {
+        "u": {
+          "type": "node",
+          "id": 10
+        },
+        "v": {
+          "type": "hex",
+          "id": 2
+        }
+      },
+      "15": {
+        "u": {
+          "type": "node",
+          "id": 14
+        },
+        "v": {
+          "type": "hex",
+          "id": 2
+        }
+      },
+      "16": {
+        "u": {
+          "type": "node",
+          "id": 9
+        },
+        "v": {
+          "type": "hex",
+          "id": 2
+        }
+      },
+      "17": {
+        "u": {
+          "type": "node",
+          "id": 5
+        },
+        "v": {
+          "type": "hex",
+          "id": 2
+        }
+      },
+      "18": {
+        "u": {
+          "type": "node",
+          "id": 7
+        },
+        "v": {
+          "type": "hex",
+          "id": 3
+        }
+      },
+      "19": {
+        "u": {
+          "type": "node",
+          "id": 12
+        },
+        "v": {
+          "type": "hex",
+          "id": 3
+        }
+      },
+      "20": {
+        "u": {
+          "type": "node",
+          "id": 17
+        },
+        "v": {
+          "type": "hex",
+          "id": 3
+        }
+      },
+      "21": {
+        "u": {
+          "type": "node",
+          "id": 22
+        },
+        "v": {
+          "type": "hex",
+          "id": 3
+        }
+      },
+      "22": {
+        "u": {
+          "type": "node",
+          "id": 16
+        },
+        "v": {
+          "type": "hex",
+          "id": 3
+        }
+      },
+      "23": {
+        "u": {
+          "type": "node",
+          "id": 11
+        },
+        "v": {
+          "type": "hex",
+          "id": 3
+        }
+      },
+      "24": {
+        "u": {
+          "type": "node",
+          "id": 8
+        },
+        "v": {
+          "type": "hex",
+          "id": 4
+        }
+      },
+      "25": {
+        "u": {
+          "type": "node",
+          "id": 13
+        },
+        "v": {
+          "type": "hex",
+          "id": 4
+        }
+      },
+      "26": {
+        "u": {
+          "type": "node",
+          "id": 18
+        },
+        "v": {
+          "type": "hex",
+          "id": 4
+        }
+      },
+      "27": {
+        "u": {
+          "type": "node",
+          "id": 23
+        },
+        "v": {
+          "type": "hex",
+          "id": 4
+        }
+      },
+      "28": {
+        "u": {
+          "type": "node",
+          "id": 17
+        },
+        "v": {
+          "type": "hex",
+          "id": 4
+        }
+      },
+      "29": {
+        "u": {
+          "type": "node",
+          "id": 12
+        },
+        "v": {
+          "type": "hex",
+          "id": 4
+        }
+      },
+      "30": {
+        "u": {
+          "type": "node",
+          "id": 9
+        },
+        "v": {
+          "type": "hex",
+          "id": 5
+        }
+      },
+      "31": {
+        "u": {
+          "type": "node",
+          "id": 14
+        },
+        "v": {
+          "type": "hex",
+          "id": 5
+        }
+      },
+      "32": {
+        "u": {
+          "type": "node",
+          "id": 19
+        },
+        "v": {
+          "type": "hex",
+          "id": 5
+        }
+      },
+      "33": {
+        "u": {
+          "type": "node",
+          "id": 24
+        },
+        "v": {
+          "type": "hex",
+          "id": 5
+        }
+      },
+      "34": {
+        "u": {
+          "type": "node",
+          "id": 18
+        },
+        "v": {
+          "type": "hex",
+          "id": 5
+        }
+      },
+      "35": {
+        "u": {
+          "type": "node",
+          "id": 13
+        },
+        "v": {
+          "type": "hex",
+          "id": 5
+        }
+      },
+      "36": {
+        "u": {
+          "type": "node",
+          "id": 10
+        },
+        "v": {
+          "type": "hex",
+          "id": 6
+        }
+      },
+      "37": {
+        "u": {
+          "type": "node",
+          "id": 15
+        },
+        "v": {
+          "type": "hex",
+          "id": 6
+        }
+      },
+      "38": {
+        "u": {
+          "type": "node",
+          "id": 20
+        },
+        "v": {
+          "type": "hex",
+          "id": 6
+        }
+      },
+      "39": {
+        "u": {
+          "type": "node",
+          "id": 25
+        },
+        "v": {
+          "type": "hex",
+          "id": 6
+        }
+      },
+      "40": {
+        "u": {
+          "type": "node",
+          "id": 19
+        },
+        "v": {
+          "type": "hex",
+          "id": 6
+        }
+      },
+      "41": {
+        "u": {
+          "type": "node",
+          "id": 14
+        },
+        "v": {
+          "type": "hex",
+          "id": 6
+        }
+      },
+      "42": {
+        "u": {
+          "type": "node",
+          "id": 16
+        },
+        "v": {
+          "type": "hex",
+          "id": 7
+        }
+      },
+      "43": {
+        "u": {
+          "type": "node",
+          "id": 22
+        },
+        "v": {
+          "type": "hex",
+          "id": 7
+        }
+      },
+      "44": {
+        "u": {
+          "type": "node",
+          "id": 28
+        },
+        "v": {
+          "type": "hex",
+          "id": 7
+        }
+      },
+      "45": {
+        "u": {
+          "type": "node",
+          "id": 33
+        },
+        "v": {
+          "type": "hex",
+          "id": 7
+        }
+      },
+      "46": {
+        "u": {
+          "type": "node",
+          "id": 27
+        },
+        "v": {
+          "type": "hex",
+          "id": 7
+        }
+      },
+      "47": {
+        "u": {
+          "type": "node",
+          "id": 21
+        },
+        "v": {
+          "type": "hex",
+          "id": 7
+        }
+      },
+      "48": {
+        "u": {
+          "type": "node",
+          "id": 17
+        },
+        "v": {
+          "type": "hex",
+          "id": 8
+        }
+      },
+      "49": {
+        "u": {
+          "type": "node",
+          "id": 23
+        },
+        "v": {
+          "type": "hex",
+          "id": 8
+        }
+      },
+      "50": {
+        "u": {
+          "type": "node",
+          "id": 29
+        },
+        "v": {
+          "type": "hex",
+          "id": 8
+        }
+      },
+      "51": {
+        "u": {
+          "type": "node",
+          "id": 34
+        },
+        "v": {
+          "type": "hex",
+          "id": 8
+        }
+      },
+      "52": {
+        "u": {
+          "type": "node",
+          "id": 28
+        },
+        "v": {
+          "type": "hex",
+          "id": 8
+        }
+      },
+      "53": {
+        "u": {
+          "type": "node",
+          "id": 22
+        },
+        "v": {
+          "type": "hex",
+          "id": 8
+        }
+      },
+      "54": {
+        "u": {
+          "type": "node",
+          "id": 18
+        },
+        "v": {
+          "type": "hex",
+          "id": 9
+        }
+      },
+      "55": {
+        "u": {
+          "type": "node",
+          "id": 24
+        },
+        "v": {
+          "type": "hex",
+          "id": 9
+        }
+      },
+      "56": {
+        "u": {
+          "type": "node",
+          "id": 30
+        },
+        "v": {
+          "type": "hex",
+          "id": 9
+        }
+      },
+      "57": {
+        "u": {
+          "type": "node",
+          "id": 35
+        },
+        "v": {
+          "type": "hex",
+          "id": 9
+        }
+      },
+      "58": {
+        "u": {
+          "type": "node",
+          "id": 29
+        },
+        "v": {
+          "type": "hex",
+          "id": 9
+        }
+      },
+      "59": {
+        "u": {
+          "type": "node",
+          "id": 23
+        },
+        "v": {
+          "type": "hex",
+          "id": 9
+        }
+      },
+      "60": {
+        "u": {
+          "type": "node",
+          "id": 19
+        },
+        "v": {
+          "type": "hex",
+          "id": 10
+        }
+      },
+      "61": {
+        "u": {
+          "type": "node",
+          "id": 25
+        },
+        "v": {
+          "type": "hex",
+          "id": 10
+        }
+      },
+      "62": {
+        "u": {
+          "type": "node",
+          "id": 31
+        },
+        "v": {
+          "type": "hex",
+          "id": 10
+        }
+      },
+      "63": {
+        "u": {
+          "type": "node",
+          "id": 36
+        },
+        "v": {
+          "type": "hex",
+          "id": 10
+        }
+      },
+      "64": {
+        "u": {
+          "type": "node",
+          "id": 30
+        },
+        "v": {
+          "type": "hex",
+          "id": 10
+        }
+      },
+      "65": {
+        "u": {
+          "type": "node",
+          "id": 24
+        },
+        "v": {
+          "type": "hex",
+          "id": 10
+        }
+      },
+      "66": {
+        "u": {
+          "type": "node",
+          "id": 20
+        },
+        "v": {
+          "type": "hex",
+          "id": 11
+        }
+      },
+      "67": {
+        "u": {
+          "type": "node",
+          "id": 26
+        },
+        "v": {
+          "type": "hex",
+          "id": 11
+        }
+      },
+      "68": {
+        "u": {
+          "type": "node",
+          "id": 32
+        },
+        "v": {
+          "type": "hex",
+          "id": 11
+        }
+      },
+      "69": {
+        "u": {
+          "type": "node",
+          "id": 37
+        },
+        "v": {
+          "type": "hex",
+          "id": 11
+        }
+      },
+      "70": {
+        "u": {
+          "type": "node",
+          "id": 31
+        },
+        "v": {
+          "type": "hex",
+          "id": 11
+        }
+      },
+      "71": {
+        "u": {
+          "type": "node",
+          "id": 25
+        },
+        "v": {
+          "type": "hex",
+          "id": 11
+        }
+      },
+      "72": {
+        "u": {
+          "type": "node",
+          "id": 28
+        },
+        "v": {
+          "type": "hex",
+          "id": 12
+        }
+      },
+      "73": {
+        "u": {
+          "type": "node",
+          "id": 34
+        },
+        "v": {
+          "type": "hex",
+          "id": 12
+        }
+      },
+      "74": {
+        "u": {
+          "type": "node",
+          "id": 39
+        },
+        "v": {
+          "type": "hex",
+          "id": 12
+        }
+      },
+      "75": {
+        "u": {
+          "type": "node",
+          "id": 43
+        },
+        "v": {
+          "type": "hex",
+          "id": 12
+        }
+      },
+      "76": {
+        "u": {
+          "type": "node",
+          "id": 38
+        },
+        "v": {
+          "type": "hex",
+          "id": 12
+        }
+      },
+      "77": {
+        "u": {
+          "type": "node",
+          "id": 33
+        },
+        "v": {
+          "type": "hex",
+          "id": 12
+        }
+      },
+      "78": {
+        "u": {
+          "type": "node",
+          "id": 29
+        },
+        "v": {
+          "type": "hex",
+          "id": 13
+        }
+      },
+      "79": {
+        "u": {
+          "type": "node",
+          "id": 35
+        },
+        "v": {
+          "type": "hex",
+          "id": 13
+        }
+      },
+      "80": {
+        "u": {
+          "type": "node",
+          "id": 40
+        },
+        "v": {
+          "type": "hex",
+          "id": 13
+        }
+      },
+      "81": {
+        "u": {
+          "type": "node",
+          "id": 44
+        },
+        "v": {
+          "type": "hex",
+          "id": 13
+        }
+      },
+      "82": {
+        "u": {
+          "type": "node",
+          "id": 39
+        },
+        "v": {
+          "type": "hex",
+          "id": 13
+        }
+      },
+      "83": {
+        "u": {
+          "type": "node",
+          "id": 34
+        },
+        "v": {
+          "type": "hex",
+          "id": 13
+        }
+      },
+      "84": {
+        "u": {
+          "type": "node",
+          "id": 30
+        },
+        "v": {
+          "type": "hex",
+          "id": 14
+        }
+      },
+      "85": {
+        "u": {
+          "type": "node",
+          "id": 36
+        },
+        "v": {
+          "type": "hex",
+          "id": 14
+        }
+      },
+      "86": {
+        "u": {
+          "type": "node",
+          "id": 41
+        },
+        "v": {
+          "type": "hex",
+          "id": 14
+        }
+      },
+      "87": {
+        "u": {
+          "type": "node",
+          "id": 45
+        },
+        "v": {
+          "type": "hex",
+          "id": 14
+        }
+      },
+      "88": {
+        "u": {
+          "type": "node",
+          "id": 40
+        },
+        "v": {
+          "type": "hex",
+          "id": 14
+        }
+      },
+      "89": {
+        "u": {
+          "type": "node",
+          "id": 35
+        },
+        "v": {
+          "type": "hex",
+          "id": 14
+        }
+      },
+      "90": {
+        "u": {
+          "type": "node",
+          "id": 31
+        },
+        "v": {
+          "type": "hex",
+          "id": 15
+        }
+      },
+      "91": {
+        "u": {
+          "type": "node",
+          "id": 37
+        },
+        "v": {
+          "type": "hex",
+          "id": 15
+        }
+      },
+      "92": {
+        "u": {
+          "type": "node",
+          "id": 42
+        },
+        "v": {
+          "type": "hex",
+          "id": 15
+        }
+      },
+      "93": {
+        "u": {
+          "type": "node",
+          "id": 46
+        },
+        "v": {
+          "type": "hex",
+          "id": 15
+        }
+      },
+      "94": {
+        "u": {
+          "type": "node",
+          "id": 41
+        },
+        "v": {
+          "type": "hex",
+          "id": 15
+        }
+      },
+      "95": {
+        "u": {
+          "type": "node",
+          "id": 36
+        },
+        "v": {
+          "type": "hex",
+          "id": 15
+        }
+      },
+      "96": {
+        "u": {
+          "type": "node",
+          "id": 39
+        },
+        "v": {
+          "type": "hex",
+          "id": 16
+        }
+      },
+      "97": {
+        "u": {
+          "type": "node",
+          "id": 44
+        },
+        "v": {
+          "type": "hex",
+          "id": 16
+        }
+      },
+      "98": {
+        "u": {
+          "type": "node",
+          "id": 48
+        },
+        "v": {
+          "type": "hex",
+          "id": 16
+        }
+      },
+      "99": {
+        "u": {
+          "type": "node",
+          "id": 51
+        },
+        "v": {
+          "type": "hex",
+          "id": 16
+        }
+      },
+      "100": {
+        "u": {
+          "type": "node",
+          "id": 47
+        },
+        "v": {
+          "type": "hex",
+          "id": 16
+        }
+      },
+      "101": {
+        "u": {
+          "type": "node",
+          "id": 43
+        },
+        "v": {
+          "type": "hex",
+          "id": 16
+        }
+      },
+      "102": {
+        "u": {
+          "type": "node",
+          "id": 40
+        },
+        "v": {
+          "type": "hex",
+          "id": 17
+        }
+      },
+      "103": {
+        "u": {
+          "type": "node",
+          "id": 45
+        },
+        "v": {
+          "type": "hex",
+          "id": 17
+        }
+      },
+      "104": {
+        "u": {
+          "type": "node",
+          "id": 49
+        },
+        "v": {
+          "type": "hex",
+          "id": 17
+        }
+      },
+      "105": {
+        "u": {
+          "type": "node",
+          "id": 52
+        },
+        "v": {
+          "type": "hex",
+          "id": 17
+        }
+      },
+      "106": {
+        "u": {
+          "type": "node",
+          "id": 48
+        },
+        "v": {
+          "type": "hex",
+          "id": 17
+        }
+      },
+      "107": {
+        "u": {
+          "type": "node",
+          "id": 44
+        },
+        "v": {
+          "type": "hex",
+          "id": 17
+        }
+      },
+      "108": {
+        "u": {
+          "type": "node",
+          "id": 41
+        },
+        "v": {
+          "type": "hex",
+          "id": 18
+        }
+      },
+      "109": {
+        "u": {
+          "type": "node",
+          "id": 46
+        },
+        "v": {
+          "type": "hex",
+          "id": 18
+        }
+      },
+      "110": {
+        "u": {
+          "type": "node",
+          "id": 50
+        },
+        "v": {
+          "type": "hex",
+          "id": 18
+        }
+      },
+      "111": {
+        "u": {
+          "type": "node",
+          "id": 53
+        },
+        "v": {
+          "type": "hex",
+          "id": 18
+        }
+      },
+      "112": {
+        "u": {
+          "type": "node",
+          "id": 49
+        },
+        "v": {
+          "type": "hex",
+          "id": 18
+        }
+      },
+      "113": {
+        "u": {
+          "type": "node",
+          "id": 45
+        },
+        "v": {
+          "type": "hex",
+          "id": 18
+        }
+      }
+    }
+  }
+}

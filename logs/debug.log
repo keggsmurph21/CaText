@@ -1,0 +1,236 @@
+[2018-01-12 15:49:14.382464] init GameManager
+[2018-01-12 15:49:14.385237]  - tmp: ./tmp
+[2018-01-12 15:49:14.388010]  - backups: ./backups
+[2018-01-12 15:49:14.390675]  - saves: ./saves
+[2018-01-12 15:49:14.427009]  - logs: ./logs
+[2018-01-12 15:49:14.430525]  - settings: ./settings
+[2018-01-12 15:49:28.171605] init GameManager
+[2018-01-12 15:49:28.313876]  - tmp: ./tmp
+[2018-01-12 15:49:28.346266]  - backups: ./backups
+[2018-01-12 15:49:28.376788]  - saves: ./saves
+[2018-01-12 15:49:28.412529]  - logs: ./logs
+[2018-01-12 15:49:28.444749]  - settings: ./settings
+[2018-01-12 15:50:13.522720] 
+
+init GameManager
+[2018-01-12 15:50:13.557307]  - tmp: ./tmp
+[2018-01-12 15:50:13.560241]  - backups: ./backups
+[2018-01-12 15:50:13.590531]  - saves: ./saves
+[2018-01-12 15:50:13.622591]  - logs: ./logs
+[2018-01-12 15:50:13.671090]  - settings: ./settings
+[2018-01-12 15:51:03.522527] init GameManager
+[2018-01-12 15:51:03.525680]  - tmp: ./tmp
+[2018-01-12 15:51:03.666092]  - backups: ./backups
+[2018-01-12 15:51:03.697614]  - saves: ./saves
+[2018-01-12 15:51:03.700585]  - logs: ./logs
+[2018-01-12 15:51:03.729899]  - settings: ./settings
+[2018-01-12 15:51:03.732969] closing file
+
+
+[2018-01-12 15:52:08.449301] init GameManager
+[2018-01-12 15:52:08.453135]  - tmp: ./tmp
+[2018-01-12 15:52:08.491676]  - backups: ./backups
+[2018-01-12 15:52:08.494530]  - saves: ./saves
+[2018-01-12 15:52:08.497395]  - logs: ./logs
+[2018-01-12 15:52:08.501088]  - settings: ./settings
+[2018-01-12 15:52:08.504732] error file does not exist: `save-001/metadata.json`
+[2018-01-12 15:52:08.544199] closing file
+
+
+[2018-01-12 15:53:33.646501] init GameManager
+[2018-01-12 15:53:33.665451]  - tmp: ./tmp
+[2018-01-12 15:53:33.700381]  - backups: ./backups
+[2018-01-12 15:53:33.731926]  - saves: ./saves
+[2018-01-12 15:53:33.765667]  - logs: ./logs
+[2018-01-12 15:53:33.799324]  - settings: ./settings
+[2018-01-12 15:53:33.803054] error file does not exist: `./saves/save-001/metadata.json`
+[2018-01-12 15:53:33.831114] closing file
+
+
+[2018-01-12 15:53:50.052114] init GameManager
+[2018-01-12 15:53:50.055410]  - tmp: ./tmp
+[2018-01-12 15:53:50.091790]  - backups: ./backups
+[2018-01-12 15:53:50.124755]  - saves: ./saves
+[2018-01-12 15:53:50.156173]  - logs: ./logs
+[2018-01-12 15:53:50.159316]  - settings: ./settings
+[2018-01-12 15:54:08.659396] init GameManager
+[2018-01-12 15:54:08.677963]  - tmp: ./tmp
+[2018-01-12 15:54:08.680770]  - backups: ./backups
+[2018-01-12 15:54:08.709936]  - saves: ./saves
+[2018-01-12 15:54:08.713518]  - logs: ./logs
+[2018-01-12 15:54:08.745097]  - settings: ./settings
+[2018-01-12 15:54:08.748195] error loading `./saves/save-001/metadata.json`: missing key `'name'`
+[2018-01-12 15:54:08.751385] closing file
+
+
+[2018-01-12 15:56:26.932000] init GameManager
+[2018-01-12 15:56:26.963023]  - tmp: ./tmp
+[2018-01-12 15:56:26.965996]  - backups: ./backups
+[2018-01-12 15:56:26.997531]  - saves: ./saves
+[2018-01-12 15:56:27.029324]  - logs: ./logs
+[2018-01-12 15:56:27.061301]  - settings: ./settings
+[2018-01-12 15:56:27.095324] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 15:56:27.098481] closing file
+
+
+[2018-01-12 15:56:53.678015] init GameManager
+[2018-01-12 15:56:53.681262]  - tmp: ./tmp
+[2018-01-12 15:56:53.684546]  - backups: ./backups
+[2018-01-12 15:56:53.741603]  - saves: ./saves
+[2018-01-12 15:56:53.745486]  - logs: ./logs
+[2018-01-12 15:56:53.772920]  - settings: ./settings
+[2018-01-12 15:56:53.806062] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 15:56:53.809276] closing file
+
+
+[2018-01-12 16:02:32.089177] init GameManager
+[2018-01-12 16:02:32.122008]  - tmp: ./tmp
+[2018-01-12 16:02:32.152701]  - backups: ./backups
+[2018-01-12 16:02:32.156619]  - saves: ./saves
+[2018-01-12 16:02:32.160459]  - logs: ./logs
+[2018-01-12 16:02:32.164418]  - settings: ./settings
+[2018-01-12 16:02:32.167830] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:02:46.920792] init GameManager
+[2018-01-12 16:02:46.925258]  - tmp: ./tmp
+[2018-01-12 16:02:46.961398]  - backups: ./backups
+[2018-01-12 16:02:46.965564]  - saves: ./saves
+[2018-01-12 16:02:47.008441]  - logs: ./logs
+[2018-01-12 16:02:47.041763]  - settings: ./settings
+[2018-01-12 16:02:47.076179] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:02:47.079607] closing file
+
+
+[2018-01-12 16:03:12.567901] init GameManager
+[2018-01-12 16:03:12.572230]  - tmp: ./tmp
+[2018-01-12 16:03:12.666185]  - backups: ./backups
+[2018-01-12 16:03:12.669965]  - saves: ./saves
+[2018-01-12 16:03:12.673748]  - logs: ./logs
+[2018-01-12 16:03:12.677243]  - settings: ./settings
+[2018-01-12 16:03:12.713754] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:03:12.760302] closing file
+
+
+[2018-01-12 16:03:32.312379] init GameManager
+[2018-01-12 16:03:32.335268]  - tmp: ./tmp
+[2018-01-12 16:03:32.364916]  - backups: ./backups
+[2018-01-12 16:03:32.400883]  - saves: ./saves
+[2018-01-12 16:03:32.434632]  - logs: ./logs
+[2018-01-12 16:03:32.465143]  - settings: ./settings
+[2018-01-12 16:03:32.497698] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:03:32.501315] closing file
+
+
+[2018-01-12 16:03:40.144885] init GameManager
+[2018-01-12 16:03:40.161484]  - tmp: ./tmp
+[2018-01-12 16:03:40.164967]  - backups: ./backups
+[2018-01-12 16:03:40.201436]  - saves: ./saves
+[2018-01-12 16:03:40.205606]  - logs: ./logs
+[2018-01-12 16:03:40.209259]  - settings: ./settings
+[2018-01-12 16:03:40.212779] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:03:40.216079] closing file
+
+
+[2018-01-12 16:05:36.636962] init GameManager
+[2018-01-12 16:05:36.640376]  - tmp: ./tmp
+[2018-01-12 16:05:36.679709]  - backups: ./backups
+[2018-01-12 16:05:36.683650]  - saves: ./saves
+[2018-01-12 16:05:36.712398]  - logs: ./logs
+[2018-01-12 16:05:36.745592]  - settings: ./settings
+[2018-01-12 16:05:36.749418] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:05:36.752882] closing file
+
+
+[2018-01-12 16:06:45.974610] init GameManager
+[2018-01-12 16:06:45.978230]  - tmp: ./tmp
+[2018-01-12 16:06:46.017362]  - backups: ./backups
+[2018-01-12 16:06:46.020828]  - saves: ./saves
+[2018-01-12 16:06:46.039524]  - logs: ./logs
+[2018-01-12 16:06:46.042794]  - settings: ./settings
+[2018-01-12 16:06:46.081656] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:06:46.085699] closing file
+
+
+[2018-01-12 16:07:30.599692] init GameManager
+[2018-01-12 16:07:30.603220]  - tmp: ./tmp
+[2018-01-12 16:07:30.607005]  - backups: ./backups
+[2018-01-12 16:07:30.610369]  - saves: ./saves
+[2018-01-12 16:07:30.646864]  - logs: ./logs
+[2018-01-12 16:07:30.679616]  - settings: ./settings
+[2018-01-12 16:07:30.683119] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:07:30.687710] closing file
+
+
+[2018-01-12 16:09:27.162424] init GameManager
+[2018-01-12 16:09:27.167697]  - tmp: ./tmp
+[2018-01-12 16:09:27.172472]  - backups: ./backups
+[2018-01-12 16:09:27.176904]  - saves: ./saves
+[2018-01-12 16:09:27.181713]  - logs: ./logs
+[2018-01-12 16:09:27.186275]  - settings: ./settings
+[2018-01-12 16:09:27.190731] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:09:27.210037] closing file
+
+
+[2018-01-12 16:09:44.572348] init GameManager
+[2018-01-12 16:09:44.576884]  - tmp: ./tmp
+[2018-01-12 16:09:44.582276]  - backups: ./backups
+[2018-01-12 16:09:44.586806]  - saves: ./saves
+[2018-01-12 16:09:44.679104]  - logs: ./logs
+[2018-01-12 16:09:44.683581]  - settings: ./settings
+[2018-01-12 16:09:44.719844] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:09:44.727462] closing file
+
+
+[2018-01-12 16:15:32.773499] init GameManager
+[2018-01-12 16:15:32.778264]  - tmp: ./tmp
+[2018-01-12 16:15:32.782953]  - backups: ./backups
+[2018-01-12 16:15:32.787369]  - saves: ./saves
+[2018-01-12 16:15:32.792003]  - logs: ./logs
+[2018-01-12 16:15:32.796782]  - settings: ./settings
+[2018-01-12 16:15:32.801421] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:15:50.340713] init GameManager
+[2018-01-12 16:15:50.345463]  - tmp: ./tmp
+[2018-01-12 16:15:50.350427]  - backups: ./backups
+[2018-01-12 16:15:50.389984]  - saves: ./saves
+[2018-01-12 16:15:50.422887]  - logs: ./logs
+[2018-01-12 16:15:50.427725]  - settings: ./settings
+[2018-01-12 16:15:50.432402] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:16:14.607131] init GameManager
+[2018-01-12 16:16:14.634121]  - tmp: ./tmp
+[2018-01-12 16:16:14.639120]  - backups: ./backups
+[2018-01-12 16:16:14.643801]  - saves: ./saves
+[2018-01-12 16:16:14.648803]  - logs: ./logs
+[2018-01-12 16:16:14.686522]  - settings: ./settings
+[2018-01-12 16:16:14.719600] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:16:18.826463] closing file
+
+
+[2018-01-12 16:16:20.916867] init GameManager
+[2018-01-12 16:16:20.922419]  - tmp: ./tmp
+[2018-01-12 16:16:20.951490]  - backups: ./backups
+[2018-01-12 16:16:20.957168]  - saves: ./saves
+[2018-01-12 16:16:20.961999]  - logs: ./logs
+[2018-01-12 16:16:21.005945]  - settings: ./settings
+[2018-01-12 16:16:21.010730] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:16:21.762465] closing file
+
+
+[2018-01-12 16:16:22.805314] init GameManager
+[2018-01-12 16:16:22.809992]  - tmp: ./tmp
+[2018-01-12 16:16:22.815649]  - backups: ./backups
+[2018-01-12 16:16:22.820143]  - saves: ./saves
+[2018-01-12 16:16:22.824592]  - logs: ./logs
+[2018-01-12 16:16:22.863152]  - settings: ./settings
+[2018-01-12 16:16:22.868567] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:16:23.554250] closing file
+
+
+[2018-01-12 16:16:52.587963] init GameManager
+[2018-01-12 16:16:52.592673]  - tmp: ./tmp
+[2018-01-12 16:16:52.597763]  - backups: ./backups
+[2018-01-12 16:16:52.602287]  - saves: ./saves
+[2018-01-12 16:16:52.606758]  - logs: ./logs
+[2018-01-12 16:16:52.610825]  - settings: ./settings
+[2018-01-12 16:16:52.614526] error loading `./saves/save-001/metadata.json`: missing key 'name'
+[2018-01-12 16:17:01.482139] closing file
+
+
