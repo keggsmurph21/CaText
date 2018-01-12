@@ -374,6 +374,21 @@
         "isAdminCommand": false,
         "isPersistentCommand": false
       },
+      "monopoly": {
+        "args": [
+          "resource type to monopolize"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
+      "yop": {
+        "args": [
+          "resource_1",
+          "resource_2"
+        ],
+        "isAdminCommand": false,
+        "isPersistentCommand": false
+      },
       "trade": {
         "args": [
           "player_name (or bank), num and type of outgoing resources, num and type of incoming resources (e.g. `trade bank 4 ore 1 sheep`)"

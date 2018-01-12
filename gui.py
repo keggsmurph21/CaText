@@ -287,7 +287,6 @@ class GUI(object):
                 args.append(argLine)
 
             for l in range(len(self.infoText)):
-                print self.infoText[l], args[l]
                 chunk.append( self.infoText[l] % tuple(args[l]) )
 
             return chunk

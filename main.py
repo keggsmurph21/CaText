@@ -115,9 +115,10 @@ class DevCard(object):
         self.text = argv['textColor']
 
     def do(self, player):
-        player.play_dc( self.name )
-        player.catan.gui.add_pMsg( ' - %s%s&& played a %s%s&&!.' % (player.color, player.name, self.text, self.name) )
-        return True
+        if player.play_dc( self.name ) == True:
+            player.catan.gui.add_pMsg( ' - %s%s&& played a %s%s&&!.' % (player.color, player.name, self.text, self.name) )
+            return True
+        return False
 
 class Options(object):
     def __init__(self, catan):
@@ -145,6 +146,8 @@ class Options(object):
             'setcpuname':   self.c_setcpuname,
             'build':        self.c_build,
             'flip':         self.c_flip,
+            'monopoly':     self.c_monopoly,
+            'yop':          self.c_yop,
             'trade':        self.c_trade,
             'pass':         self.c_pass}
 
@@ -639,14 +642,14 @@ class Options(object):
                 pass
 
             else:
-                if dc in { 'vp', 'knight', 'yop', 'monopoly', 'rb' }:
+                if dc in [ d for d in self.catan.devCards.keys() ]:
 
-                    available = self.catan.currentPlayer.devCardsU[ dc ] - int( self.catan.devCardThisTurn==dc )
+                    available = self.catan.currentPlayer.devCardsU[ dc ] - int( self.catan.devCardThisTurn==dc ) + int( self.catan.devCardThisTurn=='vp' )
                     if available > 0:
 
-                        self.catan.devCards[ dc ].do( self.catan.currentPlayer )
-                        self.catan.currentPlayer.devCardsU[ dc ] -= 1
-                        self.catan.currentPlayer.devCardsP[ dc ] += 1
+                        if self.catan.devCards[ dc ].do( self.catan.currentPlayer ) == True:
+                            self.catan.currentPlayer.devCardsU[ dc ] -= 1
+                            self.catan.currentPlayer.devCardsP[ dc ] += 1
 
                         return True
 
@@ -728,6 +731,50 @@ class Options(object):
         else:
             self.catan.gui.set_msg( "trade: Invalid number of arguments.  Expected five, got %d.\n &gsyntax:&& > trade {player_name|bank} {# out} {resource} {# in} {resource}" % (len(args)-1) )
 
+    def c_monopoly(self, args):
+        if len(args) == 2:
+            res = args[1].lower()
+
+            if res in [ r for r in self.catan.resources.keys() ]:
+                for p in self.catan.players:
+                    num = p.count( res )
+                    if p != self.catan.currentPlayer:
+                        p.resCards[ res ] -= num
+                        self.catan.currentPlayer.resCards[ res ] += num
+                        res = self.catan.resources[res]
+                        self.catan.gui.add_pMsg( 'stole %s%d %s&& from %s%s&&!' % (res.text, num, res.resource, p.color, p.name) )
+                    return True
+
+            else:
+                self.catan.gui.set_msg( 'monopoly: Unrecognized resource type `%s`.' % res )
+        else:
+            self.catan.gui.set_msg( 'monopoly: Invalid number of arguments.  Expected 1, got %d.' % (len(args)-1) )
+
+    def c_yop(self, args):
+        if len(args) == 3:
+            res1 = args[1].lower()
+            res2 = args[2].lower()
+
+            for res in [ res1, res2 ]:
+                if res in [ r for r in self.catan.resources.keys() ]:
+                    self.catan.currentPlayer.resCards[ res ] += 1
+                else:
+                    self.catan.gui.set_msg( 'yop: Unrecognized resource type `%s`.' % res )
+                    return False
+
+            if res1 == res2:
+                res = self.catan.resources[res1]
+                self.catan.gui.set_msg( 'Collected %s2 %s&& from the bank.' % (res.text, res.resource) )
+            else:
+                res1 = self.catan.resources[res]
+                res2 = self.catan.resources[res]
+                self.catan.gui.set_msg( 'Collected %s1 %s&& and %s1 %s&& from the bank.' % (res1.text, res1.resource, res2.text, res2.resource) )
+
+            return True
+
+        else:
+            self.catan.gui.set_msg( 'yop: Invalid number of arguments.  Expected 2, got %d.' % (len(args)-1) )
+
     def c_pass(self, args):
         self.catan.hasPassed = True
         return True
@@ -805,6 +852,7 @@ class Catan(object):
                 p.load( 'private', privateData[str(p.num)], self )
 
             # enter the game at the last checkpoint
+            self.is_game_over()
             self.loop( self.turn-1 )
 
             return True
@@ -1002,10 +1050,9 @@ class Catan(object):
 
     def loop(self, turn=0):
         self.turn = turn
-        while self.is_game_over() == False:
+        while True:#self.is_game_over() == False:
             self.take_turn()
             self.save_game()
-        exit()
 
     def roll(self, override=None):
         if override == None or DEBUG == False:# or self.currentPlayer.isAdmin == False:
@@ -1073,7 +1120,12 @@ class Catan(object):
 
     def is_game_over(self):
         for player in self.players:
-            return player.privateScore >= self.settings.get('victoryPointsGoal')
+            if player.privateScore >= self.settings.get('victoryPointsGoal'):
+                self.gui.remove_pMsg( 'all' )
+                self.gui.set_msg( None )
+                self.gui.add_pMsg( '%s%s wins!!' % (player.color, player.name) )
+                self.gui.render()
+                exit()
 
     def check_longest_road(self):
         if self.hasLongestRoad != None:
@@ -1248,6 +1300,7 @@ class Player(object):
                 self.publicScore += 2
             if self.hasLongestRoad:
                 self.publicScore += 2
+            self.publicScore += self.devCardsP[ 'vp' ]
             self.privateScore = self.publicScore
 
         elif keyword == 'private':
@@ -1402,6 +1455,7 @@ class Player(object):
         self.settlements.append( node )
         if node.port != None:
             self.ports.add( node.port )
+        self.catan.is_game_over()
 
     def add_road(self, road):
         self.roads.append(road)
@@ -1410,6 +1464,7 @@ class Player(object):
     def add_city(self, node):
         self.publicScore += 1
         self.privateScore += 1
+        self.catan.is_game_over()
 
     def receive_trade_offer(self, offer):
         return False # inherited classes overwrite this
@@ -1493,22 +1548,32 @@ class Human(Player):
     def play_dc(self, dc):
         if dc == 'vp':
             self.publicScore += 1
+            return True
 
         else:
             if self.catan.hasPlayedDC == False:
+
                 if dc == 'knight':
                     self.numKnights += 1
                     self.move_robber()
                     self.catan.check_largest_army()
-                elif dc == 'yop':
-                    pass
                 elif dc == 'monopoly':
-                    pass
+                    tomObj = self.catan.options.tom_suspend( {'monopoly'}, 'Choose a resource to monopolize (monopoly RES).' )
+                    self.catan.handle_input()
+                    self.catan.options.tom_resume( tomObj )
+                elif dc == 'yop':
+                    tomObj = self.catan.options.tom_suspend( {'yop'}, 'Choose two resources to collect (yop RES1 RES2).' )
+                    self.catan.handle_input()
+                    self.catan.options.tom_resume( tomObj )
                 elif dc == 'rb':
                     self.pave()
                     self.pave()
+
+                self.catan.hasPlayedDC = True
+                return True
+
             else:
-                pass
+                self.catan.gui.set_msg( "flip: You've already played a development card this turn!" )
 
     def take_turn(self):
         while self.catan.hasPassed == False:
@@ -1588,7 +1653,7 @@ class CPU(Player):
                 steal.resCards[resource] -= 1
                 self.resCards[resource] += 1
 
-    def play_knight(self):
+    def play_dc(self, dc):
         raise NotImplementedError
 
     def pave(self, restrict=None):
