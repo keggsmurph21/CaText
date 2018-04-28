@@ -12,10 +12,10 @@ class Env():
                 key,value = line.split('=')
                 self.variables[key] = value.strip('\n')
 
-    def get(self, key):
+    def get(self, key, default=None):
         if key in self.variables:
             return self.variables[key]
-        return None
+        return default
 
     def set(self, key, value):
         self.variables[key] = value
