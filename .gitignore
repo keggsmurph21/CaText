@@ -10,8 +10,8 @@ __pycache__
 # temporary stuff
 tmp
 
-# environment variables
-.env*
+# catext variables
+*.ct*
 
 # logs
 logs

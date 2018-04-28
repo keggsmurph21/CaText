@@ -1,4 +1,3 @@
-import getpass
 import json
 import os
 import requests
@@ -27,7 +26,7 @@ class API():
         ''' get a URI for API endpoint '''
         return os.path.join(self.webroot, 'api', path)
 
-    def post_login(self):
+    def post_login(self, username, password):
         '''
         post to the $WEBROOT/api/login endpoint
         note: this function prompts the user for password
@@ -35,20 +34,22 @@ class API():
         @return auth token or None
         '''
 
-        # get all the fields we need for our request
-        username = input('username: ')
-        password = getpass.getpass('password: ')
         payload = { 'username':username, 'password':password }
         uri = self.get_uri('login')
 
         try:
             # hit the endpoint
+            self.logger.info('post {} (payload: {})'.format(uri, json.dumps(payload)))
             res = requests.post(uri, data=payload)
+            self.logger.info('response code {}'.format(res.status_code))
 
             if res.status_code == 200:
                 # valid response
                 self.token = json.loads(res.text)['token']
-                return self.token
+                user = json.loads(res.text)['user']
+                self.logger.debug('user {} got auth token {}'.format(user, self.token))
+
+                return user, self.token
             else:
                 # something went wrong
                 raise APIInvalidDataError('Invalid username or password')
@@ -69,11 +70,13 @@ class API():
 
         try:
             # hit the endpoint
+            self.logger.info('get {} (token: {})'.format(self.token))
             res = requests.get(uri, headers=headers)
+            self.logger.info('response code {}'.format(res.status_code))
 
             if res.status_code == 200:
                 # valid response
-                print(res.text)
+                self.logger.info('lobby response: {}'.format(res.text))
             else:
                 # something went wrong
                 raise APIInvalidDataError(json.loads(res.text)['message'])

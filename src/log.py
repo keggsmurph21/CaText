@@ -45,7 +45,7 @@ class Logger():
 
 
     def write(self, file='main', message=''):
-        
+
         file_path = os.path.join(self.logs_path, '{}.log'.format(file))
         with open(file_path, 'a') as f:
             f.write(message)
@@ -56,10 +56,10 @@ class Logger():
         message = self.format(prefix=prefix, message=message)
 
         if self.level >= level:
-            sys.stderr.write(message)
+            #sys.stderr.write(message)
             if file != 'main':
                 self.write(file=file, message=message)
-        if self.force_debug or self.level >= level:
+        if self.force_debug or self.level >= level or level < 2:
             self.write(message=message)
 
     def critical(self, message, file='main'):
@@ -76,10 +76,6 @@ class Logger():
 
     def debug(self, message, file='main'):
         self.handle(message, file, 'DEBUG', 4)
-
-
-    def put(self, message):
-        print(message)
 
 
 def get_time():
