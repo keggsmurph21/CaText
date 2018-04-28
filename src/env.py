@@ -4,7 +4,8 @@ class Env():
 	def __init__(self, filepath):
 		self.variables = {}
 		self.filepath = filepath
-		self.read()
+		if os.path.exists(self.filepath):
+			self.read()
 
 	def read(self):
 		with open(self.filepath) as f:

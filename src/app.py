@@ -1,6 +1,7 @@
 import os
+import sys
 
-from api  import API, APIError
+from api  import API, APIError, APIInvalidDataError
 from env  import Env
 from log  import Logger
 from user import User
@@ -8,30 +9,54 @@ from user import User
 class CaText():
     def __init__(self):
 
-        self.root_path = os.path.abspath(
+        # need a consistent reference to the root of this directory
+        self.project_root = os.path.abspath(
             os.path.join(os.path.dirname(__file__),'..'))
 
-        self.env = Env(os.path.join(self.root_path, '.env'))
-        self.logger = Logger(self.root_path, self.env)
-        self.api = API(self.logger, self.env)
+        # root environment variable manager
+        self.env = Env(self.get_path('.env.ct'))
 
-        self.logger.put('Welcome to CaText')
+        # root logger
+        self.logger = Logger('MAIN', self.project_root, self.env)
 
+        # set up the interface w/ our REST API
+        try:
+            self.api = API(self.logger, self.env)
+        except APIError:
+            self.logger.critical('Cannot locate server, exiting ...')
+            sys.exit(-1)
+
+        # welcome message
+        self.logger.put('\n\n<< Welcome to CaTexT >>')
+
+        # make sure we have a path to hold our user data
+        self.users_path = self.get_path('.users')
+        if not(os.path.exists(self.users_path)):
+            self.logger.debug('creating ".users" directory')
+            os.mkdir(self.users_path)
+
+        # TODO: replace this
         self.authenticate()
 
+    def get_path(self, *paths):
+        ''' get path under project root '''
+        return os.path.join(self.project_root, *paths)
+
     def authenticate(self):
+        ''' either use an authentication token or get a new one '''
+
         token = self.env.get('CATONLINE_TOKEN')
         while token is None:
             try:
                 token = self.api.post_login()
-            except APIError:
-                pass
+            except APIError as e:
+                self.logger.error(str(e))
+                if isinstance(e, APIInvalidDataError):
+                    self.logger.put(str(e))
 
         self.env.set('CATONLINE_TOKEN', token)
 
 
 if __name__ == '__main__':
 
-
     app = CaText()
-    print(os.path.abspath(os.path.dirname(__file__)))

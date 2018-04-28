@@ -11,10 +11,13 @@ __pycache__
 tmp
 
 # environment variables
-.env
+.env*
 
 # logs
 logs
 
 # user data
 .users
+
+# VM
+virtualenv
