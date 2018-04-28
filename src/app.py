@@ -1,6 +1,8 @@
 import os
 import sys
 
+from curses import wrapper
+
 from api  import API, APIError, APIConnectionError, APIInvalidDataError
 from env  import Env
 from cli  import CLI
@@ -16,12 +18,13 @@ class CaText():
 
         # root environment variable manager
         self.env = Env(self.get_path('env.ct'))
+        self.env.set('CURRENT_USER','')
 
         # root logger
         self.logger = Logger('MAIN', self.project_root, self.env)
 
         # set up our "GUI" which is really just a curses CLI
-        self.cli = CLI(self.logger, self.env)
+        self.cli = CLI(self.logger, self.env, self.get_path)
 
         # set up the interface w/ our REST API
         try:
@@ -38,10 +41,21 @@ class CaText():
             self.logger.debug('creating ".users" directory')
             os.mkdir(self.users_path)
 
-        # try to get a user ... first check defaults
+        # try to get a user
         self.current_user = self.select_user()
-
+        self.cli.status('Successfully logged in as {}'.format(self.current_user.name))
+        self.env.set('CURRENT_USER', self.current_user.name)
         self.logger.info('current user: {}'.format(self.current_user.name))
+
+        # go to the lobby
+        self.enter_lobby()
+
+    def enter_lobby(self):
+        self.logger.info('entering lobby')
+        data = self.api.get_lobby(self.current_user.token)
+        self.cli.change_mode('lobby', data)
+
+        self.cli.wait()
 
     def select_user(self):
         '''
@@ -55,29 +69,17 @@ class CaText():
         self.logger.debug('default user: {}'.format(default_user))
         user = self.get_user(default_user)
 
-        if user is None:
-            self.cli.status('Log in with your CatOnline credentials')
-
-            users = os.listdir(self.get_path('.users'))
-            if len(users):
-                lines = ['','   << Welcome to CaTexT! >>','','SAVED LOGINS:'] + [' - {}'.format(user) for user in users]
-            else:
-                lines = ['','   << Welcome to CaTexT! >>','','NO SAVED LOGINS']
-            self.cli.set(lines)
-
         while user is None:
 
             username = self.cli.input(' - username: ')
             user = self.get_user(username)
 
-            if user is None:
+            if user is None and len(username):
                 password = self.cli.input(' - password: ', visible=False)
                 self.logger.debug('username:{}, password:{}'.format(username,'*'*len(password)))
                 self.cli.status('Querying CatOnline database ... ')
                 user = self.save_user(username, password)
 
-        self.cli.status('Successfully logged in as {}'.format(user.name))
-        self.logger.debug(user.token)
         return user
 
     def get_path(self, *paths):
@@ -111,7 +113,10 @@ class CaTextError(Exception):
     pass
 
 
-if __name__ == '__main__':
-
+def main(*args, **kwargs):
     app = CaText()
     app.cli.quit()
+
+
+if __name__ == '__main__':
+    wrapper(main)

@@ -17,9 +17,6 @@ class API():
         if self.webroot is None:
             raise APIConnectionError('Unable to locate server (try running ./scripts/setup)')
 
-        # initialize auth token
-        self.token = None
-
         self.logger.debug('... API initialized (webroot: {})'.format(self.webroot))
 
     def get_uri(self, path):
@@ -45,11 +42,11 @@ class API():
 
             if res.status_code == 200:
                 # valid response
-                self.token = json.loads(res.text)['token']
-                user = json.loads(res.text)['user']
-                self.logger.debug('user {} got auth token {}'.format(user, self.token))
+                token = json.loads(res.text)['token']
+                user  = json.loads(res.text)['user']
+                self.logger.debug('user {} got auth token {}'.format(user, token))
 
-                return user, self.token
+                return user, token
             else:
                 # something went wrong
                 raise APIInvalidDataError('Invalid username or password')
@@ -57,7 +54,7 @@ class API():
         except requests.exceptions.ConnectionError:
             raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
 
-    def get_lobby(self):
+    def get_lobby(self, token):
         '''
         query $WEBROOT/api/lobby endpoint
 
@@ -65,12 +62,12 @@ class API():
         '''
 
         # make sure we include our auth token
-        headers = { 'x-access-token':self.token }
+        headers = { 'x-access-token':token }
         uri = self.get_uri('lobby')
 
         try:
             # hit the endpoint
-            self.logger.info('get {} (token: {})'.format(self.token))
+            self.logger.info('get {} (token: {})'.format(uri, token))
             res = requests.get(uri, headers=headers)
             self.logger.info('response code {}'.format(res.status_code))
 
@@ -84,7 +81,7 @@ class API():
         except requests.exceptions.ConnectionError:
             raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
 
-    def post_lobby(self, data):
+    def post_lobby(self, token, data):
         pass
 
     def get_play(self):
