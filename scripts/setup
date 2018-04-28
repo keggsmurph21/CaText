@@ -1,7 +1,14 @@
 #!/bin/bash
 
-if [ ! -d virtualenv ]; then
-  virtualenv --no-site-packages virtualenv
+if hash virtualenv 2>/dev/null; then
+  if [ ! -d virtualenv ]; then
+    virtualenv --no-site-packages virtualenv
+  fi
+  source ./virtualenv/bin/activate
 fi
-source ./virtualenv/bin/activate
 pip install -r requirements.txt
+
+ENV=env.ct
+if [ ! -f $ENV ]; then
+  echo "WEBROOT=http://localhost:49160" >> $ENV
+fi
