@@ -36,11 +36,15 @@ class CaText():
             self.logger.debug('creating ".users" directory')
             os.mkdir(self.users_path)
 
-        # choose a user from /.users/ or add a new one
-        self.current_user = self.select_user()
-        self.logger.info('selected {}'.format(self.current_user.name))
+        # try to get a user ... first check defaults
+        default_user = self.env.get('DEFAULT_USER')
+        self.logger.debug('default user: {}'.format(default_user))
+        self.current_user = self.get_user(default_user)
+        if self.current_user is None:
+            # choose a user from /.users/ or add a new one
+            self.current_user = self.select_user()
 
-        self.cli.quit()
+        self.logger.info('current user: {}'.format(self.current_user.name))
 
     def select_user(self):
         '''
@@ -66,6 +70,8 @@ class CaText():
         return os.path.join(self.project_root, *paths)
 
     def get_user(self, name):
+        if name == None:
+            return None
         user = User(self.project_root, self.logger)
         user.read(name)
         return user
@@ -92,9 +98,12 @@ class CaText():
                 if isinstance(e, APIInvalidDataError):
                     self.cli.dialog.print_line('{}, please try again'.format(str(e)))
 
-        #self.env.set('CATONLINE_TOKEN', token)
+
+class CaTextError(Exception):
+    pass
 
 
 if __name__ == '__main__':
 
     app = CaText()
+    app.cli.quit()

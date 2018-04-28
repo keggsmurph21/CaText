@@ -9,7 +9,7 @@ class User():
         # references
         self.project_root = project_root
         self.logger = logger
-        self.logger.info('initializing new user')
+        self.logger.debug('Bootstrapping new User ...')
 
     def set(self, data, token):
 
@@ -23,9 +23,11 @@ class User():
         # the root of where we're going to store our data
         self.path = os.path.join(self.project_root, '.users', self.name)
         if not(os.path.exists(self.path)):
-            self.logger.info('creating new user {}'.format(self.name))
+            self.logger.debug('... creating new user: {}'.format(self.name))
             os.mkdir(self.path)
             os.mkdir(os.path.join(self.path, 'games'))
+        else:
+            self.logger.debug('... user already exists, overwriting')
 
         self.write()
 
@@ -42,7 +44,7 @@ class User():
 
     def read(self, name):
 
-        self.logger.info('reading in user data for {}'.format(name))
+        self.logger.debug('... reading in user data for {}'.format(name))
 
         self.name = name
         self.path = os.path.join(self.project_root, '.users', self.name)

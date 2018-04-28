@@ -20,7 +20,7 @@ class API():
         # initialize auth token
         self.token = None
 
-        self.logger.debug('API initialized (webroot: {})'.format(self.webroot))
+        self.logger.debug('... API initialized (webroot: {})'.format(self.webroot))
 
     def get_uri(self, path):
         ''' get a URI for API endpoint '''

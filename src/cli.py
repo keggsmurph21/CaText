@@ -25,6 +25,8 @@ class CLI():
         # abstraction to deal with dialog stuff
         self.dialog = DialogWin(self.logger)
 
+        self.logger.debug('... CLI initialized')
+
     def quit(self):
         ''' wrapper for cleaning up our curses mode '''
         self.stdscr.keypad(False)
