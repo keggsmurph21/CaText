@@ -1,3 +1,0 @@
-# catan
-
-$ python main.py

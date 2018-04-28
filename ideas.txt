@@ -1,6 +1,0 @@
-bad graphics:
-  - card on middle of screen, flips over to reveal what the player stole
-  - better handling of loading/saving
-  - better handling of msgs/pMsgs (maybe have one system w/ different priorities)
-  - need to have reserved names for players/saves to avoid errors
-  - need system logs and game-specific logs
