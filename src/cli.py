@@ -20,7 +20,7 @@ class CLI():
 
         # use "mode"s to logically separate widget/data structure collections
         self.modes = {
-            'home'  : Mode('home',  self.logger, 'Welcome to CaTexT!'),
+            'home'  : Mode('home',  self.logger, ''),
             'lobby' : Mode('lobby', self.logger, 'You are now in the CaTexT lobby'),
             'play'  : Mode('play',  self.logger, 'You are now playing a game of CaTexT')
         }
@@ -31,12 +31,20 @@ class CLI():
     def change_mode(self, mode):
         self.current_mode = self.modes[mode].set_as_current()
 
+    def set(self, strings):
+        self.current_mode.win_main.set(strings)
+
+    def add(self, string):
+        self.current_mode.win_main.add(string)
+
     def status(self, status):
         self.current_mode.win_status.set(status)
 
     def input(self, prompt, visible=True, completions=None):
-        self.current_mode.win_input.set_prompt(prompt)
-        return self.current_mode.win_input.listen(visible=visible, completions=completions)
+        return self.current_mode.win_input.listen(prompt=prompt, visible=visible, completions=completions)
+
+    def wait(self):
+        self.current_mode.win_input.wait()
 
     def quit(self):
         ''' wrapper for cleaning up our curses mode '''
@@ -59,12 +67,12 @@ class Mode():
 
         self.win_banner = StripWindow(self.logger, y=0)
         SeparatorWindow(self.logger, y=1)
-        self.win_activity = ScrollWindow(self.logger, y=2, height=curses.LINES-5)
+        self.win_main = ScrollWindow(self.logger, y=2, height=curses.LINES-5)
         SeparatorWindow(self.logger, y=curses.LINES-3)
         self.win_status = StripWindow(self.logger, y=curses.LINES-2)
         self.win_input = InputWindow(self.logger, y=curses.LINES-1)
 
-        self.win_input.bind_to_scrollwindow(self.win_activity)
+        self.win_input.bind_to_scrollwindow(self.win_main)
 
     def set_as_current(self):
 
@@ -101,13 +109,13 @@ class StripWindow(Window):
         self.set('')
 
     def set(self, string, reset=False):
-        self.str_var = string
+        self.str_var = str(string)
         self.str_start = 0 if reset else self.str_start
         self.refresh()
 
     def refresh(self):
         visible_str_var = self.str_var[self.str_start:self.str_start+self.str_width]
-        visible_str = '{}{}'.format(self.prefix, visible_str_var)
+        visible_str = escape('{}{}'.format(self.prefix, visible_str_var))
         self.logger.debug(visible_str)
         #self.logger.debug(type(self.win).addstr)
         self.win.addstr(0, 0, visible_str)
@@ -138,7 +146,9 @@ class InputWindow(StripWindow):
     def bind_to_scrollwindow(self, scrollwindow):
         self.sw = scrollwindow
 
-    def listen(self, visible=True, completions=None):
+    def listen(self, prompt='', visible=True, completions=None):
+
+        self.set_prompt(prompt)
 
         string = ''
         while True:
@@ -148,6 +158,8 @@ class InputWindow(StripWindow):
 
             if num == 10: # <Enter>
                 return string
+            elif num == 27: # <Esc>
+                pass
             elif num == 127: # <Backspace>
                 if len(string):
                     y, x = self.win.getyx()
@@ -166,6 +178,11 @@ class InputWindow(StripWindow):
                 string += key
                 self.win.addstr(key if visible else '*')
                 self.win.refresh()
+
+    def wait(self):
+        self.logger.debug('waiting')
+        self.set_prompt(prompt='   press any key to continue ... ')
+        self.win.getch()
 
 class ScrollWindow(Window):
     def __init__(self, logger, y=-1, height=-1):
@@ -194,6 +211,7 @@ class ScrollWindow(Window):
         for line_num in range(self.height):
             id = self.start_line + line_num
             string = self.filtered_strings[id].string if id < len(self.filtered_strings) else ''
+            string = escape(string)
             if line_num == 0 and self.start_line > 0:
                 self.logger.debug('scroll up')
                 string = ' <Up>'
@@ -233,6 +251,9 @@ class ScrollString():
 
     def is_in_filter(self, filter):
         return self.label in filter
+
+def escape(string):
+    return string[:curses.COLS]
 
 class DialogWin():
     def __init__(self, logger):

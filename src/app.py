@@ -1,7 +1,7 @@
 import os
 import sys
 
-from api  import API, APIError, APIInvalidDataError
+from api  import API, APIError, APIConnectionError, APIInvalidDataError
 from env  import Env
 from cli  import CLI
 from log  import Logger
@@ -26,8 +26,10 @@ class CaText():
         # set up the interface w/ our REST API
         try:
             self.api = API(self.logger, self.env)
-        except APIError:
-            self.logger.critical('Cannot locate server, exiting ...')
+        except APIError as e:
+            self.logger.critical(e)
+            self.cli.status('ERROR: {}'.format(e))
+            self.cli.wait()
             sys.exit(-1)
 
         # make sure we have a path to hold our user data
@@ -55,6 +57,11 @@ class CaText():
 
         if user is None:
             self.cli.status('Log in with your CatOnline credentials')
+
+            users = os.listdir(self.get_path('.users'))
+            users = ['','   << Welcome to CaTexT! >>','','SAVED LOGINS:'] + [' - {}'.format(user) for user in users]
+            self.cli.set(users)
+            self.cli.add('penis')
 
         while user is None:
 
@@ -88,6 +95,9 @@ class CaText():
             self.logger.error(e)
             if isinstance(e, APIInvalidDataError):
                 self.cli.status(str(e))
+            elif isinstance(e, APIConnectionError):
+                self.cli.status('ERROR: only local logins are available')
+                self.cli.wait()
 
 
     def authenticate(self, username, password):

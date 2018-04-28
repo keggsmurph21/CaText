@@ -6,9 +6,10 @@ if hash virtualenv 2>/dev/null; then
   fi
   source ./virtualenv/bin/activate
 fi
+
 pip install -r requirements.txt
 
 ENV=env.ct
 if [ ! -f $ENV ]; then
-  echo "WEBROOT=http://localhost:49160" >> $ENV
+  echo "WEBROOT=http://192.168.1.8:49160" >> $ENV
 fi

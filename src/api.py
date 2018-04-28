@@ -15,7 +15,7 @@ class API():
         # try to get a webroot
         self.webroot = env.get('WEBROOT')
         if self.webroot is None:
-            raise APIError('Unable to parse webroot')
+            raise APIConnectionError('Unable to locate server (try running ./scripts/setup)')
 
         # initialize auth token
         self.token = None
@@ -55,7 +55,7 @@ class API():
                 raise APIInvalidDataError('Invalid username or password')
 
         except requests.exceptions.ConnectionError:
-            raise APIError('Unable to connect to server at "{}"'.format(uri))
+            raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
 
     def get_lobby(self):
         '''
@@ -82,7 +82,7 @@ class API():
                 raise APIInvalidDataError(json.loads(res.text)['message'])
 
         except requests.exceptions.ConnectionError:
-            raise APIError('Unable to connect to server at "{}"'.format(uri))
+            raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
 
     def post_lobby(self, data):
         pass
@@ -93,7 +93,12 @@ class API():
     def post_play(self, data):
         pass
 
+
+
 class APIError(Exception):
+    pass
+
+class APIConnectionError(APIError):
     pass
 
 class APIInvalidDataError(APIError):
