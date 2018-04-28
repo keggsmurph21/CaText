@@ -59,9 +59,11 @@ class CaText():
             self.cli.status('Log in with your CatOnline credentials')
 
             users = os.listdir(self.get_path('.users'))
-            users = ['','   << Welcome to CaTexT! >>','','SAVED LOGINS:'] + [' - {}'.format(user) for user in users]
-            self.cli.set(users)
-            self.cli.add('penis')
+            if len(users):
+                lines = ['','   << Welcome to CaTexT! >>','','SAVED LOGINS:'] + [' - {}'.format(user) for user in users]
+            else:
+                lines = ['','   << Welcome to CaTexT! >>','','NO SAVED LOGINS']
+            self.cli.set(lines)
 
         while user is None:
 
