@@ -17,6 +17,10 @@ class User():
         self.name = data['name']
         self.data = data
 
+        # but not all of it
+        for key in ['password', '__v']:
+            self.data.pop(key)
+
         # grab the token
         self.token = token
 
@@ -30,6 +34,8 @@ class User():
             self.logger.debug('... user already exists, overwriting')
 
         self.write()
+
+        return self
 
     def write(self):
 
@@ -48,9 +54,13 @@ class User():
 
         self.name = name
         self.path = os.path.join(self.project_root, '.users', self.name)
+        if not(os.path.exists(os.path.join(self.path, 'token'))):
+            return None
 
         e = Env(os.path.join(self.path, 'data.ct'))
         self.data = e.variables
 
         with open(os.path.join(self.path, 'token')) as f:
             self.token = f.read()
+
+        return self

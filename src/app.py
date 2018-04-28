@@ -37,12 +37,7 @@ class CaText():
             os.mkdir(self.users_path)
 
         # try to get a user ... first check defaults
-        default_user = self.env.get('DEFAULT_USER')
-        self.logger.debug('default user: {}'.format(default_user))
-        self.current_user = self.get_user(default_user)
-        if self.current_user is None:
-            # choose a user from /.users/ or add a new one
-            self.current_user = self.select_user()
+        self.current_user = self.select_user()
 
         self.logger.info('current user: {}'.format(self.current_user.name))
 
@@ -54,16 +49,27 @@ class CaText():
         @return User() corresponding to the choice
         '''
 
-        self.cli.dialog.print_line('Choose a user profile (use arrow keys and <Enter> to choose):')
-        new_user_str = '<login from web>'
-        available_users = [new_user_str] + os.listdir(self.get_path('.users'))
-        choice = self.cli.dialog.prompt_from_list(available_users)
+        default_user = self.env.get('DEFAULT_USER')
+        self.logger.debug('default user: {}'.format(default_user))
+        user = self.get_user(default_user)
 
-        if choice == new_user_str:
-            return self.add_new_user()
-        else:
-            return self.get_user(choice)
+        if user is None:
+            self.cli.status('Log in with your CatOnline credentials')
 
+        while user is None:
+
+            username = self.cli.input(' - username: ')
+            user = self.get_user(username)
+
+            if user is None:
+                password = self.cli.input(' - password: ', visible=False)
+                self.logger.debug('username:{}, password:{}'.format(username,'*'*len(password)))
+                self.cli.status('Querying CatOnline database ... ')
+                user = self.save_user(username, password)
+
+        self.cli.status('Successfully logged in as {}'.format(user.name))
+        self.logger.debug(user.token)
+        return user
 
     def get_path(self, *paths):
         ''' get path under project root '''
@@ -72,31 +78,21 @@ class CaText():
     def get_user(self, name):
         if name == None:
             return None
-        user = User(self.project_root, self.logger)
-        user.read(name)
-        return user
+        return User(self.project_root, self.logger).read(name)
 
-    def add_new_user(self):
-        user_data, token = self.authenticate()
-        user = User(self.project_root, self.logger)
-        user.set(user_data, token)
-        return user
+    def save_user(self, username, password):
+        try:
+            user_data, token = self.authenticate(username, password)
+            return User(self.project_root, self.logger).set(user_data, token)
+        except APIError as e:
+            self.logger.error(e)
+            if isinstance(e, APIInvalidDataError):
+                self.cli.status(str(e))
 
-    def authenticate(self):
+
+    def authenticate(self, username, password):
         ''' either use an authentication token or get a new one '''
-
-        self.cli.dialog.print_line('Login with your CatOnline credentials')
-        token = None
-
-        while token is None:
-            try:
-                username, password = self.cli.dialog.prompt_credentials()
-                self.logger.debug('username:{}, password:{}'.format(username,['*' for i in password]))
-                return self.api.post_login(username, password)
-            except APIError as e:
-                self.logger.error(str(e))
-                if isinstance(e, APIInvalidDataError):
-                    self.cli.dialog.print_line('{}, please try again'.format(str(e)))
+        return self.api.post_login(username, password)
 
 
 class CaTextError(Exception):

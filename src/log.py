@@ -32,16 +32,16 @@ class Logger():
 
     def format(self, show_time=True, prefix=None, message=''):
 
-        str = ''
+        string = ''
         if show_time:
-            str += '[{}] '.format(get_time())
-        str += '{} '.format(self.name)
+            string += '[{}] '.format(get_time())
+        string += '{} '.format(self.name)
         if prefix is not None:
-            str += '{}: '.format(prefix)
-        str += message
-        str += '\n'
+            string += '{}: '.format(prefix)
+        string += str(message)
+        string += '\n'
 
-        return str
+        return string
 
 
     def write(self, file='main', message=''):
