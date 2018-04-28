@@ -8,9 +8,15 @@ URI_API_LOGIN = os.path.join(WEBROOT, 'api', 'login')
 URI_API_LOBBY = os.path.join(WEBROOT, 'api', 'lobby')
 
 class API():
-    def __init__(self):
-        print('API connection initialized ...')
+    def __init__(self, logger, env):
+        self.logger = logger
+        self.logger.debug('API initializing ...')
         self.token = None
+        self.logger.debug('API got token {}'.format(self.token))
+        self.logger.debug('API initialized')
+
+        self.env = env
+
 
     def post_login(self):
         username = input('username: ')
@@ -52,4 +58,8 @@ class API():
         pass
 
     def post_play(self, data):
+        pass
+
+class APIError(Exception):
+    def __init__(self):
         pass

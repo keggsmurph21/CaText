@@ -12,3 +12,9 @@ tmp
 
 # environment variables
 .env
+
+# logs
+logs
+
+# user data
+.users
