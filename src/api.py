@@ -4,14 +4,36 @@ import requests
 
 import config as cfg
 
+
+def choose_api(name):
+    if name == 'http':
+        return HTTP
+    elif name == 'socketio':
+        return SocketIO
+    else:
+        raise APIError('Unknown interface ({})'.format(name))
+
+
 class API():
-    def __init__(self, protocol=None, host=None, port=None):
+    def __init__(self):     raise NotImplementedError
+    def get_uri(self):      raise NotImplementedError
+    def post_login(self):   raise NotImplementedError
+    def get_lobby(self):    raise NotImplementedError
+    def post_lobby(self):   raise NotImplementedError
+    def get_play(self):     raise NotImplementedError
+    def post_play(self):    raise NotImplementedError
+
+
+class HTTP(API):
+    def __init__(self):
 
         cfg.api_logger.debug('API initializing ...')
 
-        # save webroot
-        if protocol is None or host is None or port is None:
-            raise APIConnectionError('Unable to locate server (try running ./scripts/setup)')
+        protocol = cfg.env.get('PROTOCOL', 'http')
+        host = cfg.env.get('HOST', 'localhost')
+        port = cfg.env.get('PORT', 49160)
+
+        # save webroot as combination of these
         self.webroot = '{}://{}:{}'.format(protocol, host, port)
 
         cfg.api_logger.debug('... API initialized (webroot: {})'.format(self.webroot))
@@ -88,6 +110,8 @@ class API():
         pass
 
 
+class SocketIO(API):
+    pass
 
 class APIError(Exception): pass
 class APIConnectionError(APIError): pass

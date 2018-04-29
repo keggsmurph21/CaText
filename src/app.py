@@ -5,8 +5,8 @@ from curses import wrapper
 
 import config as cfg
 
-from api  import API, APIError, APIConnectionError, APIInvalidDataError
-from cli  import CLI
+from api  import choose_api, APIError, APIConnectionError, APIInvalidDataError
+from cli  import choose_cli, CLIError
 from env  import Env
 from log  import Logger
 from user import User
@@ -14,13 +14,11 @@ from user import User
 class CaTexT():
     def __init__(self):
 
-        # need a consistent reference to the root of this directory
-        cfg.root = os.path.abspath(os.path.join(os.path.dirname(__file__),'..'))
-
         # root environment variable manager
         env_filepath = cfg.get_path('env.ct')
         cfg.env = Env(env_filepath)
         cfg.env.set('CURRENT_USER','')
+        cfg.env.set('PROJECT_ROOT', cfg.root)
 
         # make some loggers
         logs_path = cfg.get_path('logs')
@@ -32,22 +30,21 @@ class CaTexT():
 
         # make sure we have a path to hold our user data
         users_path = cfg.get_path('.users')
-        cfg.env.set('users_path', users_path)
+        cfg.env.set('USERS_ROOT', users_path)
         if not(os.path.exists(users_path)):
             cfg.app_logger.debug('creating ".users" directory')
             os.mkdir(users_path)
 
         # set up our "GUI" which is really just a curses CLI
+        cli = cfg.env.get('CLI_TYPE','curses')
         cfg.cli_logger = Logger('CLI')
-        cfg.cli = CLI()
+        cfg.cli = choose_cli(cli)()
 
         # set up the interface w/ our REST API
         try:
-            protocol = cfg.env.get('PROTOCOL', 'http')
-            host = cfg.env.get('HOST', 'localhost')
-            port = cfg.env.get('PORT', 49160)
+            api = cfg.env.get('API_TYPE','http')
             cfg.api_logger = Logger('API')
-            cfg.api = API(protocol, host, port)
+            cfg.api = choose_api(api)()
         except APIError as e:
             cfg.app_logger.critical(e)
             cfg.cli.status('ERROR: {}'.format(e))
@@ -120,8 +117,9 @@ class CaTexT():
         return cfg.api.post_login(username, password)
 
     def quit(self):
-        cfg.app_logger('quitting CaTexT')
+        cfg.app_logger.info('CaTexT quitting')
         cfg.cli.quit()
+        cfg.root_logger.info('goodbye')
 
 class CaTexTError(Exception): pass
 
@@ -134,4 +132,4 @@ def main(*args, **kwargs):
 
 
 if __name__ == '__main__':
-    wrapper(main)
+    main()#wrapper(main)

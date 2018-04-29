@@ -1,14 +1,38 @@
 import curses
+import getpass
+import os
+import sys
 
 import config as cfg
 
-from cli_mode import Home, Lobby, Play
+cli_module_path = cfg.get_path('src','cli_modules')
+sys.path.append(cli_module_path)
+from mode import Home, Lobby, Play
+
+
+def choose_cli(name):
+    if name == 'basic':
+        return Basic
+    elif name == 'curses':
+        return Curses
+    else:
+        raise CLIError('Unknown interface ({})'.format(name))
 
 
 class CLI():
+    def __init__(self):     raise NotImplementedError
+    def change_mode(self):  raise NotImplementedError
+    def add_line(self):     raise NotImplementedError
+    def status(self):       raise NotImplementedError
+    def input(self):        raise NotImplementedError
+    def wait(self):         raise NotImplementedError
+    def quit(self):         raise NotImplementedError
+
+
+class Curses(CLI):
     def __init__(self):
 
-        cfg.cli_logger.debug('CLI initializing ...')
+        cfg.cli_logger.debug('CLI initializing (Curses) ...')
 
         # set up curses screen
         self.stdscr = curses.initscr()
@@ -57,3 +81,55 @@ class CLI():
         curses.echo()
         curses.nocbreak()
         curses.endwin()
+
+
+class Basic(CLI):
+    def __init__(self):
+
+        cfg.cli_logger.debug('CLI initializing (Basic) ...')
+
+        # primitive modes
+        self.modes = {
+            'home' : {
+                'set_as_current' : (lambda: print('Log in with your CatOnline credentials'))
+            },
+            'lobby' : {
+                'set_as_current' : (lambda: print('You are now in the CaTexT lobby'))
+            },
+            'play'  : {
+                'set_as_current' : (lambda: print('You are now playing CaTexT'))
+            }
+        }
+        self.change_mode('home')
+
+        cfg.cli_logger.debug('... CLI initialized')
+
+    def change_mode(self, mode, *args):
+        cfg.cli_logger.debug('CLI changing mode (to {})'.format(mode))
+        self.current_mode = self.modes[mode]
+        self.current_mode['set_as_current']()
+
+    def add_line(self, string):
+        cfg.cli_logger.debug('CLI adding a line to the current win_main')
+        print(string)
+
+    def status(self, status):
+        cfg.cli_logger.debug('CLI setting current win_status')
+        print(status)
+
+    def input(self, prompt, visible=True, completions=None):
+        cfg.cli_logger.debug('CLI prompting the user for input')
+        if visible:
+            return input(prompt)
+        else:
+            return getpass.getpass(prompt)
+
+    def wait(self):
+        cfg.cli_logger.debug('CLI waiting')
+        input('press <Enter> to continue ...')
+
+    def quit(self):
+        cfg.cli_logger.debug('CLI quitting')
+
+
+class CLIError(Exception): pass

@@ -3,7 +3,7 @@ import os
 
 import config as cfg
 
-from cli_window import StripWindow, SeparatorWindow, InputWindow, ScrollWindow
+from window import StripWindow, SeparatorWindow, InputWindow, ScrollWindow
 
 
 
@@ -52,7 +52,7 @@ class Home(Mode):
         cfg.cli_logger.debug('Home is now the current mode')
 
         lines = ['','   Welcome to CaTexT','']
-        users = os.listdir(cfg.env.get('users_path'))
+        users = os.listdir(cfg.env.get('USERS_ROOT'))
         if len(users):
             lines.append('SAVED LOGINS:')
             lines += [' - {}'.format(user) for user in users]

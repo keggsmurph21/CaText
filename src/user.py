@@ -24,7 +24,7 @@ class User():
         self.token = token
 
         # the root of where we're going to store our data
-        self.path = os.path.join(cfg.root, '.users', self.name)
+        self.path = os.path.join(cfg.env.get('USERS_ROOT'), self.name)
         if not(os.path.exists(self.path)):
             cfg.app_logger.debug('creating new user: {}'.format(self.name))
             os.mkdir(self.path)
@@ -52,7 +52,7 @@ class User():
         cfg.app_logger.debug('reading in user data for {}'.format(name))
 
         self.name = name
-        self.path = os.path.join(cfg.root, '.users', self.name)
+        self.path = os.path.join(cfg.env.get('USERS_ROOT'), self.name)
         if not(os.path.exists(os.path.join(self.path, 'token'))):
             return None
 
