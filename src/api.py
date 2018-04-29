@@ -4,6 +4,7 @@ import requests
 
 import config as cfg
 
+__all__ = ['choose_api', 'APIError', 'APIConnectionError', 'APIInvalidDataError']
 
 def choose_api(name):
     if name == 'http':

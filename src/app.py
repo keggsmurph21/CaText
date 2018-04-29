@@ -6,8 +6,8 @@ from curses import wrapper
 
 import config as cfg
 
-from api  import choose_api, APIError, APIConnectionError, APIInvalidDataError
-from cli  import choose_cli, CLIError
+from api  import *
+from cli  import *
 from env  import Env
 from log  import Logger
 from user import User

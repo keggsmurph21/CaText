@@ -11,6 +11,7 @@ cli_module_path = cfg.get_path('src','cli_modules')
 sys.path.append(cli_module_path)
 from mode import Home, Lobby, Play
 
+__all__ = ['choose_cli', 'CLIError']
 
 def choose_cli(name):
     if name == 'basic':
