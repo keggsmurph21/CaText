@@ -11,5 +11,9 @@ pip install -r requirements.txt
 
 ENV=env.ct
 if [ ! -f $ENV ]; then
-  echo "WEBROOT=http://192.168.1.28:49160" >> $ENV
+  echo "API_TYPE=http" >> $ENV
+  echo "PROTOCOL=http" >> $ENV
+  echo "HOST=192.168.1.28" >> $ENV
+  echo "PORT=49160" >> $ENV
+  echo "CLI_TYPE=curses" >> $ENV
 fi
