@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 
@@ -12,13 +13,17 @@ from log  import Logger
 from user import User
 
 class CaTexT():
-    def __init__(self):
+    def __init__(self, args={}):
 
         # root environment variable manager
-        env_filepath = cfg.get_path('env.ct')
+        env_filepath = cfg.get_path('.env.ct')
         cfg.env = Env(env_filepath)
         cfg.env.set('CURRENT_USER','')
         cfg.env.set('PROJECT_ROOT', cfg.root)
+
+        # evaluate passed arguments (dictionary)
+        self.args = args
+        self.parse_args()
 
         # make some loggers
         logs_path = cfg.get_path('logs')
@@ -35,7 +40,7 @@ class CaTexT():
             cfg.app_logger.debug('creating ".users" directory')
             os.mkdir(users_path)
 
-        # set up our "GUI" which is really just a curses CLI
+        # set up our "GUI" which is really just a (curses) CLI
         cli = cfg.env.get('CLI_TYPE','curses')
         cfg.cli_logger = Logger('CLI')
         cfg.cli = choose_cli(cli)()
@@ -111,22 +116,35 @@ class CaTexT():
                 cfg.cli.status('ERROR: only local logins are available')
                 cfg.cli.wait()
 
-
     def authenticate(self, username, password):
         ''' either use an authentication token or get a new one '''
         return cfg.api.post_login(username, password)
+
+    def parse_args(self):
+        print(self.args)
 
     def quit(self):
         cfg.app_logger.info('CaTexT quitting')
         cfg.cli.quit()
         cfg.root_logger.info('goodbye')
 
+
 class CaTexTError(Exception): pass
 
 
 def main(*args, **kwargs):
 
-    app = CaTexT()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a','--api', help='either `http` or `socketio`')
+    parser.add_argument('-c','--cli', help='either `basic` or `curses`')
+    parser.add_argument('--debug')
+    parser.add_argument('--quiet')
+    parser.add_argument('--set-default-user', help='set this user as the default')
+    parser.add_argument('-u','--user', help='login as this user')
+    parser.add_argument('-v', action='count', default=0)
+    args = vars(parser.parse_args()) # convert to dictionary
+
+    app = CaTexT(args)
     app.enter_lobby()
     app.quit()
 
