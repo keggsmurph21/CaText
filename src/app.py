@@ -120,7 +120,8 @@ class CaTexT(object):
 
     def authenticate(self, username, password):
         ''' either use an authentication token or get a new one '''
-        return cfg.api.post_login(username, password)
+        response = cfg.api.post_login(username, password)
+        return response['user'], response['token']
 
     def parse_args(self):
         print('args',self.args)

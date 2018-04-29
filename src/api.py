@@ -52,26 +52,7 @@ class HTTP(API):
 
         payload = { 'username':username, 'password':password }
         uri = self.get_uri('login')
-
-        try:
-            # hit the endpoint
-            cfg.api_logger.info('post {} (payload: {})'.format(uri, json.dumps(payload)))
-            res = requests.post(uri, data=payload)
-            cfg.api_logger.info('response code {}'.format(res.status_code))
-
-            if res.status_code == 200:
-                # valid response
-                token = json.loads(res.text)['token']
-                user  = json.loads(res.text)['user']
-                cfg.api_logger.debug('user {} got auth token {}'.format(user, token))
-
-                return user, token
-            else:
-                # something went wrong
-                raise APIInvalidDataError('Invalid username or password')
-
-        except requests.exceptions.ConnectionError:
-            raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
+        return self.post(uri, payload)
 
     def get_lobby(self, token):
         '''
@@ -83,32 +64,62 @@ class HTTP(API):
         # make sure we include our auth token
         headers = { 'x-access-token':token }
         uri = self.get_uri('lobby')
+        return self.get(uri, headers)
 
-        try:
-            # hit the endpoint
-            cfg.api_logger.info('get {} (token: {})'.format(uri, token))
-            res = requests.get(uri, headers=headers)
-            cfg.api_logger.info('response code {}'.format(res.status_code))
+    def post_lobby(self, token, payload):
+        '''
+        post to the $WEBROOT/api/lobby endpoint
+        note: this function prompts the user for password
 
-            if res.status_code == 200:
-                # valid response
-                cfg.api_logger.info('lobby response: {}'.format(res.text))
-                return json.loads(res.text)
-            else:
-                # something went wrong
-                raise APIInvalidDataError(json.loads(res.text)['message'])
+        @return data
+        '''
 
-        except requests.exceptions.ConnectionError:
-            raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
-
-    def post_lobby(self, token, data):
-        pass
+        # make sure we include our auth token
+        headers = { 'x-access-token':token }
+        uri = self.get_uri('lobby')
+        return self.post(uri, payload, headers)
 
     def get_play(self):
         pass
 
-    def post_play(self, data):
+    def post_play(self, payload):
         pass
+
+    def get(self, uri, headers={}):
+        try:
+            # hit the endpoint
+            cfg.api_logger.info('get {}'.format(uri))
+            res = requests.get(uri, headers=headers)
+            cfg.api_logger.info('response code: {}'.format(res.status_code))
+
+            if res.status_code == 200:
+                # valid response
+                cfg.api_logger.debug('response: {}'.format(res.text))
+                return json.loads(res.text)
+            else:
+                # something went wrong
+                raise APIInvalidDataError(res.text)
+
+        except requests.exceptions.ConnectionError:
+            raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
+
+    def post(self, uri, payload, headers={}):
+        try:
+            # hit the endpoint
+            cfg.api_logger.info('post {} (payload: {})'.format(uri, json.dumps(payload)))
+            res = requests.post(uri, data=payload, headers=headers)
+            cfg.api_logger.info('response code: {}'.format(res.status_code))
+
+            if res.status_code == 200:
+                # valid response
+                cfg.api_logger.debug('response: {}'.format(res.text))
+                return json.loads(res.text)
+            else:
+                # something went wrong
+                raise APIInvalidDataError(res.text)
+
+        except requests.exceptions.ConnectionError:
+            raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
 
 
 class SocketIO(API):
