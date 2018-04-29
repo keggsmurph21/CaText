@@ -4,7 +4,7 @@ import config as cfg
 
 from env import Env
 
-class User():
+class User(object):
 
     def __init__(self):
 

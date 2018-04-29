@@ -14,7 +14,7 @@ def choose_api(name):
         raise APIError('Unknown interface ({})'.format(name))
 
 
-class API():
+class API(object):
     def __init__(self):     raise NotImplementedError
     def get_uri(self):      raise NotImplementedError
     def post_login(self):   raise NotImplementedError

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import curses
 import getpass
 import os
@@ -19,7 +21,7 @@ def choose_cli(name):
         raise CLIError('Unknown interface ({})'.format(name))
 
 
-class CLI():
+class CLI(object):
     def __init__(self):     raise NotImplementedError
     def change_mode(self):  raise NotImplementedError
     def add_line(self):     raise NotImplementedError

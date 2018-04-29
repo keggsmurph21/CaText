@@ -14,7 +14,7 @@ from user import User
 
 __all__ = ['CaTexT', 'CaTexTError', 'play']
 
-class CaTexT():
+class CaTexT(object):
     def __init__(self, args={}):
 
         # root environment variable manager
@@ -154,4 +154,5 @@ if __name__ == '__main__':
     parser.add_argument('--version')
     args = vars(parser.parse_args()) # convert to dictionary
 
-    play(args)#wrapper(main)
+    wrapper(lambda x: play(args))
+    #play(args)

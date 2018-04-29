@@ -4,7 +4,7 @@ import sys
 
 import config as cfg
 
-class Logger():
+class Logger(object):
 
     def __init__(self, name):
 

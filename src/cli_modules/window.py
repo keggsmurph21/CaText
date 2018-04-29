@@ -2,7 +2,7 @@ import curses
 
 import config as cfg
 
-class Window():
+class Window(object):
     def __init__(self, dimensions, prefix=''):
 
         cfg.cli_logger.debug('initializing Window (dimensions={})'.format(dimensions))
@@ -19,7 +19,7 @@ class StripWindow(Window):
     def __init__(self, y=-1, prefix=''):
 
         cfg.cli_logger.debug('initializing StripWindow (prefix="{}")'.format(prefix))
-        super().__init__( (1, curses.COLS, y, 0), prefix=prefix)
+        super(StripWindow, self).__init__( (1, curses.COLS, y, 0), prefix=prefix)
 
         # variable string
         self.str_var = ''
@@ -47,7 +47,7 @@ class SeparatorWindow(StripWindow):
     def __init__(self, y=-1):
 
         cfg.cli_logger.debug('initializing SeparatorWindow')
-        super().__init__(y=y)
+        super(SeparatorWindow, self).__init__(y=y)
         self.set('-'*(curses.COLS-1))
 
 class InputWindow(StripWindow):
@@ -55,7 +55,7 @@ class InputWindow(StripWindow):
 
         cfg.cli_logger.debug('initializing InputWindow (prefix="{}")'.format(prefix))
         self.default_prompt = ' > '
-        super().__init__(y=y, prefix=self.default_prompt)
+        super(InputWindow, self).__init__(y=y, prefix=self.default_prompt)
         self.set_prompt()
 
     def set_prompt(self, prompt=None):
@@ -114,7 +114,7 @@ class ScrollWindow(Window):
     def __init__(self, y=-1, height=-1):
 
         cfg.cli_logger.debug('initializing ScrollWindow')
-        super().__init__((height, curses.COLS, y, 0))
+        super(ScrollWindow, self).__init__((height, curses.COLS, y, 0))
 
         # variable string array
         self.all_strings = []
@@ -170,7 +170,7 @@ class ScrollWindow(Window):
         cfg.cli_logger.debug('ScrollWindow filtering strings with labels {}'.format(','.join(filter)))
         self.filtered_strings = [string for string in self.all_strings if string.is_in_filter(filter)]
 
-class ScrollString():
+class ScrollString(object):
     def __init__(self, string, id, label):
 
         # save this stuff

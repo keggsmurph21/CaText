@@ -1,6 +1,6 @@
 import os
 
-class Env():
+class Env(object):
 	def __init__(self, filepath):
 		self.variables = {}
 		self.filepath = filepath

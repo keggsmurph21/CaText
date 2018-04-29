@@ -7,7 +7,7 @@ from window import StripWindow, SeparatorWindow, InputWindow, ScrollWindow
 
 
 
-class Mode():
+class Mode(object):
     def __init__(self, name):
 
         cfg.cli_logger.debug('initializing Mode (name={})'.format(name))
@@ -103,26 +103,28 @@ class Lobby(Mode):
                 elif not(game['isFull']):
                     split_games['bottom'].append(game)
 
-        self.win_main.add('IN-PROGRESS')
-        self.print_game_list(split_games['top'], 1)
-        self.win_main.add('')
-        self.win_main.add('PENDING')
-        self.print_game_list(split_games['middle'], len(split_games['top']))
-        self.win_main.add('')
-        self.win_main.add('AVAILABLE')
-        self.print_game_list(split_games['bottom'], len(split_games['top'])+len(split_games['middle']))
+        count = 1
+        count += self.print_game_list(title='IN-PROGRESS', games=split_games['top'], count=count)
+        count += self.print_game_list(title='PENDING', games=split_games['middle'], count=count)
+        count += self.print_game_list(title='AVAILABLE', games=split_games['bottom'], count=count)
 
-    def print_game_list(self, games, start_at=1):
+    def print_game_list(self, title='', games=[], count=1):
 
-        self.win_main.add('  num    id         author      players      last updated')
-        self.win_main.add(' ---- -------- ---------------- ------- ----------------------')
-        for i, game in enumerate(games):
-            gamestring = ' {:3}) {:8} {:^16} {:^7} {:<22}'.format(start_at+i
-                , game['id'][-8:]
-                , game['author']['name']
-                , self.get_players_string(game)
-                , game['updated'] )
-            self.win_main.add(gamestring)
+        if len(games):
+            self.win_main.add(title)
+            self.win_main.add('  num    id         author      players      last updated')
+            self.win_main.add(' ---- -------- ---------------- ------- ----------------------')
+            for i, game in enumerate(games):
+                gamestring = ' {:3}) {:8} {:^16} {:^7} {:<22}'.format(count
+                    , game['id'][-8:]
+                    , game['author']['name']
+                    , self.get_players_string(game)
+                    , game['updated'] )
+                self.win_main.add(gamestring)
+                count += 1
+            self.win_main.add('')
+
+        return count
 
     def set_as_current(self, args):
 
