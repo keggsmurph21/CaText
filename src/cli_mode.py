@@ -1,31 +1,31 @@
 import curses
 import os
 
+import config as cfg
+
 from cli_window import StripWindow, SeparatorWindow, InputWindow, ScrollWindow
 
 
 
 class Mode():
-    def __init__(self, name, logger, env, get_path):
+    def __init__(self, name):
 
-        # keep references
+        cfg.cli_logger.debug('initializing Mode (name={})'.format(name))
+
         self.name = name
-        self.logger = logger
-        self.env = env
-        self.get_path = get_path
 
-        self.win_banner = StripWindow(self.logger, y=0)
-        SeparatorWindow(self.logger, y=1)
-        self.win_main = ScrollWindow(self.logger, y=2, height=curses.LINES-5)
-        SeparatorWindow(self.logger, y=curses.LINES-3)
-        self.win_status = StripWindow(self.logger, y=curses.LINES-2)
-        self.win_input = InputWindow(self.logger, y=curses.LINES-1)
+        self.win_banner = StripWindow(y=0)
+        SeparatorWindow(y=1)
+        self.win_main = ScrollWindow(y=2, height=curses.LINES-5)
+        SeparatorWindow(y=curses.LINES-3)
+        self.win_status = StripWindow(y=curses.LINES-2)
+        self.win_input = InputWindow(y=curses.LINES-1)
 
         self.win_input.bind_to_scrollwindow(self.win_main)
 
     def get_banner_text(self):
 
-        current_user = self.env.get('CURRENT_USER', None)
+        current_user = cfg.env.get('CURRENT_USER', None)
 
         if current_user is '':
 
@@ -40,21 +40,19 @@ class Mode():
             banner_pad = curses.COLS - len(left_banner) - len(right_banner) - 1
             banner_text = '{}{}{}'.format(left_banner, ' '*banner_pad, right_banner)
 
+        cfg.cli_logger.debug('Mode banner text : "{}"'.format(banner_text))
+
         return banner_text
 
 
 
 class Home(Mode):
-    def __init__(self, *args):
-
-        super().__init__(*args)
-
     def set_as_current(self, *args):
 
-        self.logger.debug('setting <home> as the current mode')
+        cfg.cli_logger.debug('Home is now the current mode')
 
-        lines = ['','   << Welcome to CaTexT >>','']
-        users = os.listdir(self.get_path('.users'))
+        lines = ['','   Welcome to CaTexT','']
+        users = os.listdir(cfg.env.get('users_path'))
         if len(users):
             lines.append('SAVED LOGINS:')
             lines += [' - {}'.format(user) for user in users]
@@ -69,13 +67,9 @@ class Home(Mode):
         return self
 
 class Lobby(Mode):
-    def __init__(self, *args):
-
-        super().__init__(*args)
-
     def set_as_current(self, *args):
 
-        self.logger.debug('setting <lobby> as the current mode')
+        cfg.cli_logger.debug('Lobby is now the current mode')
 
         self.win_banner.set(self.get_banner_text())
         self.win_main.set([])
@@ -85,13 +79,9 @@ class Lobby(Mode):
         return self
 
 class Play(Mode):
-    def __init__(self, *args):
-
-        super().__init__(*args)
-
     def set_as_current(self, *args):
 
-        self.logger.debug('settings <{}> as the current mode'.format(self.name))
+        cfg.cli_logger.debug('Play ({}) is now the current mode'.format(self.name))
 
         self.win_banner.set(self.get_banner_text())
         self.win_main.set([])

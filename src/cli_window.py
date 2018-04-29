@@ -1,14 +1,14 @@
 import curses
 
-class Window():
-    def __init__(self, logger, dimensions, prefix=''):
+import config as cfg
 
-        # keep the same logger
-        self.logger = logger
+class Window():
+    def __init__(self, dimensions, prefix=''):
+
+        cfg.cli_logger.debug('initializing Window (dimensions={})'.format(dimensions))
 
         # get dimensions of the strip for our newwin()
         self.height, self.width, self.start_y, self.start_x = dimensions
-        self.logger.debug(str(dimensions))
         self.win = curses.newwin(self.height, self.width, self.start_y, self.start_x)
         self.win.keypad(True)
 
@@ -16,8 +16,10 @@ class Window():
         self.prefix = prefix
 
 class StripWindow(Window):
-    def __init__(self, logger, y=-1, prefix=''):
-        super().__init__(logger, (1, curses.COLS, y, 0), prefix=prefix)
+    def __init__(self, y=-1, prefix=''):
+
+        cfg.cli_logger.debug('initializing StripWindow (prefix="{}")'.format(prefix))
+        super().__init__( (1, curses.COLS, y, 0), prefix=prefix)
 
         # variable string
         self.str_var = ''
@@ -29,30 +31,35 @@ class StripWindow(Window):
     def set(self, string, reset=False):
         self.str_var = str(string)
         self.str_start = 0 if reset else self.str_start
+        cfg.cli_logger.debug('StripWindow str_var : "{}"'.format(self.str_var))
         self.refresh()
 
     def refresh(self):
         visible_str_var = self.str_var[self.str_start:self.str_start+self.str_width]
         visible_str = escape('{}{}'.format(self.prefix, visible_str_var))
-        self.logger.debug(visible_str)
-        #self.logger.debug(type(self.win).addstr)
+
+        cfg.cli_logger.debug('StripWindow visibile_str : "{}"'.format(visible_str))
         self.win.addstr(0, 0, visible_str)
         self.win.clrtoeol()
         self.win.refresh()
 
 class SeparatorWindow(StripWindow):
-    def __init__(self, logger, y=-1):
-        super().__init__(logger, y=y)
+    def __init__(self, y=-1):
+
+        cfg.cli_logger.debug('initializing SeparatorWindow')
+        super().__init__(y=y)
         self.set('-'*(curses.COLS-1))
 
 class InputWindow(StripWindow):
-    def __init__(self, logger, y=-1, prefix=''):
+    def __init__(self, y=-1, prefix=''):
+
+        cfg.cli_logger.debug('initializing InputWindow (prefix="{}")'.format(prefix))
         self.default_prompt = ' > '
-        super().__init__(logger, y=y, prefix=self.default_prompt)
+        super().__init__(y=y, prefix=self.default_prompt)
         self.set_prompt()
 
     def set_prompt(self, prompt=None):
-        self.logger.debug('new prompt: {}'.format(prompt))
+        cfg.cli_logger.debug('InputWindow prompt: {}'.format(prompt))
         self.prefix = self.default_prompt if prompt is None else prompt
 
         self.str_var = ''
@@ -66,13 +73,14 @@ class InputWindow(StripWindow):
 
     def listen(self, prompt='', visible=True, completions=None):
 
+        cfg.cli_logger.debug('InputWindow listening')
         self.set_prompt(prompt)
 
         string = ''
         while True:
             key = self.win.getkey()
             num = ord(key) if len(key)==1 else -1
-            self.logger.debug('pressed "{}" ({})'.format(key, num))
+            cfg.cli_logger.debug('InputWindow key "{}" ({})'.format(key, num))
 
             if num == 10: # <Enter>
                 return string
@@ -98,13 +106,15 @@ class InputWindow(StripWindow):
                 self.win.refresh()
 
     def wait(self):
-        self.logger.debug('waiting')
+        cfg.cli_logger.debug('InputWindow waiting')
         self.set_prompt(prompt='   press any key to continue ... ')
         self.win.getch()
 
 class ScrollWindow(Window):
-    def __init__(self, logger, y=-1, height=-1):
-        super().__init__(logger, (height, curses.COLS, y, 0))
+    def __init__(self, y=-1, height=-1):
+
+        cfg.cli_logger.debug('initializing ScrollWindow')
+        super().__init__((height, curses.COLS, y, 0))
 
         # variable string array
         self.all_strings = []
@@ -114,30 +124,28 @@ class ScrollWindow(Window):
         self.start_line = 0
 
     def scroll_up(self):
+        cfg.cli_logger.debug('ScrollWindow try scroll up')
         if self.start_line > 0:
+            cfg.cli_logger.debug('ScrollWindow scrolling up')
             self.start_line -= 1
             self.refresh()
 
     def scroll_down(self):
+        cfg.cli_logger.debug('ScrollWindow try scroll down')
         if len(self.filtered_strings) > self.start_line + self.height:
+            cfg.cli_logger.debug('ScrollWindow scrolling down')
             self.start_line += 1
             self.refresh()
 
     def refresh(self):
-        #self.logger.debug(self.all_strings)
-        #self.logger.debug(self.filtered_strings)
         for line_num in range(self.height):
             id = self.start_line + line_num
             string = self.filtered_strings[id].string if id < len(self.filtered_strings) else ''
             string = escape(string)
             if line_num == 0 and self.start_line > 0:
-                self.logger.debug('scroll up')
                 string = ' <Up>'
             if line_num == self.height-1 and len(self.filtered_strings) - 1 > id:
-                self.logger.debug('start_line {}, line_num {}, id {}, height {}, len-strings {}'.format(self.start_line, line_num, id, self.height, len(self.filtered_strings)))
-                self.logger.debug('scroll down')
                 string = ' <Down>'
-            #self.logger.debug(string)
             self.win.addstr(line_num, 0, string)
             self.win.clrtoeol()
         self.win.refresh()
@@ -145,18 +153,21 @@ class ScrollWindow(Window):
     def set(self, strings, label='server'):
         for string in strings:
             string = ScrollString(string, len(self.all_strings), label)
+            cfg.cli_logger.debug('ScrollWindow set string : "{}"'.format(string))
             self.all_strings.append(string)
         self.filter_strings(self.string_filter)
         self.refresh()
 
     def add(self, string, label='<NONE>'):
         string = ScrollString(string, len(self.all_strings), label)
+        cfg.cli_logger.debug('ScrollWindow add string : "{}"'.format(string))
         self.all_strings.append(string)
         self.filter_strings(self.string_filter)
         self.refresh()
 
     def filter_strings(self, filter=None):
         self.string_filter = self.string_filter_all if filter is None else filter
+        cfg.cli_logger.debug('ScrollWindow filtering strings with labels {}'.format(','.join(filter)))
         self.filtered_strings = [string for string in self.all_strings if string.is_in_filter(filter)]
 
 class ScrollString():
@@ -167,8 +178,13 @@ class ScrollString():
         self.id = id
         self.label = label
 
+        cfg.cli_logger.debug('initializing {}'.format(self))
+
     def is_in_filter(self, filter):
         return self.label in filter
+
+    def __repr__(self):
+        return 'ScrollString (string="{}", id={}, label={})'.format(self.string, self.id, self.label)
 
 def escape(string):
     return string[:curses.COLS]

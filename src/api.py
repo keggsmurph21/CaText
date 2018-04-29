@@ -2,22 +2,19 @@ import json
 import os
 import requests
 
+import config as cfg
+
 class API():
-    def __init__(self, root_logger, env):
+    def __init__(self, protocol=None, host=None, port=None):
 
-        # keep a reference to the root logger
-        self.logger = root_logger
-        self.logger.debug('API initializing ...')
+        cfg.api_logger.debug('API initializing ...')
 
-        # keep a reference to the root environment variables
-        self.env = env
-
-        # try to get a webroot
-        self.webroot = env.get('WEBROOT')
-        if self.webroot is None:
+        # save webroot
+        if protocol is None or host is None or port is None:
             raise APIConnectionError('Unable to locate server (try running ./scripts/setup)')
+        self.webroot = '{}://{}:{}'.format(protocol, host, port)
 
-        self.logger.debug('... API initialized (webroot: {})'.format(self.webroot))
+        cfg.api_logger.debug('... API initialized (webroot: {})'.format(self.webroot))
 
     def get_uri(self, path):
         ''' get a URI for API endpoint '''
@@ -36,15 +33,15 @@ class API():
 
         try:
             # hit the endpoint
-            self.logger.info('post {} (payload: {})'.format(uri, json.dumps(payload)))
+            cfg.api_logger.info('post {} (payload: {})'.format(uri, json.dumps(payload)))
             res = requests.post(uri, data=payload)
-            self.logger.info('response code {}'.format(res.status_code))
+            cfg.api_logger.info('response code {}'.format(res.status_code))
 
             if res.status_code == 200:
                 # valid response
                 token = json.loads(res.text)['token']
                 user  = json.loads(res.text)['user']
-                self.logger.debug('user {} got auth token {}'.format(user, token))
+                cfg.api_logger.debug('user {} got auth token {}'.format(user, token))
 
                 return user, token
             else:
@@ -67,13 +64,13 @@ class API():
 
         try:
             # hit the endpoint
-            self.logger.info('get {} (token: {})'.format(uri, token))
+            cfg.api_logger.info('get {} (token: {})'.format(uri, token))
             res = requests.get(uri, headers=headers)
-            self.logger.info('response code {}'.format(res.status_code))
+            cfg.api_logger.info('response code {}'.format(res.status_code))
 
             if res.status_code == 200:
                 # valid response
-                self.logger.info('lobby response: {}'.format(res.text))
+                cfg.api_logger.info('lobby response: {}'.format(res.text))
             else:
                 # something went wrong
                 raise APIInvalidDataError(json.loads(res.text)['message'])
@@ -92,11 +89,6 @@ class API():
 
 
 
-class APIError(Exception):
-    pass
-
-class APIConnectionError(APIError):
-    pass
-
-class APIInvalidDataError(APIError):
-    pass
+class APIError(Exception): pass
+class APIConnectionError(APIError): pass
+class APIInvalidDataError(APIError): pass

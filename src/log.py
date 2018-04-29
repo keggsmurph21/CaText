@@ -2,14 +2,19 @@ import datetime
 import os
 import sys
 
+import config as cfg
+
 class Logger():
 
-    def __init__(self, name, project_root, env):
+    def __init__(self, name):
 
-        self.name = name
+        self.name = name.lower()
 
-        verbosity = env.get('VERBOSITY','CRITICAL')
-        debug = True if env.get('DEBUG') == '1' else 0
+        self.file = cfg.get_path('logs','{}.log'.format(self.name))
+        self.root = cfg.get_path('logs','root.log')
+
+        verbosity = cfg.env.get('VERBOSITY','CRITICAL')
+        debug = True if cfg.env.get('DEBUG') == '1' else 0
 
         levels = ['CRITICAL','ERROR','WARN','INFO','DEBUG']
         try:
@@ -20,14 +25,10 @@ class Logger():
             self.level = 1
             self.level_name = 'INVALID_LOGGING_LEVEL'
 
-        self.logs_path = os.path.join(project_root, 'logs')
-        if not(os.path.exists(self.logs_path)):
-            os.mkdir(self.logs_path)
-
         self.force_debug = debug or self.level == 4
 
-        self.write(message='\n\n\n')
-        self.debug('Logger initializing (level: {}, debug: {})'.format(self.level_name, self.force_debug))
+        self.write(file=self.file, message='\n\n\n')
+        self.debug('Logger initializing ({})'.format(self))
 
 
     def format(self, show_time=True, prefix=None, message=''):
@@ -44,10 +45,9 @@ class Logger():
         return string
 
 
-    def write(self, file='main', message=''):
+    def write(self, file='', message=''):
 
-        file_path = os.path.join(self.logs_path, '{}.log'.format(file))
-        with open(file_path, 'a') as f:
+        with open(file, 'a') as f:
             f.write(message)
 
 
@@ -57,10 +57,10 @@ class Logger():
 
         if self.level >= level:
             #sys.stderr.write(message)
-            if file != 'main':
-                self.write(file=file, message=message)
+            if self.file != self.root:
+                self.write(file=self.file, message=message)
         if self.force_debug or self.level >= level or level < 2:
-            self.write(message=message)
+            self.write(file=self.root, message=message)
 
     def critical(self, message, file='main'):
         self.handle(message, file, 'CRITICAL', 0)
@@ -77,6 +77,9 @@ class Logger():
     def debug(self, message, file='main'):
         self.handle(message, file, 'DEBUG', 4)
 
+
+    def __repr__(self):
+        return 'Logger (name={}, level={}, debug={})'.format(self.name, self.level_name, self.force_debug)
 
 def get_time():
     return str(datetime.datetime.now())

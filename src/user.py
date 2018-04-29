@@ -1,15 +1,14 @@
 import os
 
+import config as cfg
+
 from env import Env
 
 class User():
 
-    def __init__(self, project_root, logger):
+    def __init__(self):
 
-        # references
-        self.project_root = project_root
-        self.logger = logger
-        self.logger.debug('Bootstrapping new User ...')
+        cfg.app_logger.debug('bootstrapping new User')
 
     def set(self, data, token):
 
@@ -25,13 +24,13 @@ class User():
         self.token = token
 
         # the root of where we're going to store our data
-        self.path = os.path.join(self.project_root, '.users', self.name)
+        self.path = os.path.join(cfg.root, '.users', self.name)
         if not(os.path.exists(self.path)):
-            self.logger.debug('... creating new user: {}'.format(self.name))
+            cfg.app_logger.debug('creating new user: {}'.format(self.name))
             os.mkdir(self.path)
             os.mkdir(os.path.join(self.path, 'games'))
         else:
-            self.logger.debug('... user already exists, overwriting')
+            cfg.app_logger.debug('user already exists, overwriting')
 
         self.write()
 
@@ -39,7 +38,7 @@ class User():
 
     def write(self):
 
-        self.logger.info('writing user data for {}'.format(self.name))
+        cfg.app_logger.info('writing user data for {}'.format(self.name))
 
         e = Env(os.path.join(self.path, 'data.ct'))
         for key in self.data:
@@ -50,10 +49,10 @@ class User():
 
     def read(self, name):
 
-        self.logger.debug('... reading in user data for {}'.format(name))
+        cfg.app_logger.debug('reading in user data for {}'.format(name))
 
         self.name = name
-        self.path = os.path.join(self.project_root, '.users', self.name)
+        self.path = os.path.join(cfg.root, '.users', self.name)
         if not(os.path.exists(os.path.join(self.path, 'token'))):
             return None
 
