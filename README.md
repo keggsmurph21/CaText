@@ -1,5 +1,10 @@
 ## Setup
-`./bin/bootstrap`
+```bash
+$ git clone https://github.com/keggsmurph21/catext
+$ ./bin/bootstrap
+```
 
 ## Play
-`python src/app.py`
+```bash
+$ python src/app.py
+```
