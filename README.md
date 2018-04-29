@@ -1,5 +1,5 @@
-##Setup
-./bin/bootstrap
+## Setup
+`./bin/bootstrap`
 
-##Play
-python src/app.py
+## Play
+`python src/app.py`
