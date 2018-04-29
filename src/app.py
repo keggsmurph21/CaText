@@ -12,12 +12,14 @@ from env  import Env
 from log  import Logger
 from user import User
 
+__all__ = ['CaTexT', 'CaTexTError', 'play']
+
 class CaTexT():
     def __init__(self, args={}):
 
         # root environment variable manager
-        env_filepath = cfg.get_path('.env.ct')
-        cfg.env = Env(env_filepath)
+        env_path = cfg.get_path('.env.ct')
+        cfg.env = Env(env_path)
         cfg.env.set('CURRENT_USER','')
         cfg.env.set('PROJECT_ROOT', cfg.root)
 
@@ -70,7 +72,7 @@ class CaTexT():
         data = cfg.api.get_lobby(cfg.current_user.token)
         cfg.cli.change_mode('lobby', data)
 
-        cfg.cli.wait()
+        cfg.cli.input()
 
     def select_user(self):
         '''
@@ -121,7 +123,7 @@ class CaTexT():
         return cfg.api.post_login(username, password)
 
     def parse_args(self):
-        print(self.args)
+        print('args',self.args)
 
     def quit(self):
         cfg.app_logger.info('CaTexT quitting')
@@ -132,7 +134,14 @@ class CaTexT():
 class CaTexTError(Exception): pass
 
 
-def main(*args, **kwargs):
+def play(args={}):
+
+    app = CaTexT(args)
+    app.enter_lobby()
+    app.quit()
+
+
+if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-a','--api', help='either `http` or `socketio`')
@@ -141,13 +150,8 @@ def main(*args, **kwargs):
     parser.add_argument('--quiet')
     parser.add_argument('--set-default-user', help='set this user as the default')
     parser.add_argument('-u','--user', help='login as this user')
-    parser.add_argument('-v', action='count', default=0)
+    parser.add_argument('--verbosity')
+    parser.add_argument('--version')
     args = vars(parser.parse_args()) # convert to dictionary
 
-    app = CaTexT(args)
-    app.enter_lobby()
-    app.quit()
-
-
-if __name__ == '__main__':
-    main()#wrapper(main)
+    play(args)#wrapper(main)

@@ -67,7 +67,64 @@ class Home(Mode):
         return self
 
 class Lobby(Mode):
-    def set_as_current(self, *args):
+
+    def get_players_string(self, game):
+        if game['status'] == 'in-progress':
+            return '{:2}'.format(len(game['players']))
+        elif game['status'] == 'ready':
+            return '{:2}'.format(len(game['players']))
+        elif game['status'] == 'pending':
+            return '{:2}/{:2}'.format(len(game['players']), game['settings']['numHumans'])
+
+    def check_if_user_in_game(self, game):
+        user = cfg.current_user
+
+        for player in game['players']:
+            cfg.cli_logger.debug('"{}" "{}"'.format(player['name'], user.name))
+            if player['name'] == user.name:
+                cfg.cli_logger.debug('same')
+                return True
+
+        return False
+
+    def print_games(self, games):
+
+        split_games = { 'top':[], 'middle':[], 'bottom':[] }
+        for game in games:
+
+            user_in_game = self.check_if_user_in_game(game)
+            cfg.cli_logger.debug('{} {}'.format(user_in_game, game['status']))
+            if game['status'] == 'in-progress':
+                if user_in_game:
+                    split_games['top'].append(game)
+            else:
+                if user_in_game:
+                    split_games['middle'].append(game)
+                elif not(game['isFull']):
+                    split_games['bottom'].append(game)
+
+        self.win_main.add('IN-PROGRESS')
+        self.print_game_list(split_games['top'], 1)
+        self.win_main.add('')
+        self.win_main.add('PENDING')
+        self.print_game_list(split_games['middle'], len(split_games['top']))
+        self.win_main.add('')
+        self.win_main.add('AVAILABLE')
+        self.print_game_list(split_games['bottom'], len(split_games['top'])+len(split_games['middle']))
+
+    def print_game_list(self, games, start_at=1):
+
+        self.win_main.add('  num    id         author      players      last updated')
+        self.win_main.add(' ---- -------- ---------------- ------- ----------------------')
+        for i, game in enumerate(games):
+            gamestring = ' {:3}) {:8} {:^16} {:^7} {:<22}'.format(start_at+i
+                , game['id'][-8:]
+                , game['author']['name']
+                , self.get_players_string(game)
+                , game['updated'] )
+            self.win_main.add(gamestring)
+
+    def set_as_current(self, args):
 
         cfg.cli_logger.debug('Lobby is now the current mode')
 
@@ -75,6 +132,8 @@ class Lobby(Mode):
         self.win_main.set([])
         self.win_status.set('')
         self.win_input.set('')
+
+        self.print_games(args['games'])
 
         return self
 

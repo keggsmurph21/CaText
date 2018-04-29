@@ -93,6 +93,7 @@ class HTTP(API):
             if res.status_code == 200:
                 # valid response
                 cfg.api_logger.info('lobby response: {}'.format(res.text))
+                return json.loads(res.text)
             else:
                 # something went wrong
                 raise APIInvalidDataError(json.loads(res.text)['message'])

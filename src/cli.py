@@ -66,7 +66,7 @@ class Curses(CLI):
         cfg.cli_logger.debug('CLI setting current win_status')
         self.current_mode.win_status.set(status)
 
-    def input(self, prompt, visible=True, completions=None):
+    def input(self, prompt=None, visible=True, completions=None):
         cfg.cli_logger.debug('CLI prompting the user for input')
         return self.current_mode.win_input.listen(prompt=prompt, visible=visible, completions=completions)
 
@@ -117,7 +117,7 @@ class Basic(CLI):
         cfg.cli_logger.debug('CLI setting current win_status')
         print(status)
 
-    def input(self, prompt, visible=True, completions=None):
+    def input(self, prompt='', visible=True, completions=None):
         cfg.cli_logger.debug('CLI prompting the user for input')
         if visible:
             return input(prompt)
