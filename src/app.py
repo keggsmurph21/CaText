@@ -22,6 +22,7 @@ class CaTexT(object):
         cfg.env = Env(env_path)
         cfg.env.set('CURRENT_USER','')
         cfg.env.set('PROJECT_ROOT', cfg.root)
+        cfg.app = self
 
         # evaluate passed arguments (dictionary)
         self.args = args
@@ -54,13 +55,13 @@ class CaTexT(object):
             cfg.api = choose_api(api)()
         except APIError as e:
             cfg.app_logger.critical(e)
-            cfg.cli.status('ERROR: {}'.format(e))
+            cfg.cli.set_status('ERROR: {}'.format(e))
             cfg.cli.wait()
             raise CaTexTError(e)
 
         # try to get a user
         cfg.current_user = self.select_user()
-        cfg.cli.status('Successfully logged in as {}'.format(cfg.current_user.name))
+        cfg.cli.set_status('Successfully logged in as {}'.format(cfg.current_user.name))
         cfg.env.set('CURRENT_USER', cfg.current_user.name)
         cfg.app_logger.info('current user: {}'.format(cfg.current_user.name))
 
@@ -72,7 +73,7 @@ class CaTexT(object):
         data = cfg.api.get_lobby(cfg.current_user.token)
         cfg.cli.change_mode('lobby', data)
 
-        cfg.cli.input()
+        cfg.cli.wait()
 
     def select_user(self):
         '''
@@ -93,10 +94,11 @@ class CaTexT(object):
             username = cfg.cli.input(' - username: ')
             user = self.get_user(username)
 
+            cfg.app_logger.debug('username: "{}" ({})'.format(username, len(username)))
             if user is None and len(username):
                 password = cfg.cli.input(' - password: ', visible=False)
                 cfg.app_logger.debug('attempting login (username={}, password={})'.format(username,'*'*len(password)))
-                cfg.cli.status('Querying CatOnline database ... ')
+                cfg.cli.set_status('Querying CatOnline database ... ')
                 user = self.save_user(username, password)
 
         return user
@@ -113,9 +115,9 @@ class CaTexT(object):
         except APIError as e:
             cfg.app_logger.error(e)
             if isinstance(e, APIInvalidDataError):
-                cfg.cli.status(str(e))
+                cfg.cli.set_status(str(e))
             elif isinstance(e, APIConnectionError):
-                cfg.cli.status('ERROR: only local logins are available')
+                cfg.cli.set_status('ERROR: only local logins are available')
                 cfg.cli.wait()
 
     def authenticate(self, username, password):
@@ -130,6 +132,7 @@ class CaTexT(object):
         cfg.app_logger.info('CaTexT quitting')
         cfg.cli.quit()
         cfg.root_logger.info('goodbye')
+        sys.exit(0)
 
 
 class CaTexTError(Exception): pass
@@ -155,5 +158,4 @@ if __name__ == '__main__':
     parser.add_argument('--version')
     args = vars(parser.parse_args()) # convert to dictionary
 
-    wrapper(lambda x: play(args))
-    #play(args)
+    play(args)

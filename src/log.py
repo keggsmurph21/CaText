@@ -28,7 +28,7 @@ class Logger(object):
         self.force_debug = debug or self.level == 4
 
         self.write(file=self.file, message='\n\n\n')
-        self.debug('Logger initializing ({})'.format(self))
+        self.debug('Logger initialized ({})'.format(self))
 
 
     def format(self, show_time=True, prefix=None, message=''):

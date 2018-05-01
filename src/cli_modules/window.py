@@ -2,6 +2,8 @@ import curses
 
 import config as cfg
 
+__all__ = ['StripWindow', 'SeparatorWindow', 'InputWindow', 'ScrollWindow']
+
 class Window(object):
     def __init__(self, dimensions, prefix=''):
 
@@ -51,11 +53,12 @@ class SeparatorWindow(StripWindow):
         self.set('-'*(curses.COLS-1))
 
 class InputWindow(StripWindow):
-    def __init__(self, y=-1, prefix=''):
+    def __init__(self, y=-1, prefix='', scrollwindow=None):
 
         cfg.cli_logger.debug('initializing InputWindow (prefix="{}")'.format(prefix))
         self.default_prompt = ' > '
         super(InputWindow, self).__init__(y=y, prefix=self.default_prompt)
+        self.scrollwindow = scrollwindow
         self.set_prompt()
 
     def set_prompt(self, prompt=None):
@@ -68,9 +71,6 @@ class InputWindow(StripWindow):
 
         self.refresh()
 
-    def bind_to_scrollwindow(self, scrollwindow):
-        self.sw = scrollwindow
-
     def listen(self, prompt='', visible=True, completions=None):
 
         cfg.cli_logger.debug('InputWindow listening')
@@ -78,7 +78,12 @@ class InputWindow(StripWindow):
 
         string = ''
         while True:
-            key = self.win.getkey()
+            try:
+                key = self.win.getkey()
+            except KeyboardInterrupt:
+                cfg.cli_logger.critical('InputWindow received KeyboardInterrupt')
+                cfg.app.quit()
+
             num = ord(key) if len(key)==1 else -1
             cfg.cli_logger.debug('InputWindow key "{}" ({})'.format(key, num))
 
@@ -93,9 +98,9 @@ class InputWindow(StripWindow):
                     string = string[:-1]
                 self.win.refresh()
             elif key == 'KEY_UP':
-                self.sw.scroll_up()
+                self.scrollwindow.scroll_up()
             elif key == 'KEY_DOWN':
-                self.sw.scroll_down()
+                self.scrollwindow.scroll_down()
             elif key == 'KEY_LEFT':
                 pass
             elif key == 'KEY_RIGHT':
