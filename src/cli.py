@@ -103,6 +103,10 @@ class Curses(CLI):
         cfg.cli_logger.debug('CLI setting the current win_banner')
         self.current_mode.win_banner.set(string)
 
+    def set_main(self, strings):
+        cfg.cli_logger.debug('CLI setting the current win_main')
+        self.current_mode.win_main.set(strings)
+
     def add_main(self, string):
         cfg.cli_logger.debug('CLI adding a line to the current win_main')
         self.current_mode.win_main.add(string)
@@ -192,7 +196,7 @@ class Basic(CLI):
         self.show('\nNo more input to parse, quitting CaTexT\n\n')
         return None
 
-    def input(self, prompt='', visible=True, completions=None):
+    def input(self, prompt=' > ', visible=True, completions=None):
         cfg.cli_logger.debug('CLI prompting the user for input')
         if visible:
             self.show(prompt, newline=False)

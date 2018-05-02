@@ -121,12 +121,7 @@ class ScrollWindow(Window):
         cfg.cli_logger.debug('initializing ScrollWindow')
         super(ScrollWindow, self).__init__((height, curses.COLS, y, 0))
 
-        # variable string array
-        self.all_strings = []
-        self.filtered_strings = []
-        self.string_filter_all = ['game', 'message', 'server', '<NONE>']
-        self.string_filter = self.string_filter_all
-        self.start_line = 0
+        self.reset_strings()
 
     def scroll_up(self):
         cfg.cli_logger.debug('ScrollWindow try scroll up')
@@ -155,7 +150,18 @@ class ScrollWindow(Window):
             self.win.clrtoeol()
         self.win.refresh()
 
+    def reset_strings(self):
+        # variable string array
+        self.all_strings = []
+        self.filtered_strings = []
+        self.string_filter_all = ['game', 'message', 'server', '<NONE>']
+        self.string_filter = self.string_filter_all
+        self.start_line = 0
+
     def set(self, strings, label='server'):
+
+        self.reset_strings()
+        
         for string in strings:
             string = ScrollString(string, len(self.all_strings), label)
             cfg.cli_logger.debug('ScrollWindow set string : "{}"'.format(string))

@@ -17,3 +17,5 @@ if [ ! -f $ENV ]; then
   echo "PORT=49160" >> $ENV
   echo "CLI_TYPE=curses" >> $ENV
 fi
+
+alias play="python src/app.py"

@@ -12,7 +12,7 @@ tmp
 
 # catext variables
 *.ct*
-.env*
+*.env*
 
 # logs
 logs

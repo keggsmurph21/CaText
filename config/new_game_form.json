@@ -1,0 +1,51 @@
+{
+  "strings" : {
+    "scenario" : {
+      "short"  : "s",
+      "default": "standard",
+      "options": null
+    },
+    "portStyle" : {
+      "short"  : "p",
+      "default": "fixed",
+      "options": [
+        "fixed",
+        "random"
+      ]
+    },
+    "tileStyle" : {
+      "short"  : "t",
+      "default": "random",
+      "options": [
+        "fixed",
+        "random"
+      ]
+    }
+  },
+  "ints" : {
+    "numHumans" : {
+      "short"  : "h",
+      "default": 2,
+      "min"    : 0,
+      "max"    : 5
+    },
+    "victoryPointsGoal" : {
+      "short"  : "v",
+      "default": 10,
+      "min"    : 8,
+      "max"    : 12
+    },
+    "numCPUs" : {
+      "short"  : "c",
+      "default": 0,
+      "min"    : 0,
+      "max"    : 0
+    }
+  },
+  "bools" : {
+    "isPublic" : {
+      "short"  : "P",
+      "default": "true"
+    }
+  }
+}

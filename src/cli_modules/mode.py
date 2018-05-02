@@ -51,7 +51,7 @@ class Mode(object):
 
         cfg.cli.set_banner(self.get_banner_text())
         cfg.cli.set_main(self.get_main_text(*args))
-        cfg.cli.set_status(self.get_status_text())
+        cfg.cli.set_status(self.get_status_text(*args))
 
         return self
 
@@ -132,6 +132,17 @@ class Lobby(Mode):
         count = self.print_game_list(title='AVAILABLE', games=split_games['bottom'], count=count, lines=lines)
 
         return lines
+
+    def get_status_text(self, args):
+
+        status = ''
+        if 'response' in args:
+            if args['response']['action'] == 'ERROR':
+                status = args['response']['message']
+            else:
+                status = args['response']['action']
+
+        return status
 
 class Play(Mode):
     pass

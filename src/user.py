@@ -1,6 +1,7 @@
 import os
 
 import config as cfg
+import shutil
 
 from env import Env
 
@@ -10,6 +11,9 @@ class User(object):
 
         cfg.app_logger.debug('bootstrapping new User')
 
+    def logout(self):
+        shutil.rmtree(self.path)
+        
     def set(self, data, token):
 
         # grab some data from the response
