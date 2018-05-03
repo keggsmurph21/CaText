@@ -86,7 +86,6 @@ class CaTexT(object):
         cfg.cli.change_mode('home')
 
     def logout(self):
-        self.current_user = None
         cfg.current_user.logout()
         cfg.env.set('CURRENT_USER','')
         cfg.cli.change_mode('home')

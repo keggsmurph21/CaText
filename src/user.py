@@ -13,7 +13,8 @@ class User(object):
 
     def logout(self):
         shutil.rmtree(self.path)
-        
+        cfg.current_user = None
+
     def set(self, data, token):
 
         # grab some data from the response

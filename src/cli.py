@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import curses
 import getpass
 import os
@@ -28,6 +26,7 @@ class CLI(object):
     def __init__(self):
         cfg.cli = self
 
+        self.is_piped = not sys.stdin.isatty()
         self.set_width()
 
         home_mode = Home('home')
@@ -148,10 +147,8 @@ class Basic(CLI):
 
     def flash_message(self, message):
         self.show('\n')
-        self.show('*------------------------------*')
-        self.show('|{:^30}|'.format(message))
-        self.show('*------------------------------*')
-        self.show('\n')
+        self.show(' //{}'.format('='*21))
+        self.show('//  {}'.format(message))
 
     def show(self, *args, newline=True):
         if len(args):
@@ -187,13 +184,19 @@ class Basic(CLI):
         cfg.cli_logger.debug('CLI setting current win_status')
         self.show(string)
 
-    def readline(self):
+    def readline(self, prompt, visible):
         try:
-            line = sys.stdin.readline()
+            if visible:
+                self.show(prompt, newline=False)
+                line = sys.stdin.readline()
+            else:
+                line = getpass.getpass(prompt)
             if line:
                 return line.strip('\n')
             else:
-                self.show('^EOF')
+                self.show('^D')
+        except EOFError:
+            self.show('^D')
         except KeyboardInterrupt:
             pass
 
@@ -201,15 +204,13 @@ class Basic(CLI):
 
     def input(self, prompt=' > ', visible=True, completions=None):
         cfg.cli_logger.debug('CLI prompting the user for input')
-        if visible:
-            self.show(prompt, newline=False)
-            line = self.readline()
-            if line is None:
-                cfg.app.quit()
-            else:
-                return line
+        line = self.readline(prompt, visible)
+        if line is None:
+            cfg.app.quit()
         else:
-            return getpass.getpass(prompt)
+            if self.is_piped and visible:
+                self.show(line)
+            return line
 
     def wait(self):
         cfg.cli_logger.debug('CLI waiting')

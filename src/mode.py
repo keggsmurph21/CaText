@@ -63,8 +63,8 @@ class Mode(object):
         if input is None:
             return '', None, None
 
-        cfg.app_logger.info('parsing string: "{}"'.format(string))
-        words = string.split(' ')
+        cfg.app_logger.info('parsing string: "{}"'.format(input))
+        words = input.split(' ')
         command = words[0]
         args = []
         kwargs = {}
@@ -211,6 +211,7 @@ class Lobby(Mode):
         return status
 
     def loop(self):
+
         while True:
 
             command, options, payload = self.parse_input()
@@ -242,9 +243,6 @@ class Lobby(Mode):
                 message = 'Unrecognized command: {}'.format(command)
                 cfg.app_logger.error(message)
                 cfg.cli.set_status(message)
-
-        #data = cfg.api.post_lobby(cfg.current_user.token, {'gameid':'5ae9cfbda992d5015715b046'})
-        #print('data',data)
 
 class Play(Mode):
     pass
