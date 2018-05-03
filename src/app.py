@@ -64,122 +64,32 @@ class CaTexT(object):
         with open(cfg.get_path('config','new_game_form.json')) as f:
             cfg.new_game_form = json.load(f)
 
-        # initialize current_user to None (need it for self.loop())
-        cfg.current_user = None
-
         cfg.app_logger.debug('... CaTexT initialized')
 
-        self.loop()
+        # initialize current_user to None (need it for self.loop())
+        self.login()
+
+    def lobby(self):
+        # go to the lobby
+        if cfg.current_user is None:
+            return self.login()
+
+        try:
+            cfg.app_logger.info('entering lobby')
+            data = cfg.api.get_lobby(cfg.current_user.token)
+            cfg.cli.change_mode('lobby', data)
+        except APIError as e:
+            raise e
+
+    def login(self):
+        cfg.current_user = None
+        cfg.cli.change_mode('home')
 
     def logout(self):
         self.current_user = None
         cfg.current_user.logout()
         cfg.env.set('CURRENT_USER','')
         cfg.cli.change_mode('home')
-
-    def loop(self):
-
-        while True:
-
-            # we need to be logged in to do anything
-            if cfg.current_user is None:
-
-                # try to get a user
-                cfg.current_user = self.select_user()
-                cfg.cli.set_status('Successfully logged in as {}'.format(cfg.current_user.name))
-                cfg.env.set('CURRENT_USER', cfg.current_user.name)
-                cfg.app_logger.info('current user: {}'.format(cfg.current_user.name))
-
-                # go to the lobby
-                cfg.app_logger.info('entering lobby')
-                data = cfg.api.get_lobby(cfg.current_user.token)
-                cfg.cli.change_mode('lobby', data)
-
-            command, options, payload = self.parse(cfg.cli.input())
-
-            if command == 'quit':
-                self.quit()
-            elif command == 'logout':
-                self.logout()
-            elif command == 'refresh':
-                try:
-                    data = cfg.api.get_lobby(cfg.current_user.token)
-                    cfg.cli.change_mode('lobby', data)
-                except APIError as e:
-                    raise e
-            elif command == 'new' or command == 'new_game':
-                for param_type in cfg.new_game_form:
-                    for param_name in cfg.new_game_form[param_type]:
-                        param = cfg.new_game_form[param_type][param_name]
-                        if param['short'] not in payload:
-                            payload[param_name] = param['default']
-                        else:
-                            payload[param_name] = payload[param['short']]
-
-                payload['action'] = 'new_game'
-                try:
-                    data = cfg.api.post_lobby(cfg.current_user.token, payload)
-                    cfg.cli.change_mode('lobby', data)
-                except APIError as e:
-                    raise e
-            else:
-                message = 'Unrecognized command: {}'.format(command)
-                cfg.app_logger.error(message)
-                cfg.cli.set_status(message)
-
-        #data = cfg.api.post_lobby(cfg.current_user.token, {'gameid':'5ae9cfbda992d5015715b046'})
-        #print('data',data)
-
-    def parse(self, string):
-
-        cfg.app_logger.info('parsing string: "{}"'.format(string))
-        words = string.split(' ')
-        command = words[0]
-        args = []
-        kwargs = {}
-
-        i = 1
-
-        while i < len(words):
-
-            word = words[i]
-            if word[0] == '-':
-                kwargs[word.strip('-')] = words[i+1]
-                i += 2
-            else:
-                args.append(word)
-                i += 1
-
-        cfg.app_logger.info('parsed string: {}, {}, {}'.format(command, args, kwargs))
-        return command, args, kwargs
-
-    def select_user(self):
-        '''
-        generates a list of available users to select from, or enables
-        the user to login thru the web endpoint
-
-        @return User() corresponding to the choice
-        '''
-
-        cfg.app_logger.debug('selecting user')
-        default_user = cfg.env.get('DEFAULT_USER')
-        cfg.app_logger.debug('default user: {}'.format(default_user))
-        user = self.get_user(default_user)
-
-        while user is None:
-
-            cfg.app_logger.debug('unable to log in with default user')
-            username = cfg.cli.input(' - username: ')
-            user = self.get_user(username)
-
-            cfg.app_logger.debug('username: "{}" ({})'.format(username, len(username)))
-            if user is None and len(username):
-                password = cfg.cli.input(' - password: ', visible=False)
-                cfg.app_logger.debug('attempting login (username={}, password={})'.format(username,'*'*len(password)))
-                cfg.cli.set_status('Querying CatOnline database ... ')
-                user = self.save_user(username, password)
-
-        return user
 
     def get_user(self, name):
         if name == None:
@@ -207,6 +117,7 @@ class CaTexT(object):
         print('args',self.args)
 
     def quit(self):
+        cfg.cli.set_status('Goodbye!')
         cfg.app_logger.info('CaTexT quitting')
         cfg.cli.quit()
         cfg.root_logger.info('goodbye')

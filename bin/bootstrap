@@ -1,14 +1,35 @@
 #!/bin/bash
 
+# colors
+GREEN="\033[1;32m"
+RESET="\033[0m"
+
+alias echo="echo -e"
+alias play="python src/app.py"
+
+# python virtual environment setup
+VENV=""
 if hash virtualenv 2>/dev/null; then
-  if [ ! -d virtualenv ]; then
-    virtualenv --no-site-packages virtualenv
+  VENV="catext-env"
+
+  if [ ! -d $VENV ]; then
+    virtualenv --no-site-packages $VENV
   fi
-  source ./virtualenv/bin/activate
+  . ./$VENV/bin/activate
+
+  # virtual environment use instructions
+  echo ""
+  echo "NOTE: Python virtual environment activated;"
+  echo "  to deactivate, type ${GREEN}$ deactivate${RESET}."
+  echo ""
+
 fi
 
-pip install -r requirements.txt
+# install required python packages
+# without "Requirement already satisfied warnings"
+pip install -r requirements.txt 1> >(grep -v 'Requirement already satisfied' 1>&2)
 
+# basic ENV file
 ENV=.env.ct
 if [ ! -f $ENV ]; then
   echo "API_TYPE=http" >> $ENV
@@ -17,5 +38,3 @@ if [ ! -f $ENV ]; then
   echo "PORT=49160" >> $ENV
   echo "CLI_TYPE=curses" >> $ENV
 fi
-
-alias play="python src/app.py"

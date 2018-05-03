@@ -55,6 +55,35 @@ class Mode(object):
 
         return self
 
+    def loop(self):         raise NotImplementedError
+
+    def parse_input(self):
+
+        input = cfg.cli.input()
+        if input is None:
+            return '', None, None
+
+        cfg.app_logger.info('parsing string: "{}"'.format(string))
+        words = string.split(' ')
+        command = words[0]
+        args = []
+        kwargs = {}
+
+        i = 1
+
+        while i < len(words):
+
+            word = words[i]
+            if word[0] == '-':
+                kwargs[word.strip('-')] = words[i+1]
+                i += 2
+            else:
+                args.append(word)
+                i += 1
+
+        cfg.app_logger.info('parsed string: {}, {}, {}'.format(command, args, kwargs))
+        return command, args, kwargs
+
 
 class Home(Mode):
     def get_main_text(self):
@@ -71,6 +100,43 @@ class Home(Mode):
 
     def get_status_text(self):
         return 'Log in with your CatOnline credentials'
+
+    def loop(self):
+        '''
+        TODO: change this docstring
+        generates a list of available users to select from, or enables
+        the user to login thru the web endpoint
+
+        @return User() corresponding to the choice
+        '''
+
+        user = cfg.current_user
+
+        if user is None:
+            cfg.app_logger.debug('selecting user')
+            default_user = cfg.env.get('DEFAULT_USER')
+            cfg.app_logger.debug('default user: {}'.format(default_user))
+            user = cfg.app.get_user(default_user)
+
+        while user is None:
+
+            cfg.app_logger.debug('unable to log in with default user')
+            username = cfg.cli.input(' - username: ')
+            user = cfg.app.get_user(username)
+
+            cfg.app_logger.debug('username: "{}" ({})'.format(username, len(username)))
+            if user is None and len(username):
+                password = cfg.cli.input(' - password: ', visible=False)
+                cfg.app_logger.debug('attempting login (username={}, password={})'.format(username,'*'*len(password)))
+                cfg.cli.set_status('Querying CatOnline database ... ')
+                user = cfg.app.save_user(username, password)
+
+        cfg.current_user = user
+        cfg.cli.set_status('Successfully logged in as {}'.format(cfg.current_user.name))
+        cfg.env.set('CURRENT_USER', cfg.current_user.name)
+        cfg.app_logger.info('current user: {}'.format(cfg.current_user.name))
+
+        cfg.app.lobby()
 
 class Lobby(Mode):
 
@@ -143,6 +209,42 @@ class Lobby(Mode):
                 status = args['response']['action']
 
         return status
+
+    def loop(self):
+        while True:
+
+            command, options, payload = self.parse_input()
+
+            if command == '':
+                continue
+            if command == 'quit':
+                cfg.app.quit()
+            elif command == 'logout':
+                cfg.app.logout()
+            elif command == 'refresh':
+                try:
+                    data = cfg.api.get_lobby(cfg.current_user.token)
+                    cfg.cli.change_mode('lobby', data)
+                except APIError as e:
+                    raise e
+            elif command == 'new' or command == 'new_game':
+                for param_type in cfg.new_game_form:
+                    for param_name in cfg.new_game_form[param_type]:
+                        param = cfg.new_game_form[param_type][param_name]
+                        if param['short'] not in payload:
+                            payload[param_name] = param['default']
+                        else:
+                            payload[param_name] = payload[param['short']]
+
+                payload['action'] = 'new_game'
+                cfg.app.lobby()
+            else:
+                message = 'Unrecognized command: {}'.format(command)
+                cfg.app_logger.error(message)
+                cfg.cli.set_status(message)
+
+        #data = cfg.api.post_lobby(cfg.current_user.token, {'gameid':'5ae9cfbda992d5015715b046'})
+        #print('data',data)
 
 class Play(Mode):
     pass

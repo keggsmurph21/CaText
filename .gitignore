@@ -21,4 +21,4 @@ logs
 .users
 
 # VM
-virtualenv
+catext-env

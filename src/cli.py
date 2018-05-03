@@ -10,8 +10,6 @@ from curses import wrapper
 
 import config as cfg
 
-cli_module_path = cfg.get_path('src','cli_modules')
-sys.path.append(cli_module_path)
 from mode import *
 from window import *
 
@@ -53,6 +51,9 @@ class CLI(object):
     def add_main(self):             raise NotImplementedError
     def set_status(self, string):   raise NotImplementedError
 
+    def loop(self):
+        self.current_mode.loop()
+
     def input(self):        raise NotImplementedError
     def wait(self):         raise NotImplementedError
     def quit(self):         raise NotImplementedError
@@ -71,9 +72,6 @@ class Curses(CLI):
         curses.noecho()
         curses.cbreak()
         self.init_windows()
-
-        # print the stuff from the Home mode
-        self.current_mode.set_as_current()
 
         cfg.cli_logger.debug('... Curses CLI initialized')
 
@@ -98,6 +96,8 @@ class Curses(CLI):
             self.current_mode.set_as_current(*args)
         else:
             self.current_mode = self.modes[mode].set_as_current(*args)
+
+        self.current_mode.loop()
 
     def set_banner(self, string):
         cfg.cli_logger.debug('CLI setting the current win_banner')
@@ -151,7 +151,7 @@ class Basic(CLI):
         self.show('*------------------------------*')
         self.show('|{:^30}|'.format(message))
         self.show('*------------------------------*')
-        self.show('\n\n\n')
+        self.show('\n')
 
     def show(self, *args, newline=True):
         if len(args):
@@ -173,6 +173,8 @@ class Basic(CLI):
                 self.modes[mode] = Play(mode)
         self.current_mode = self.modes[mode].set_as_current(*args)
 
+        self.current_mode.loop()
+
     def set_banner(self, string):
         cfg.cli_logger.debug('CLI setting the current win_banner')
         self.show(string)
@@ -190,10 +192,11 @@ class Basic(CLI):
             line = sys.stdin.readline()
             if line:
                 return line.strip('\n')
+            else:
+                self.show('^EOF')
         except KeyboardInterrupt:
             pass
 
-        self.show('\nNo more input to parse, quitting CaTexT\n\n')
         return None
 
     def input(self, prompt=' > ', visible=True, completions=None):
