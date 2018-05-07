@@ -1,6 +1,8 @@
 import json
 import os
 import requests
+import socket
+import sys
 
 import config as cfg
 
@@ -9,8 +11,8 @@ __all__ = ['choose_api', 'APIError', 'APIConnectionError', 'APIInvalidDataError'
 def choose_api(name):
     if name == 'http':
         return HTTP
-    elif name == 'socketio':
-        return SocketIO
+    elif name == 'udp':
+        return UDP
     else:
         raise APIError('Unknown interface ({})'.format(name))
 
@@ -18,17 +20,16 @@ def choose_api(name):
 class API(object):
     def __init__(self):     raise NotImplementedError
     def get_uri(self):      raise NotImplementedError
-    def post_login(self):   raise NotImplementedError
-    def get_lobby(self):    raise NotImplementedError
-    def post_lobby(self):   raise NotImplementedError
-    def get_play(self):     raise NotImplementedError
-    def post_play(self):    raise NotImplementedError
+    def login(self):        raise NotImplementedError
+    def signup(self):       raise NotImplementedError
+    def lobby(self):        raise NotImplementedError
+    def play(self):         raise NotImplementedError
 
 
 class HTTP(API):
     def __init__(self):
 
-        cfg.api_logger.debug('API initializing ...')
+        cfg.api_logger.debug('HTTP API initializing ...')
 
         protocol = cfg.env.get('PROTOCOL', 'http')
         host = cfg.env.get('HOST', 'localhost')
@@ -43,7 +44,7 @@ class HTTP(API):
         ''' get a URI for API endpoint '''
         return os.path.join(self.webroot, 'api', path)
 
-    def post_login(self, username, password):
+    def login(self, username, password):
         '''
         post to the $WEBROOT/api/login endpoint
         note: this function prompts the user for password
@@ -55,19 +56,7 @@ class HTTP(API):
         uri = self.get_uri('login')
         return self.post(uri, payload)
 
-    def get_lobby(self, token):
-        '''
-        query $WEBROOT/api/lobby endpoint
-
-        @return data
-        '''
-
-        # make sure we include our auth token
-        headers = { 'x-access-token':token }
-        uri = self.get_uri('lobby')
-        return self.get(uri, headers)
-
-    def post_lobby(self, token, payload):
+    def lobby(self, token, payload=None):
         '''
         post to the $WEBROOT/api/lobby endpoint
         note: this function prompts the user for password
@@ -78,13 +67,17 @@ class HTTP(API):
         # make sure we include our auth token
         headers = { 'x-access-token':token }
         uri = self.get_uri('lobby')
-        return self.post(uri, payload, headers)
 
-    def get_play(self):
-        pass
+        if payload is None:
+            return self.get(uri, headers)
+        else:
+            return self.post(uri, payload, headers)
 
-    def post_play(self, payload):
-        pass
+    def play(self, payload=None):
+        if payload is None:
+            self.get()
+        else:
+            self.post()
 
     def get(self, uri, headers={}):
         try:
@@ -123,8 +116,74 @@ class HTTP(API):
             raise APIConnectionError('Unable to connect to server at "{}"'.format(uri))
 
 
-class SocketIO(API):
-    pass
+class UDP(API):
+    def __init__(self):
+
+        cfg.api_logger.debug('UDP API initializing ...')
+
+        catonlinePath = cfg.env.get('CATONLINE_PATH')
+        socketPath = cfg.env.get('CATONLINE_UDP_SOCKET')
+        self.socketPath = os.path.join(catonlinePath, socketPath)
+        self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        try:
+            self.socket.connect(self.socketPath)
+        except socket.error as e:
+            raise APIConnectionError('Unable to connect to UDP socket at {}'.format(self.socketPath))
+
+    def receive(self):
+        BUFF_SIZE = 4096 # 4 KiB
+        data = b''
+        while True:
+            part = self.socket.recv(BUFF_SIZE)
+            data += part
+            if len(part) < BUFF_SIZE:
+                # either 0 or end of data
+                break
+        return data
+
+    def talk(self, message):
+
+        message = json.dumps(message)
+        message = message.encode()
+
+        try:
+            self.socket.sendall(message)
+            response = self.receive()
+            response = response.decode()
+            response = json.loads(response)
+            return response
+
+        except socket.error as e:
+            print(e)
+            sys.exit(1)
+
+    def get_uri(self, path):
+        raise NotImplementedError
+
+    def login(self, username, password):
+        payload = {
+            'location': 'login',
+            'body': {
+                'username': username,
+                'password': password
+            }
+        }
+        response = self.talk(payload)
+
+        return response
+
+    def lobby(self, token, payload=None):
+
+        payload = {'body':{}} if payload is None else {'body':payload}
+
+        payload['location'] = 'lobby'
+        payload['token'] = token
+        response = self.talk(payload)
+
+        return response
+
+    def play(self, payload=None):
+        raise NotImplementedError
 
 class APIError(Exception): pass
 class APIConnectionError(APIError): pass

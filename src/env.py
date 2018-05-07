@@ -16,6 +16,10 @@ class Env(object):
 	def get(self, key, default=None):
 		if key in self.variables:
 			return self.variables[key]
+		value = os.getenv(key)
+		if value is not None:
+			self.set(key, value)
+			return value
 		return default
 
 	def set(self, key, value):

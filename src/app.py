@@ -69,14 +69,14 @@ class CaTexT(object):
         # initialize current_user to None (need it for self.loop())
         self.login()
 
-    def lobby(self):
+    def lobby(self, payload=None):
         # go to the lobby
         if cfg.current_user is None:
             return self.login()
 
         try:
             cfg.app_logger.info('entering lobby')
-            data = cfg.api.get_lobby(cfg.current_user.token)
+            data = cfg.api.lobby(cfg.current_user.token, payload)
             cfg.cli.change_mode('lobby', data)
         except APIError as e:
             raise e
@@ -109,11 +109,11 @@ class CaTexT(object):
 
     def authenticate(self, username, password):
         ''' either use an authentication token or get a new one '''
-        response = cfg.api.post_login(username, password)
+        response = cfg.api.login(username, password)
         return response['user'], response['token']
 
     def parse_args(self):
-        print('args',self.args)
+        pass#print('args',self.args)
 
     def quit(self):
         cfg.cli.set_status('Goodbye!')

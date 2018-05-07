@@ -43,6 +43,7 @@ class CLI(object):
 
     def set_main(self, strings):
         cfg.cli_logger.debug('CLI adding lines to the current win_main')
+        self.add_main('')
         for string in strings:
             self.add_main(string)
 

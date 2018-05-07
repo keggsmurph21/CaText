@@ -2,6 +2,8 @@ import os
 
 import config as cfg
 
+from api import APIError
+
 __all__ = ['Home', 'Lobby', 'Play']
 
 class Mode(object):
@@ -224,7 +226,7 @@ class Lobby(Mode):
                 cfg.app.logout()
             elif command == 'refresh':
                 try:
-                    data = cfg.api.get_lobby(cfg.current_user.token)
+                    data = cfg.api.lobby(cfg.current_user.token)
                     cfg.cli.change_mode('lobby', data)
                 except APIError as e:
                     raise e
@@ -238,7 +240,7 @@ class Lobby(Mode):
                             payload[param_name] = payload[param['short']]
 
                 payload['action'] = 'new_game'
-                cfg.app.lobby()
+                cfg.app.lobby(payload)
             else:
                 message = 'Unrecognized command: {}'.format(command)
                 cfg.app_logger.error(message)
