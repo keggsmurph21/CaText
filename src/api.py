@@ -122,8 +122,9 @@ class UDP(API):
         cfg.api_logger.debug('UDP API initializing ...')
 
         catonlinePath = cfg.env.get('CATONLINE_PATH')
-        socketPath = cfg.env.get('CATONLINE_UDP_SOCKET')
-        self.socketPath = os.path.join(catonlinePath, socketPath)
+        socketPath = cfg.env.get('CATONLINE_UDP_PATH')
+        socketFile = cfg.env.get('CATONLINE_UDP_SOCKET')
+        self.socketPath = os.path.join(catonlinePath, socketPath, socketFile)
         self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
             self.socket.connect(self.socketPath)
